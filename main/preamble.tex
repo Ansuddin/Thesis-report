@@ -1,4 +1,4 @@
-\documentclass[a4paper,11pt,oneside,openany]{memoir}
+\documentclass[a4paper,10pt,oneside,openany]{memoir}
 
 % Aesthetics
 \chapterstyle{hangnum}
@@ -31,9 +31,11 @@
 \usepackage{subcaption}
 \usepackage{tabularx}
 \usepackage{color}
-\DisemulatePackage{setspace}
-\usepackage{setspace}
-	\onehalfspacing
+
+% Set margin 
+\setlrmarginsandblock{4.5cm}{4.5cm}{*}
+\setulmarginsandblock{4.5cm}{*}{1}
+\checkandfixthelayout 
 
 % To list code blocks in latex
 \usepackage{lstautogobble}
