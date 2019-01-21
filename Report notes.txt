@@ -1,0 +1,4 @@
+Analysis/Discussion: Each actor must be a final initialized instance. Each actor is initialized globally and then defined in a policy. What if we have hundreds of actors in a Hospital would each actor have to be initialized and defined? 
+Is it possible to define policies based on type?
+
+The above might be false!

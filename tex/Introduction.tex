@@ -1,16 +1,117 @@
-\section{Problem Formulation} 
-Matrix is an open standard protocol for messaging over HTTP and synchronizing data. Matrix provides secure real-time communication over a decentralized federated network. Matrix secures data by providing end-to-end encryption. However in the presence of end-to-end encryption, apps can still leak through their application logic; a content-filtering chat bot running at the receiving end of an end-to-end encrypted connection can leak anything it receives from this connection.
+\section{Data privacy and protection}
+
+With GDPR becoming effective in 2018 the focus on data privacy is at its peak. 
+Privacy violation is when sensitive data is exposed to unauthorized actors. OWASP top ten ranks \emph{Sensitive Data Exposure} as 3rd biggest security risk. Recent cases of data leakage has put more attention on data privacy and protection. Some cases are due to poor security measures and could arguably have been prevented. Examples of cases are:
+
+\begin{itemize}
+	\item The Facebook - Cambridge Analytica scandal. Third parties were able to collect data through Facebook Login API.
+	\item Google Plus leak. Third parties could access private data through APIs.
+	\item Medicaid leak. A medical assistant had accessed patients health records and exchanged mails with another employee containing the patients' private data.  
+\end{itemize}
+
+
+%https://www.nytimes.com/2018/10/08/technology/google-plus-security-disclosure.html
+%https://www.seattletimes.com/seattle-news/health/91000-state-medicaid-clients-warned-of-data-breach/
+
+The cases above failed to achieve end-to-end security and could have been prevented with proper security policies and enforcement technique that enforces these policies.
+
+There is more awareness on how applications deal with data. This add extra concern to the programmer and the application being developed on how sensitive data is handled and protected.  
+
+The well-known security enforcement techniques like access controls, firewalls and encryption are inadequate alone and does not ensure end-to-end security hence improperly handle sensitive data.
+
+
+
+
+%https://cwe.mitre.org/data/definitions/359.html
+
+
+%OWASP top ten A3 sensitive data exposure
+
+
+\section{Information Flow Control} % ikke teknisk. hvilke problemer løser ifc -> lave eksempeler med kode
+Information-flow security aims at protecting confidentiality and integrity of information.
+
+Information flow systems controls the flow of information by enforcing policies. 
+
+
+Common security enforcement mechanisms such as
+firewalls, encryption, and antivirus software are useful for protecting
+confidential information. However, these mechanisms
+do not provide end-to-end security.
+
+Access control permissions prevents processes not authorized by the file owner from reading the file. However, access control does not control how
+the data is used after it is read from the file.
+To soundly enforce confidentiality using this access-control policy, it is necessary to grant the file access privilege only to processes that will not improperly transmit or leak the confidential data.
+Access-control mechanisms cannot identify these processes; therefore, access control, while useful, cannot substitute for information-flow control.
+
+A firewall protects confidential information by preventing communication with the outside. A firewall permit some communication in both directions whether this communication violates confidentiality lies outside the scope of the firewall mechanism. 
+
+Encryption can be used to secure an information channel so that only the communicating endpoints have access to the information. However, this encryption provides no assurance that once the data is decrypted, the computation at the receiver respects the confidentiality of the transmitted data.
+\\
+\\
+What these mechanism lack is a way language-based way to control how information propagates. A mechanism for information flow control is one that enforces information flow policies. There have been proposed many methods to enforce information flow policies. Run-time mechanisms that tag data with information flow labels have been employed at the operating system level and at the programming language level. Static program analyses have also been developed that ensure information flows within programs are in accordance with policies. 
+
+
+
+\section{Matrix}\label{matrix:intro}
+Matrix is an open standard protocol for messaging over HTTP and synchronizing data. Matrix provides secure real-time communication over a decentralized federated network. Matrix secures data by providing end-to-end encryption. 
+
+Matrix defines their goal as to act as a generic HTTP messaging and data synchronisation system for the whole web - allowing people, services and devices to easily communicate with each other, empowering users to own and control their data and select the services and vendors they want to use.
+
+\subsection{Why Matrix?}
+Even though Matrix is intended for chat and instant messaging they define their longterm goal as "to act as a genering HTTP messaging and data synchronization for the whole web". 
+The large number of software systems in the public sector has created a need for a common way of exchanging data. The Dabish public sector is facing a similar issue as Matrix.org has tried to solve...
+
+
+\section{The case study} % Challenges 
+
+Medical privacy is a relevant topic 
+
+Health care records. 
+
+Issues with Sundhedsplatformen more specifically the patient journal. 90.000 medical employees have access to ones journal. In practice a Health care assistant can access the journal. There are clear policies on who should have access and under what conditions to view the journal. But the mechanism to ensure these policies are lacking. 
+
+
+%https://www.sundhed.dk/borger/service/om-sundheddk/om-portalen/datasikkerhed/andres-dataadgang/adgang-til-sundhedsdata/
+The following policies 
+\begin{enumerate}
+	\item The medical employee must have a employee certificate
+	\item The employee has to login to the journal system 
+	\item Logging in or accessing a journal triggers a log entry
+	\item The employee must have the patient in care 
+	\item The lookup most be relevant for the employee
+\end{enumerate}
+
+
+
+
+
+There currently is no limitation to what the employees can see. Safety measures have been applied through logging and monitoring, and by  but is inadequate.
+
+%https://cwe.mitre.org/data/definitions/359.html
+
+%https://www.version2.dk/artikel/e-journals-systemadministrator-vi-vaerner-patienternes-privatliv-1059692
+%Vi kan ikke garantere, at alle bliver opdaget, men borgerne kan se i 'Min log', hvem der har været inde og se på deres data. Derudover laves der en auditering, hvor ca. fire procent af alle opslag undersøges, og der verificeres, om der har været en behandlerrelation.
+%Loggen på sundhed.dk viser kun de tilgange til journalen der har været via netop sundhed.dk. Læger, apoteker m.m. har nemlig også en adgang til sundhed.dk hvor de kan slå folk op - og det bliver logget. Men loggen i sundhed.dk viser IKKE de opslag der sker i alle de andre systemer i sundhedsvæsenet, f.eks. patientjournal-systemerne. 
+%https://www.version2.dk/artikel/90000-ansatte-har-adgang-til-patientjournaler-stikproever-er-eneste-kontrol-58628
+
+
+The medical study example shows that it is possible to give
+another party private information and receive the results of its
+computation while remaining confident that the data given to
+it is not leaked.
+
+As mentioned earlier Matrix provide end-to-end encryption. However in the presence of end-to-end encryption, apps can still leak through their application logic; a content-filtering chat bot running at the receiving end of an end-to-end encrypted connection can leak anything it receives from this connection.
 \\
 \\
 Leaks through the application logic can be prevented with Information Flow Control (IFC). IFC prevents leaks by enforcing policies for secure information flow in a program. There exist tools (e.g JIF, Paragon and Fabric) that aid in building software with secure information flow. 
 
-\section{Method}
-The objective of the project is to do a case study on the security of Matrix, apply IFC tools to improve the Matrix security model and demonstrate the improvements.
+\subsection{Scope} %Selvom jeg ikke kiggr på fx trafic analysis så er det vigtigt at nævne og påpege det ikkeer noget jeg løser. Hvis det for teknisk så background eller method
+The objective of the project is to do a case study on the security of Matrix, apply IFC tools to improve the Matrix security model and demonstrate the improvements. 
+% The goal of the thesis is not to reimplement Matrix using IFC tools. It is to use Matrix and analyze the security model and see what security guarentees and how we can improve the system that uses Matrix. 
 \\
 \\
 A successful project is one that fulfills these criteria: 
-
-
 
 \begin{itemize}
 \item Evaluation of Matrix security model
@@ -20,30 +121,28 @@ A successful project is one that fulfills these criteria:
 \end{itemize}   
  
  
- Lorem ipsum dolor sit amet, affert maiorum cum at, te qui tamquam volumus philosophia. Has eu detracto deserunt. Mea agam idque comprehensam ne, quaeque insolens an nec. Denique accumsan eum in, qui ignota audire scripserit te, duo ludus eleifend id. Splendide inciderint ne vix.
+ \section{Threat model}
+ %adversary model
  
- At quis wisi has, pro soleat definiebas ut. Has ut agam deleniti iudicabit. Nibh intellegat ei est, sale virtute euripidis et est. Ad vocent molestie patrioque cum, vis ad erant viris efficiendi. Legere consequat an duo, an eam volutpat erroribus, vel dolore primis consectetuer ex. Te quo gloriatur persecuti consetetur.
+ *** Comment *** 
+ \\
+ *** Is it called adversary model / attacker model / threat model ***
+ \\
+ *** Not sure if this section is correct ***
+ \\
+ \\
+ The major threat is to confidentiality and integrity
+ Preservation of confidentiality and integrity of information is obtained with information-flow security. 
  
- Possim referrentur ne usu, in quo minim platonem pertinacia. Ad cum essent eirmod, sed velit commune atomorum te, et sit dicant dolorem. Eos elit principes patrioque ne. Dictas admodum qui te, et dicta summo erroribus vel. Qui doctus alterum intellegebat ex. Eam habeo sapientem no, everti expetendis ut pro, quaeque quaerendum no eos.
  
- Cum an populo scribentur. Quas dignissim intellegam duo cu, est malorum nostrum vituperata te, mei partem deterruisset at. Nostro partiendo an his, eu duo feugiat oportere. Stet vide periculis eos in, eam quis elit ullum ut. Vim erant honestatis eloquentiam id, vix ne vidit apeirian. No nam consulatu cotidieque, sea verterem salutandi facilisis eu, pro purto mucius semper ad. Eros quodsi animal vim ut.
+ The adversary has control of public input and output and is able to observe data over the network. It is assumed that the adversary has limited access to the system with restricted privileges and must not gain sensitive data.
  
- Velit nominavi definitiones usu ad. An nibh omnesque facilisi sit. Eu est purto oportere, vide nullam iudicabit te nam. Ne iudico laudem semper qui, eros iusto cu usu, ad summo suscipit facilisi quo. At duo mundi albucius. Saepe blandit salutandi qui in. Usu te conceptam abhorreant, usu tale aperiri argumentum no.
- Lorem ipsum dolor sit amet, affert maiorum cum at, te qui tamquam volumus philosophia. Has eu detracto deserunt. Mea agam idque comprehensam ne, quaeque insolens an nec. Denique accumsan eum in, qui ignota audire scripserit te, duo ludus eleifend id. Splendide inciderint ne vix.
+ %Minimizes the risk of human error and inside job
  
- At quis wisi has, pro soleat definiebas ut. Has ut agam deleniti iudicabit. Nibh intellegat ei est, sale virtute euripidis et est. Ad vocent molestie patrioque cum, vis ad erant viris efficiendi. Legere consequat an duo, an eam volutpat erroribus, vel dolore primis consectetuer ex. Te quo gloriatur persecuti consetetur.
  
- Possim referrentur ne usu, in quo minim platonem pertinacia. Ad cum essent eirmod, sed velit commune atomorum te, et sit dicant dolorem. Eos elit principes patrioque ne. Dictas admodum qui te, et dicta summo erroribus vel. Qui doctus alterum intellegebat ex. Eam habeo sapientem no, everti expetendis ut pro, quaeque quaerendum no eos.
+\section{Contribution} %end-to-end security
  
- Cum an populo scribentur. Quas dignissim intellegam duo cu, est malorum nostrum vituperata te, mei partem deterruisset at. Nostro partiendo an his, eu duo feugiat oportere. Stet vide periculis eos in, eam quis elit ullum ut. Vim erant honestatis eloquentiam id, vix ne vidit apeirian. No nam consulatu cotidieque, sea verterem salutandi facilisis eu, pro purto mucius semper ad. Eros quodsi animal vim ut.
+\section{Structure of thesis} % her kan nævnes den antagelse gøres 
+
+Chapter \ref{intro} sets the foundation for the thesis and introduces relevant information and background. In chapter \ref{method} the method used in the thesis is elaborated on. Chapters \ref{analysis} and \ref{design} goes in depth with the analysis and design of the solution. The results are then presented and discussed in \ref{results}. The thesis is wrapped up in the conclusion section. 
  
- Velit nominavi definitiones usu ad. An nibh omnesque facilisi sit. Eu est purto oportere, vide nullam iudicabit te nam. Ne iudico laudem semper qui, eros iusto cu usu, ad summo suscipit facilisi quo. At duo mundi albucius. Saepe blandit salutandi qui in. Usu te conceptam abhorreant, usu tale aperiri argumentum no.
- Lorem ipsum dolor sit amet, affert maiorum cum at, te qui tamquam volumus philosophia. Has eu detracto deserunt. Mea agam idque comprehensam ne, quaeque insolens an nec. Denique accumsan eum in, qui ignota audire scripserit te, duo ludus eleifend id. Splendide inciderint ne vix.
- 
- At quis wisi has, pro soleat definiebas ut. Has ut agam deleniti iudicabit. Nibh intellegat ei est, sale virtute euripidis et est. Ad vocent molestie patrioque cum, vis ad erant viris efficiendi. Legere consequat an duo, an eam volutpat erroribus, vel dolore primis consectetuer ex. Te quo gloriatur persecuti consetetur.
- 
- Possim referrentur ne usu, in quo minim platonem pertinacia. Ad cum essent eirmod, sed velit commune atomorum te, et sit dicant dolorem. Eos elit principes patrioque ne. Dictas admodum qui te, et dicta summo erroribus vel. Qui doctus alterum intellegebat ex. Eam habeo sapientem no, everti expetendis ut pro, quaeque quaerendum no eos.
- 
- Cum an populo scribentur. Quas dignissim intellegam duo cu, est malorum nostrum vituperata te, mei partem deterruisset at. Nostro partiendo an his, eu duo feugiat oportere. Stet vide periculis eos in, eam quis elit ullum ut. Vim erant honestatis eloquentiam id, vix ne vidit apeirian. No nam consulatu cotidieque, sea verterem salutandi facilisis eu, pro purto mucius semper ad. Eros quodsi animal vim ut.
- 
- Velit nominavi definitiones usu ad. An nibh omnesque facilisi sit. Eu est purto oportere, vide nullam iudicabit te nam. Ne iudico laudem semper qui, eros iusto cu usu, ad summo suscipit facilisi quo. At duo mundi albucius. Saepe blandit salutandi qui in. Usu te conceptam abhorreant, usu tale aperiri argumentum no.
