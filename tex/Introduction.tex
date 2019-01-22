@@ -59,22 +59,27 @@ The fragmentation of IP communication is the problem Matrix essentially wants to
 
 
 \section{The case study} % Challenges 
-The goal of the case study is to make secure implementation using Information-Flow Control. The case study will use Matrix as the communication channel and strengthen the security at the endpoints using IFC.
 
-\subsection{The prototype}
-Medical privacy is a well-known issue. Sensitive data about patients needs to be handle carefully. In the Danish public sector there exist several software solution that aids the medical staff in hospitals.
+The goal of the case study is to make secure implementation of a prototype using Information-Flow Control. The case study will use Matrix as the communication channel and strengthen the security at the endpoints using IFC.
 
-Patients have access to their medical records through E-journal. A patient journal on E-journal is available to 90.000 different medical employees. In practice a Health care assistant can access the journal and read sensitive information about a unrelated treatment. 
+\subsection{Journal system}
+The prototype implements a journal system and is loosely based on the Danish E-journal system.
 
-There are clear policies on who should have access and under what conditions to view the journal. It is legally required that an employee accessing the journal must have the patient in care and that the lookup must be relevant for the employee. However there currently is no limitation to what the employees can see. Safety measures have been applied through logging and monitoring. Sampling is used to find irregularities on the access to information.
+%https://journalofethics.ama-assn.org/article/electronic-health-records-privacy-confidentiality-and-security/2012-09
+Medical privacy is a well-known issue. Sensitive data about patients needs to be handled carefully. Patients have access to their medical records through E-journal. A patient's journal on E-journal is available to 90.000 different medical employees. 
 
+There are clear policies about who and under what conditions should access a journal. It is legally required that an employee accessing the journal must have the patient in care and that the lookup must be relevant for the employee. Safety measures have been applied through logging and audit trails with random sampling checks however they do not prevent access to journals. Any medical employee can access the patient journal and even if prevention mechanism were established there would be no limitation to what a medical employee could see once access was granted. 
+
+%Example of a being referred to a physician. A physician can access the patient journal but can see full history of the patient sessions. If the patient had psychiatric treatment it would be of no relevance to that medical employee. 
 
 %https://www.sundhed.dk/borger/service/om-sundheddk/om-portalen/datasikkerhed/andres-dataadgang/adgang-til-sundhedsdata/
 
-The mechanism for ensuring where information can flow is lacking in the current patient journal system. Secure flow information can be ensured by enforcing policies using IFC. 
+The mechanisms in the current journal system might restrain malicious intend. However it does not guarantee prevention of unintentional access or disclosure of information. What is missing is the enforcement of secure information flow policies. Unintentional access or disclosure of information can be prevented by enforcing policies that define secure information flow.
 
-The prototype will model the simple scenario of multuple hospitals with different actors accessing a patient journal. based on the patient journal system. 
+The prototype will model the scenario of hospitals with different actors accessing a patient journal. The bulk of information on the journal system is extracted from newspaper articles hence there is a high uncertainty of how the system really works. Therefore many assumptions are made and the scenario is simplified when programming the prototype.
 
+
+%https://journalofethics.ama-assn.org/article/electronic-health-records-privacy-confidentiality-and-security/2012-09
 
 
 %https://cwe.mitre.org/data/definitions/359.html
