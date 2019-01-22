@@ -1,14 +1,14 @@
 \section{Data privacy and protection}
 
 With GDPR becoming effective in 2018 the focus on data privacy is at its peak. 
-Privacy violation is when sensitive data is exposed to unauthorized actors. OWASP top ten ranks \emph{sensitive data exposure} as 3rd biggest security threat. 
+Privacy violation is when sensitive data is exposed to unauthorized actors\cite{cwe}. OWASP top ten ranks \emph{sensitive data exposure} as 3rd biggest security threat\cite{owasp}. 
 
 Recent cases of data leakage has put more attention on data privacy and protection. Some cases are due to poor security measures and could arguably have been prevented. Examples of cases are:
 
 \begin{itemize}
 	\item The infamous Facebook - Cambridge Analytica scandal. Third parties were able to collect data through Facebook Login API.
-	\item Google Plus leak. 500.000 users private data was exposed to third parties through APIs.
-	\item Medicaid leak. A medical assistant had accessed patients' health records and exchanged mails with another employee containing the patients' private data.  
+	\item Google Plus leak. 500.000 users private data was exposed to third parties through APIs\cite{googleplus}.
+	\item Medicaid leak. A medical assistant had accessed patients' health records and exchanged mails with another employee containing the patients' private data\cite{medicaid}.  
 \end{itemize}
 
 
@@ -17,9 +17,9 @@ Recent cases of data leakage has put more attention on data privacy and protecti
 
 The cases above failed to achieve end-to-end security and the improper handling of sensitive data could have been prevented with appropriate security policies and enforcement technique that enforces these policies.
 
-There is more awareness on how applications deal with data. This add extra concern to the programmer and the application being developed on how sensitive data is handled and protected.  
+There is more awareness on how applications deal with data. This add extra concern to the programmer and the application about how sensitive data is handled and protected.  
 
-The well-known security enforcement techniques like access controls, firewalls and encryption are inadequate alone and does not ensure end-to-end security.
+The well-known security enforcement techniques like access controls, firewalls and encryption are inadequate alone and does not ensure end-to-end security\cite{Sabelfeld2003}.
 
 
 
@@ -40,7 +40,7 @@ There exist useful security enforcement mechanisms for protecting confidential i
 	\item \emph{Encryption} secures information on a channel with only the endpoints being able to access that information. However there is no assurance that once the data is decrypted that the confidentiality of that information is ensured.
 \end{itemize}
 
-The mechanisms mentioned above all have in common that they lack control of how the information flows. Information-flow security aims at protecting confidentiality and integrity of information by enforcing security policies. Information-Flow Control allows the programmer to define and enforce policies in a language-based way. 
+The mechanisms mentioned above all have in common that they lack control of how the information flows. Information-flow security aims at protecting confidentiality and integrity of information by enforcing security policies. Information-Flow Control allows the programmer to define and enforce policies in a language-based way\cite{Sabelfeld2003}. 
 
 
 
@@ -49,7 +49,7 @@ Matrix is an open standard protocol for messaging over HTTP and synchronizing da
 
 Matrix cover use cases such as instant messaging, VoIP, Internet of Things communication and is generally applicable anywhere for subscribing and publishing data over standard HTTP API.
  
-The fragmentation of IP communication is the problem Matrix essentially wants to solve. Making calls and messages between users needless of which app they use. However they define their longer term goal as \emph{"to act as a generic HTTP messaging and data synchronisation protocol for the whole web"}.
+The fragmentation of IP communication is the problem Matrix essentially wants to solve. Making calls and messages between users needless of which app they use. However they define their longer term goal as \emph{"to act as a generic HTTP messaging and data synchronisation protocol for the whole web"}\cite{matrixfaq}.
 
 
 
@@ -66,17 +66,18 @@ The goal of the case study is to make secure implementation of a prototype using
 The prototype implements a journal system and is loosely based on the Danish E-journal system.
 
 %https://journalofethics.ama-assn.org/article/electronic-health-records-privacy-confidentiality-and-security/2012-09
-Medical privacy is a well-known issue. Sensitive data about patients needs to be handled carefully. Patients have access to their medical records through E-journal. A patient's journal on E-journal is available to 90.000 different medical employees. 
+Medical privacy is a well-known issue\cite{Rahim2013}. Sensitive data about patients needs to be handled carefully. In Denmark patients have access to their medical records through E-journal\cite{ejournal}. A patient's journal on E-journal is available for up to 90.000 different medical employees\cite{JP90000}. 
 
-There are clear policies about who and under what conditions should access a journal. It is legally required that an employee accessing the journal must have the patient in care and that the lookup must be relevant for the employee. Safety measures have been applied through logging and audit trails with random sampling checks however they do not prevent access to journals. Any medical employee can access the patient journal and even if prevention mechanism were established there would be no limitation to what a medical employee could see once access was granted. 
+There are clear policies about who and under what conditions should access a journal. It is legally required that an employee accessing the journal must have the patient in care and that the lookup must be relevant for the employee. Safety measures have been applied through logging and audit trails with random sampling checks however they do not prevent access to journals. Any medical employee can access the patient journal and even if prevention mechanism were established there would be no limitation to what a medical employee could see once access was granted \cite{adgang}\cite{kontrol}. 
 
 %Example of a being referred to a physician. A physician can access the patient journal but can see full history of the patient sessions. If the patient had psychiatric treatment it would be of no relevance to that medical employee. 
 
 %https://www.sundhed.dk/borger/service/om-sundheddk/om-portalen/datasikkerhed/andres-dataadgang/adgang-til-sundhedsdata/
 
-The mechanisms in the current journal system might restrain malicious intend. However it does not guarantee prevention of unintentional access or disclosure of information. What is missing is the enforcement of secure information flow policies. Unintentional access or disclosure of information can be prevented by enforcing policies that define secure information flow.
+The mechanisms in the current journal system might restrain malicious intend. However it does not guarantee prevention of unintentional access or disclosure of information\cite{Harman2012}. 
+What is missing is the enforcement of secure information flow policies. Unintentional access or disclosure of information can be prevented by enforcing policies that define secure information flow.
 
-The prototype will model the scenario of hospitals with different actors accessing a patient journal. The bulk of information on the journal system is extracted from newspaper articles hence there is a high uncertainty of how the system really works. Therefore many assumptions are made and the scenario is simplified when programming the prototype.
+The prototype will model a simplified scenario of hospitals with different actors accessing a patient journal. The bulk of information on the journal system is extracted from newspaper articles hence there is a high uncertainty of how the system really works. Therefore many assumptions are made about the current system when programming the prototype.
 
 
 %https://journalofethics.ama-assn.org/article/electronic-health-records-privacy-confidentiality-and-security/2012-09
@@ -88,6 +89,8 @@ The prototype will model the scenario of hospitals with different actors accessi
 %Vi kan ikke garantere, at alle bliver opdaget, men borgerne kan se i 'Min log', hvem der har været inde og se på deres data. Derudover laves der en auditering, hvor ca. fire procent af alle opslag undersøges, og der verificeres, om der har været en behandlerrelation.
 %Loggen på sundhed.dk viser kun de tilgange til journalen der har været via netop sundhed.dk. Læger, apoteker m.m. har nemlig også en adgang til sundhed.dk hvor de kan slå folk op - og det bliver logget. Men loggen i sundhed.dk viser IKKE de opslag der sker i alle de andre systemer i sundhedsvæsenet, f.eks. patientjournal-systemerne. 
 %https://www.version2.dk/artikel/90000-ansatte-har-adgang-til-patientjournaler-stikproever-er-eneste-kontrol-58628
+%https://jyllands-posten.dk/indland/ECE6715461/op-imod-90000-ansatte-kan-kigge-i-din-journal/
+%https://www.dr.dk/nyheder/regionale/sjaelland/it-systemer-snakker-ikke-godt-nok-sammen-risikerer-gaa-ud-over
 
 \subsection{Scope} 
 %Selvom jeg ikke kiggr på fx trafic analysis så er det vigtigt at nævne og påpege det ikkeer noget jeg løser.
@@ -108,7 +111,7 @@ A successful project is one that fulfills these criteria:
 
 
 \subsection{Why Matrix?}
-In the Digital Strategy 2016-2020 the Danish Agency of Digitisation defines initiative 7.2 as "Common standards for secure exchange of information". The large number of software systems in the Danish public sector has created a need for an uniform way of exchanging data across different application in a secure manner. 
+In the Digital Strategy 2016-2020 the Danish Agency of Digitisation defines initiative 7.2 as "Common standards for secure exchange of information". The large number of software systems in the Danish public sector has created a need for an uniform way of exchanging data across different application in a secure manner\cite{TheGovernment2016}. 
 
 The initiative has similarities to the issue Matrix is trying to solve with fragmented IP communication. With Matrix security guarantees and their long term goal as a generic HTTP messaging protocol there is a strong case for using Matrix as a communication channel in this case study.
 
