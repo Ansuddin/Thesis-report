@@ -1,3 +1,20 @@
+This chapter consists of two parts. The first part will provide an evaluation of the Matrix security model and relies heavily on the paper \emph{A Formal Security Analysis of the Signal Messaging Protocol}. 
+  and a preliminary analysis of the IFC tools and the selected tool. 
+
+
+\section{Evaluation of Matrix security model}
+
+Matrix provides end-to-end encryption by using the Olm library which is an implementation of the Double Ratchet algorithm known from Signal Protocol. As mentioned in xx Matrix uses the Megolm library for group chat which is layered on top of the Olm library. This evaluation will primarily focus on the Double Ratchet algorithm. 
+
+By evaluating the Signal Protocol we can derive the same evaluation for Matrix as well.  
+
+
+
+% Tools issue: java sdk for matrix is beta and not fully implemented. 
+% Best supported sdk is for javascript or python. Problem of running javascript code or python code with Paragon (java)
+% Maybe better to use JSFlow instead 
+
+
 \section{Survey of IFC Tools}
 
 \subsection{JIF}
@@ -13,12 +30,11 @@ Swift, SIF, FlowR, JFlow, LIO
 
 
 \subsection{Selection of IFC tool}
+The selection of the IFC tool used for developing the prototype is based the following defined parameters.
 The selection of IFC tool put emphasis on the practical usage in combination with Matrix. 
 
-\section{Evaluation of Matrix security model}
+\subsection{Paragon analysis}
 
 
-
-% Tools issue: java sdk for matrix is beta and not fully implemented. 
-% Best supported sdk is for javascript or python. Problem of running javascript code or python code with Paragon (java)
-% Maybe better to use JSFlow instead 
+\section{Summary}
+In this chapter the Matrix security model has been evaluated. Matrix provides end-to-end security and uses the Double Ratchet algorithm by Signal. The evaluation found that there are no major flaws in the design. To achieve end-to-end security the endpoints need to be secured as well \cite{Sabelfeld2003} this leads us to the chapter's second part. The chapter analyzed information-flow control tools and justifies the selection of Paragon which the prototype is programmed in. 
