@@ -1,13 +1,42 @@
-This chapter consists of two parts. The first part will provide an evaluation of the Matrix security model and relies heavily on the paper \emph{A Formal Security Analysis of the Signal Messaging Protocol}. 
-  and a preliminary analysis of the IFC tools and the selected tool. 
+This chapter consists of two parts. The first part will provide an evaluation of the Matrix security model and relies heavily on the paper \emph{A Formal Security Analysis of the Signal Messaging Protocol} and the security assessment of Matrix. The second part provides a preliminary analysis of the IFC tools and further analysis of the selected tool Paragon and the rational behind selecting it.
 
 
 \section{Evaluation of Matrix security model}
 
-Matrix provides end-to-end encryption by using the Olm library which is an implementation of the Double Ratchet algorithm known from Signal Protocol. As mentioned in xx Matrix uses the Megolm library for group chat which is layered on top of the Olm library. This evaluation will primarily focus on the Double Ratchet algorithm. 
+Matrix provides end-to-end encryption by using the Olm library which is an implementation of the Double Ratchet algorithm known from Signal Protocol. As mentioned in xx Matrix uses the Megolm library for group chat. This evaluation will primarily focus on the cryptographic protocol.
+%As mentioned in xx Matrix uses the Megolm library for group chat. which is layered on top of the Olm library.
 
-By evaluating the Signal Protocol we can derive the same evaluation for Matrix as well.  
+By evaluating Signal's cryptographic protocol we can derive the same evaluation for Matrix as well.  
 
+
+\subsection{Signal protocol}
+
+\subsubsection{Overview of the Double Ratchet algorithm}
+
+\paragraph{Symmetric ratchet}
+
+\paragraph{Deffie-Hellman ratchet}
+
+\paragraph{Double ratchet}
+
+
+\subsubsection{Threat model}
+
+\subsubsection{Security model and analysis}
+
+\subsubsection{Application variants}
+
+The Olm library used by Matrix is a variant of the Double Ratchet algorithm. The custom variants invites important changes in need to be analyzed independently. WhatsApp variant of the protocol has a retransmission mechanism which is vulnerable. 
+% if Bob appears to change his identity key, clients will resend messages encrypted under the new value.Hence, an adversary with control over identity registration can disconnect Bob and replace his key, and Alice will re-send the message to the adversary.  
+The further analysis relies upon the the security assessment on Matrix. 
+
+
+\subsection{Matrix protocol}
+
+\subsubsection{Olm}
+Vulnerabilities found in the security assessment. 
+
+\subsubsection{Megolm}
 
 
 % Tools issue: java sdk for matrix is beta and not fully implemented. 
@@ -18,8 +47,6 @@ By evaluating the Signal Protocol we can derive the same evaluation for Matrix a
 \section{Survey of IFC Tools}
 
 \subsection{JIF}
-
-\subsection{Fabric}
 
 \subsection{Paragon}
 
