@@ -1,150 +1,163 @@
-This chapter consists of two parts. The first part will provide an evaluation of the Matrix security model and relies heavily on the paper \emph{A Formal Security Analysis of the Signal Messaging Protocol} \cite{Signal} and \emph{The Olm Cryptographic Review} by NCC Group \cite{ncc}. The second part provides a preliminary analysis of the IFC tools, the selection of Paragon and the rationale behind it, and a further analysis of the selected tool Paragon.
+This chapter consists of two parts. The first part will provide an evaluation of the Matrix security model and relies on the paper \emph{SoK: Secure Messaging} \cite{sok} and \emph{The Olm Cryptographic Review} by NCC Group \cite{ncc}. 
+
+The second part provides a preliminary analysis of the IFC tools, the selection of Paragon and the rationale behind it, and a further analysis of the selected tool Paragon.
 
 
 \section{Evaluation of Matrix security model}
+The security of matrix will be evaluated in the context of secure messaging. An evaluation framework has been proposed in the paper \emph{SoK: Secure messaging} which the evaluation will be loosely based on. 
 
-Matrix provides end-to-end encryption by using the Olm and Megolm library with the former being an implementation of the Double Ratchet algorithm known from Signal Protocol, and the latter being the algorithm used for group chat. 
-%As mentioned in xx Matrix uses the Megolm library for group chat. which is layered on top of the Olm library.
+The evaluation framework covers several areas with \emph{conversation security} being the most relevant for this evaluation. The area \emph{conversation security} describes three categories; \emph{Security and Privacy}, \emph{Adoption}, and \emph{Group Chat}. Obviously the most relevant category for the evaluation is \emph{Security and Privacy}
+\\
+\\
+Matrix provides end-to-end encryption by using the Olm and Megolm library with the former being an implementation of the Double Ratchet algorithm also known as the Signal Protocol, and the latter being the algorithm used for group chat. 
 
-The evaluation will focus on the cryptographic protocols used by Matrix. By evaluating Signal's cryptographic protocol we can derive the same evaluation for the Olm library. The evaluation is extended by examining the the cryptographic review of Olm and Megolm by NCC Group. 
+Olm is used for securely exchanging message keys/session keys during group chat and is vital part of the end-to-end encryption in Matrix.
 
-\subsection{Overview of the Double Ratchet algorithm}
+Before the Matrix protocol is evaluated the Signal Protocol will be considered. 
 
-Before the Double Ratchet algorithm can 
+%\subsection{Threat model} Describe the threat model in SoK
 
-\subsubsection{Triple Deffie-Hellman}
+\subsection{Signal Protocol}
+Olm is an implementation of the Signal Protocol. The Signal Protocol is a messaging protocol with end-to-end encryption between two devices. 
 
-\begin{figure}[H]
-	\centering
-	\includegraphics{figures/tripledh.png}
-	\caption{Diffie-Hellman between keys \cite{tripledh}.}
-	\label{fig:tripledh}
-\end{figure}
+Section xx provides a list of security properties relevant for \emph{conversation security}. These security properties is used for evaluating a secure messaging protocol such as the Signal Protocol.
+%Any messaging application that provides end-to-end encryption is likely an implementation of  the protocol 
 
-\subsubsection{KDF chain}
-
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=10cm]{figures/kdfchain.png}
-	\caption{Processing of three inputs and the resulting outputs in KDF chain \cite{doubleratchet}.}
-	\label{fig:kdfchain}
-\end{figure}
-
-\subsubsection{Symmetric ratchet}
+The table below shows an evaluation of the Signal Protocol (previously known as TextSecure) \cite{sok}. 
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=10cm]{figures/symmetrickeyratchet.png}
-	\caption{Symmetric key ratchet \cite{doubleratchet}.}
-	\label{fig:symkeyratchet}
+	\includegraphics[width=12cm]{figures/framework_signal.png}
+	\caption{Evaluation of Signal (TextSecure) \cite{sok}.}
+	\label{fig:framework_signal}
 \end{figure}
 
-\subsubsection{Deffie-Hellman ratchet}
 
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=10cm]{figures/dhratchet1.png}
-	\caption{Diffie-Hellman ratchet 1 \cite{doubleratchet}.}
-	\label{fig:dhratchet1}
-\end{figure}
+%Explain how they provide the properties or why they don't
 
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=10cm]{figures/dhratchet2.png}
-	\caption{Diffie-Hellman ratchet 2 \cite{doubleratchet}.}
-	\label{fig:dhratchet2}
-\end{figure}
 
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=10cm]{figures/dhratchet3.png}
-	\caption{Diffie-Hellman ratchet 3 \cite{doubleratchet}.}
-	\label{fig:dhratchet3}
-\end{figure}
+\subparagraph{Confidentiality} When a message is sent using the Signal Protocol then only the intended recipient can read the message.  
 
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=10cm]{figures/dhratchet4.png}
-	\caption{Diffie-Hellman ratchet 4 \cite{doubleratchet}.}
-	\label{fig:dhratchet4}
-\end{figure}
+\subparagraph{Integrity}
 
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=10cm]{figures/dhratchet5.png}
-	\caption{Diffie-Hellman ratchet 5 \cite{doubleratchet}.}
-	\label{fig:dhratchet5}
-\end{figure}
+\subparagraph{Authentication}
 
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=10cm]{figures/dhratchet6.png}
-	\caption{Diffie-Hellman ratchet 6 \cite{doubleratchet}.}
-	\label{fig:dhratchet6}
-\end{figure}
+\subparagraph{Forward secrecy}
 
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=10cm]{figures/dhratchet7.png}
-	\caption{Diffie-Hellman ratchet 7 \cite{doubleratchet}.}
-	\label{fig:dhratchet7}
-\end{figure}
+\subparagraph{Backward secrecy}
 
-\subsubsection{Double ratchet}
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=10cm]{figures/doubleratchet1.png}
-	\caption{Double ratchet 1 \cite{doubleratchet}.}
-	\label{fig:doubleratchet1}
-\end{figure}
+\subparagraph{Deniability properties}
 
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=10cm]{figures/doubleratchet2.png}
-	\caption{Double ratchet 2 \cite{doubleratchet}.}
-	\label{fig:doubleratchet2}
-\end{figure}
+\subparagraph{Speaker consistency}
+This property is partially provided through the key evolution of the ratchets. A ratchet will keep evolving and the produced sender ratchets session key will correspond to the received ratchets session key. If a message is 
 
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=10cm]{figures/doubleratchet3.png}
-	\caption{Double ratchet 3 \cite{doubleratchet}.}
-	\label{fig:doubleratchet3}
-\end{figure}
 
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=10cm]{figures/doubleratchet4.png}
-	\caption{Double ratchet 4 \cite{doubleratchet}.}
-	\label{fig:doubleratchet4}
-\end{figure}
+\subparagraph{Anonymity preserving}
+3-DH also provides
+participant consistency without the need to explicitly exchange
+identities after a secure channel has been established. Unfortunately,
+this also causes a partial loss of anonymity preservation
+since long-term public keys are always observable during
+the initial key agreement
+\\
+\\
+The evaluation shows that several security properties are provided with the important ones being confidentiality, integrity, authentication, forward secrecy, backward secrecy. 
 
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=10cm]{figures/doubleratchet5.png}
-	\caption{Double ratchet 5 \cite{doubleratchet}.}
-	\label{fig:doubleratchet5}
-\end{figure}
+Furthermore a formal analysis have been made on the Signal Protocol that proves the protocol is free from any major flaws and it satisfy standard security properties such as; confidentiality, authentication and secrecy \cite{Signal}. 
 
-\subsection{Security model and analysis}
+%The next section provides a brief summary of the analysis.
 
-\subsubsection{Threat model}
+%\newpage
+%
+%\subsubsection{Summary of the security analysis of Signal Protocol}
+%\emph{**NOTE: Is this section even relevant to have in the report? **}
+%
+%
+%As described earlier in section xx the Signal Protocol consists of three stages.
+%
+%\begin{itemize}
+%	\item Initial stage (Triple-DH). For establishing a shared secret. 
+%	\item Deffie-Hellman ratchet. For generating session key. 
+%	\item Symmetric ratchet. For generating message key.
+%\end{itemize}
+%
+%
+%
+%\paragraph{Threat model}
+%The threat model defined in the analysis assumes that the adversary have full control over the network.
+%
+%The adversary can observe traffic over the network and can drop and send messages.
+%
+%For an adversary to break security he must be able to
+%
+%For an adversary to break security he must obtain 
+%
+%In assymmetric messaging a party can be offline over 
+%
+%\paragraph{Security properties}
+%
+%The high-level properties we aim to prove are secrecy and authentication of message keys
+%
+%\begin{itemize}
+%	
+%	\item Secrecy. If Alice and Bob complete an exchange to generate a key k, nobody other than Alice and Bob should be able to learn anything about k. Forward secrecy are not explicit goals; instead, derived session keys should remain secret under a variety of compromise scenarios.
+%	\item (Implicit) Authentication. If Alice believes that she shares the key k with Bob, nobody other than Bob should be able to learn anything about k. Note that this property is implied by secrecy. Authentication will be implicit meaning that only the intended party could compute the key rather than explicit (get a guarantee that the intended party did compute the key).
+%\end{itemize}
+%
+%%and thereby distinguish any fresh message encryption key from random
+%
+%
+%As described earlier a group chat is represented by a session which has three stages; initial exchange, asymmetric and symmetric. Each stage will generate a key 
+%
+%
+%By proving that the session keys generated at each stage are key indistinguishable it can be argued that the session keys at each stage are safe...
+%
+%
+%We find if the above goals are fulfilled by looking at the freshness of the session keys in the different stages. By defining under what conditions the session keys are fresh and by proving that they indeed are fresh then it has been proved that the above security properties are provided. 
+%
+%
+%\paragraph{Freshness and cleanness} 
+%
+%Our goal when defining fresh is to describe the best security condition that might be provable for each of
+%Signal’s message keys based on the protocol’s design; here, “best” is with respect to the maximal combinations
+%of secrets learned by the adversary.
+%That is, we use the structure of the protocol to infer which attacks cannot
+%possibly be prevented, and rule them out by restricting the adversary.
+%
+%For each session there are different definition of freshness.
+%
+%The cleanness predicate defines under what conditions the session keys are .....
+%
+%
+%
+%\subparagraph{Stage 0}
+%We can prove the security of the stage 0 key (output by the triple key exchange during session setup) if one of the following is upheld cleanLM(u,i), cleanEL(u,i,0), cleanEM(u,i,0).
+%
+%\subparagraph{Asymmetric stages}
+%In this stage there are two types; asym-ir (sending) or asym-ri (receiving).
+%
+%By satisfying the cleanness predicates for each type of state we can prove the security of this stage.
+%
+%Most cases are of the form cleanEE, and for these we obtain a probability bound by replacing the DH ratchet keys and shared secrets with values from a GDH challenger.
+%
+%The only case not of this form involves clean\_state, which describes a scenario where both recent ratchet keys were compromised but the previous stage was still secure. Secrecy here is intuitive, and the bound follows from an inductive argument: if an adversary could win in this manner, then, assuming GDH and ROM security, there is an adversary which could win against the previous stage.
+%
+%
+%\subparagraph{Symmetric stages}
+%To ensure security of session key in this stage we only need to consider the following case. We replace the keys used to initialise the current sending chain with uniformly random values, since an adversary who could detect this could win against that
+%previous stage.
+%\\
+%\\
+%The proof for the above is provided in detail in the paper \emph{A Formal Security Analysis of the Signal Messaging Protocol} \cite{Signal}.
 
-\subsubsection{Multi-State Key Exchange Protocol}
+ 
+%\subsubsection{Multi-State Key Exchange Protocol}
 
-\subsubsection{Key Indistinguishability Experiment}
+%\subsubsection{Key Indistinguishability Experiment}
+%This means that the unknown key share attack against TextSecure [35] is not considered an attack in our model: Alice’s session with Eve will have the same session identifier as Bob’s session with Alice.
 
-\subsubsection{Freshness}
+%\subsubsection{Freshness}
 
-\paragraph{Stage 0}
-
-\paragraph{Asymmetric stages}
-
-\paragraph{Symmetric stages}
-
-\subsubsection{Proof}
-
-% Definitions of hardness assumptions. Should I include it?
 
 \subsubsection{Application variants}
 
@@ -154,26 +167,120 @@ The further evaluation relies upon the the security assessment on Matrix.
 
 \subsection{Matrix protocol}
 
-The Double Ratchet algorithm is meant for one-to-one chatting and is not practical for group chatting? %why not?
-For direct conversation Matrix uses Olm library which is an implementation of the Double Ratchet algorithm. For group chats the Megolm library is used. With Group chats 
-Instead for group chats the Mego
 
-The rooms in Matrix are meant for group chats. 
+
+
+\subsubsection{Group chat}
+The Double Ratchet algorithm is meant for one-to-one chatting and is not practical for group chatting. %why not?
+
+For direct conversation Matrix uses Olm library which is an implementation of the Double Ratchet algorithm. For group chats the Megolm library is used. 
+
+It is more difficult to evaluate the Matrix protocol because they as well do not specify any detailed security goal and there is at this point of writing no formaæ analysis of their implementation of the Double Ratchet algorithm.
+
+
+List problems with group chat 
+
+\begin{itemize}
+	\item Lack of post compromise security
+\end{itemize}
+
+There is an tradeoff on security and usability and the security is decreased for group chats. %8.30
+
+As of this moment of writing there exist no implemented protocol that solves these issues in group chat. However recent research has proposed solutions with early implementations for these problems with IETF leading the research on the standard on \emph{Messaging Layer Security}. Matrix has expressed awareness of the protocol and a possibility of adaption in the future.
 
 \subsubsection{Olm}
+Olm is an implementation of the Double Ratchet algorithm and plays a major role in the Megolm library which is used by Matrix group messaging. 
+
+The security assessment provides a review of the Olm and Megolm libraries. However there exist no work that verifies if Olm correctly implements the Double Ratchet described earlier.
+
 Vulnerabilities found in the security assessment. 
 
 \paragraph{Unknown Key Share attack}
 
+In this variant of the unknown key-share (OKs) attack, an attacker will allow highly targeted, known messages to be sent to Bob. In this scenario, Bob will still believe he is talking with Alice. Here, two parties (Donald and Mallory), who may be the same person, will collude against Alice in a group chat situation (Megolm). Donald will be performing the unknown key-share attack. Mallory will be an instigator (attempting to elicit messages from Alice that will later be sent to Bob) who will be able to read the contents of the group chat.
+
 \subsubsection{Megolm}
+% The way Megolm works is to give every sender in the room its own encrypted ratchet (‘outbound session’), so every device encrypts each message once based on the current key given by their ratchet (and then advances the ratchet to generate a new key).  Meanwhile, the device shares the state of their ‘outbound session’ to every other device in the room via the normal Olm ratchet in a 1:1 exchange between the devices.  The other devices maintain an ‘inbound session’ for each of the devices they know about, and so can decrypt their messages.  Meanwhile, when new devices join a room, senders can share their sessions according to taste to the new device – either giving access to old history or not depending on the configuration of the room.
+
+
+
+Conceptually, when you first send a message in an encrypted room, your Riot client generates a random key to encrypt your message, sends the encrypted message to the server, and then sends the decryption key to all the devices in the room that should be allowed to decrypt the message. Of course, the decryption key is sent encrypted (based on the device's unique key, which you verified above) so that it cannot be intercepted. The recipient then fetches the message decryption key and the encrypted message and decrypts the message.
+
+In order to avoid having to re-send decryption keys to every device for every message you send, Matrix's encryption system includes a method for generating a new key based on an old key. So for the next message you send, your Riot client will use that method on your previous encryption key to generate a new key, and the recipients will use the same method and generate the same key, so that when you send a message encrypted using the new key, the recipients can decrypt the message without any extra key exchange. The new key will only need to be sent to any new devices that showed up in between when the first message was sent and when the second message was sent.
+
+Riot will occasionally start from scratch, generating a new random key and sending it to all the devices in the room. This happens, for example, whenever someone leaves a room, after you have sent a certain number of messages, or after a certain amount of time.
+
+\paragraph{Message Replays}
+A message can be decrypted successfully multiple times. This means that an attacker can re-send a copy of an old message, and the recipient will treat it as a new message.
+
+To mitigate this it is recommended that applications track the ratchet indices they have received and that they reject messages with a ratchet index that they have already decrypted.
+
+\paragraph{Lack of Transcript Consistency}
+In a group conversation, there is no guarantee that all recipients have received the same messages. For example, if Alice is in a conversation with Bob and Charlie, she could send different messages to Bob and Charlie, or could send some messages to Bob but not Charlie, or vice versa.
+
+Solving this is, in general, a hard problem, particularly in a protocol which does not guarantee in-order message delivery. For now it remains the subject of future research.
+
+\paragraph{Lack of Backward Secrecy}
+Once the key to a Megolm session is compromised, the attacker can decrypt any future messages sent via that session.
+
+In order to mitigate this, the application should ensure that Megolm sessions are not used indefinitely. Instead it should periodically start a new session, with new keys shared over a secure channel.
+
+\paragraph{Partial Forward Secrecy}
+Each recipient maintains a record of the ratchet value which allows them to decrypt any messages sent in the session after the corresponding point in the conversation. If this value is compromised, an attacker can similarly decrypt those past messages.
+
+To mitigate this issue, the application should offer the user the option to discard historical conversations, by winding forward any stored ratchet values, or discarding sessions altogether.
+
+\paragraph{Dependency on secure channel for key exchange}
+The design of the Megolm ratchet relies on the availability of a secure peer-to-peer channel for the exchange of session keys. Any vulnerabilities in the underlying channel are likely to be amplified when applied to Megolm session setup.
+
+For example, if the peer-to-peer channel is vulnerable to an unknown key-share attack, the entire Megolm session become similarly vulnerable. For example: Alice starts a group chat with Eve, and shares the session keys with Eve. Eve uses the unknown key-share attack to forward the session keys to Bob, who believes Alice is starting the session with him. Eve then forwards messages from the Megolm session to Bob, who again believes they are coming from Alice. Provided the peer-to-peer channel is not vulnerable to this attack, Bob will realise that the key-sharing message was forwarded by Eve, and can treat the Megolm session as a forgery.
+
+A second example: if the peer-to-peer channel is vulnerable to a replay attack, this can be extended to entire Megolm sessions.
+
 % Lack of backward secrecy is problematic for the prototype.
 
 %Enforcing new session start every time a patient journal is sent. Could it be enforced with IFC?
- 
-\subsubsection{End-to-end security}
-Having established that Matrix security model is sufficient.
+
+
+
+
+\subsubsection{Evaluation}
+The evaluation framework in the paper \emph{SoK: Secure Messaging} defines \emph{Conversation Security} as a problem area which contains the following main groups; \emph{Security and Privacy Featues}, \emph{Adoption}, and \emph{Group Chat}.
+
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=12cm]{figures/framework.png}
+	\caption{Evaluation of Matrix Security.}
+	\label{fig:framework}
+\end{figure}
+
+
+\subsection{End-to-end security}
+It can be argued that some of the Matrix shortcomings can be configured on the application layer. This puts a lot of responsibility on the application and that it is configured correctly. 
+
+Even if the application using Matrix is configured correctly and give the best guarantee of forward and backward secrecy this not the end of security. 
+
+Dynamic policies?
+
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=12cm]{figures/e2esecurity.png}
+	\caption{End-to-end security.}
+	\label{fig:e2esecurity}
+\end{figure}
+
+
+Recently two technical directors from the Government Communication Headquarters of United Kingdom released an essay arguing that the software vendors could grant access to group chat by inserting the government as a hidden silent participant in a chat hence not weakening the encryption \cite{gchq}.
+
+
+Explain how some of the shortcomings in Matrix can be solved with IFC.The initial state ratchet is never ratcheted?
 
 \subsection{Summary}
+
+
+
 
 
 
@@ -182,26 +289,29 @@ Having established that Matrix security model is sufficient.
 % Maybe better to use JSFlow instead 
 
 
-\section{Survey of IFC Tools}
+%\section{Survey of IFC Tools}
+%Having established that end-to-end security is not the end of security we will now look at Information-Flow Control tools. 
 
-\subsection{JIF}
+%The approach to the section will be from a programmers perspective hence usability and practicality will play a role in which IFC tool is chosen. 
 
-\subsection{Paragon}
+%\subsection{JIF}
 
-\subsection{JSFlow}
-Not possible to use Matrix library with JSFlow because of missing support for libaries such as require (in node). Also overhead with configuring JSFlow to be the interpretor.
+%\subsection{Paragon}
 
-Swift, SIF, FlowR, JFlow, LIO
+%\subsection{JSFlow}
+%Not possible to use Matrix library with JSFlow because of missing support for libaries such as require (in node). Also overhead with configuring JSFlow to be the interpretor.
 
-
-\subsection{Selection of IFC tool}
-The selection of the IFC tool used for developing the prototype is based the following defined parameters.
-The selection of IFC tool put emphasis on the practical usage in combination with Matrix. 
-
-\subsection{Paragon analysis}
-
-\subsection{Summary}
+%Swift, SIF, FlowR, JFlow, LIO
 
 
-\section{Summary}
-In this chapter the Matrix security model has been evaluated. Matrix provides end-to-end security and uses the Double Ratchet algorithm by Signal. The evaluation found that there are no major flaws in the design. To achieve end-to-end security the endpoints need to be secured as well \cite{Sabelfeld2003} this leads us to the chapter's second part. The chapter analyzed information-flow control tools and justifies the selection of Paragon which the prototype is programmed in. 
+%\subsection{Selection of IFC tool}
+%The selection of the IFC tool used for developing the prototype is based the following defined parameters.
+%The selection of IFC tool put emphasis on the practical usage in combination with Matrix. 
+
+%\subsection{Paragon analysis}
+
+%\subsection{Summary}
+
+
+%\section{Summary}
+%In this chapter the Matrix security model has been evaluated. Matrix provides end-to-end security and uses the Double Ratchet algorithm by Signal. The evaluation found that there are no major flaws in the design. To achieve end-to-end security the endpoints need to be secured as well \cite{Sabelfeld2003} this leads us to the chapter's second part. The chapter analyzed information-flow control tools and justifies the selection of Paragon which the prototype is programmed in. 
