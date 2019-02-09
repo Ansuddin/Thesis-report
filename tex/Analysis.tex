@@ -26,8 +26,9 @@ Section xx provides a list of security properties relevant for \emph{conversatio
 The table below shows an evaluation of the Signal Protocol (previously known as TextSecure) \cite{sok}. 
 
 \begin{figure}[H]
+	\hspace*{-1.7cm} 
 	\centering
-	\includegraphics[width=12cm]{figures/framework_signal.png}
+	\includegraphics[width=16cm]{figures/framework_signal.png}
 	\caption{Evaluation of Signal (TextSecure) \cite{sok}.}
 	\label{fig:framework_signal}
 \end{figure}
@@ -36,34 +37,43 @@ The table below shows an evaluation of the Signal Protocol (previously known as 
 %Explain how they provide the properties or why they don't
 
 
-\subparagraph{Confidentiality} When a message is sent using the Signal Protocol then only the intended recipient can read the message.  
+\subparagraph{Confidentiality} When a message is sent using the Signal Protocol then only the intended recipient can read the message. The senders sending ratchet and receivers receiving ratchet will derive the same message key hence only the two parties will be able to encrypt the messages. 
 
-\subparagraph{Integrity}
+\subparagraph{Integrity} The receiver will only accept a message if it is successfully decrypted hence if in transit a message was modified then the message would be rejected.
 
-\subparagraph{Authentication}
+\subparagraph{Authentication} The decryption of a message also gives authentication guarantees since only the intended recipient could compute the message key.
 
-\subparagraph{Forward secrecy}
+\subparagraph{Forward secrecy} The symmetric ratchet ensures forward secrecy. If a chain session key is compromised then the previous keys can not be generated since the ratchet is one way cryptographic hash function hence secrecy is provided for all previous send messages.  
 
-\subparagraph{Backward secrecy}
+\subparagraph{Backward secrecy} Diffie-Hellman ratchet have the self-healing property and will generate a new chain session key for the symmetric ratchet hence if a chain key is compromised then secrecy for future messages is still provided because a new chain ratchet key will be generated.
+
+\subparagraph{Anonymity preserving}
+
+Anonymity preservation is lost in the Signal Protocol since the initial key agreement requires long-term public keys hence making them observable during Triple-DH. However \textbf{\emph{participant consistency}} is provided by Triple-DH \cite{sok}. %How?
+%Without participant consistency, identity misbinding attacks might be possible. Unknown key share attack
+
+\subparagraph{Speaker consistency}
+This property is partially provided through the key evolution of the ratchets. If a message is dropped then it is not possible to generate message keys for future messages. This also makes the protocol partially have the property \emph{\textbf{Dropped message resilence}}. It will also not go unnoticed if a message is received out of order since this will result in the message's key being an unexpected key. Hence the recipient have to store expired keys to decrypt delayed messages. This makes the property \emph{\textbf{Out-of-order resilient}} only partially provided \cite{sok}.
+
+\subparagraph{Global transcript} 
+In an asynchrounous messaging protocol there is no global transcript. Both participants have to be online to receive messages hence the participants will not have all the messages if one of them is offline. This is a result of having the \textbf{\emph{Asynchronicity}} property.
 
 \subparagraph{Deniability properties}
 
-\subparagraph{Speaker consistency}
-This property is partially provided through the key evolution of the ratchets. A ratchet will keep evolving and the produced sender ratchets session key will correspond to the received ratchets session key. If a message is 
+Since the ratchet session keys are used for encrypting messages and not the long-term public keys the properties \textbf{\emph{Message unlinkability}} and \textbf{\emph{Message repudiation}} are provided. 
 
 
-\subparagraph{Anonymity preserving}
-3-DH also provides
-participant consistency without the need to explicitly exchange
-identities after a secure channel has been established. Unfortunately,
-this also causes a partial loss of anonymity preservation
-since long-term public keys are always observable during
-the initial key agreement
-\\
-\\
+\subparagraph{Other properties}
+
+\begin{itemize}
+	\item \textbf{\emph{Participant repudiation}}. Triple-DH achieves full participant repudiation since anyone can forge a transcript between any two participants \cite{sok}.
+	\item \textbf{\emph{Destination validation}}. The Deffie-Hellman ratchet provides this property since the recipients public key is used to generate the chain key \cite{sok}. % Is this true?
+\end{itemize}
+
+
 The evaluation shows that several security properties are provided with the important ones being confidentiality, integrity, authentication, forward secrecy, backward secrecy. 
 
-Furthermore a formal analysis have been made on the Signal Protocol that proves the protocol is free from any major flaws and it satisfy standard security properties such as; confidentiality, authentication and secrecy \cite{Signal}. 
+Furthermore a formal analysis have been made on the Signal Protocol that proves the protocol is free from any major flaws and it satisfy the following security properties; confidentiality, authentication and secrecy \cite{Signal}. 
 
 %The next section provides a brief summary of the analysis.
 
@@ -149,14 +159,6 @@ Furthermore a formal analysis have been made on the Signal Protocol that proves 
 %\\
 %\\
 %The proof for the above is provided in detail in the paper \emph{A Formal Security Analysis of the Signal Messaging Protocol} \cite{Signal}.
-
- 
-%\subsubsection{Multi-State Key Exchange Protocol}
-
-%\subsubsection{Key Indistinguishability Experiment}
-%This means that the unknown key share attack against TextSecure [35] is not considered an attack in our model: Alice’s session with Eve will have the same session identifier as Bob’s session with Alice.
-
-%\subsubsection{Freshness}
 
 
 \subsubsection{Application variants}
@@ -254,6 +256,39 @@ The evaluation framework in the paper \emph{SoK: Secure Messaging} defines \emph
 	\caption{Evaluation of Matrix Security.}
 	\label{fig:framework}
 \end{figure}
+
+\subparagraph{Confidentiality} When a message is sent using the Signal Protocol then only the intended recipient can read the message. The senders sending ratchet and receivers receiving ratchet will derive the same message key hence only the two parties will be able to encrypt the messages. 
+
+\subparagraph{Integrity} The receiver will only accept a message if it is successfully decrypted hence if in transit a message was modified then the message would be rejected.
+
+\subparagraph{Authentication} The decryption of a message also gives authentication guarantees since only the intended recipient could compute the message key.
+
+\subparagraph{Forward secrecy} The symmetric ratchet ensures forward secrecy. If a chain session key is compromised then the previous keys can not be generated since the ratchet is one way cryptographic hash function hence secrecy is provided for all previous send messages.  
+
+\subparagraph{Backward secrecy} Diffie-Hellman ratchet have the self-healing property and will generate a new chain session key for the symmetric ratchet hence if a chain key is compromised then secrecy for future messages is still provided because a new chain ratchet key will be generated.
+
+\subparagraph{Anonymity preserving}
+
+Anonymity preservation is lost in the Signal Protocol since the initial key agreement requires long-term public keys hence making them observable during Triple-DH. However \textbf{\emph{participant consistency}} is provided by Triple-DH \cite{sok}. %How?
+%Without participant consistency, identity misbinding attacks might be possible. Unknown key share attack
+
+\subparagraph{Speaker consistency}
+This property is partially provided through the key evolution of the ratchets. If a message is dropped then it is not possible to generate message keys for future messages. This also makes the protocol partially have the property \emph{\textbf{Dropped message resilence}}. It will also not go unnoticed if a message is received out of order since this will result in the message's key being an unexpected key. Hence the recipient have to store expired keys to decrypt delayed messages. This makes the property \emph{\textbf{Out-of-order resilient}} only partially provided \cite{sok}.
+
+\subparagraph{Global transcript} 
+In an asynchrounous messaging protocol there is no global transcript. Both participants have to be online to receive messages hence the participants will not have all the messages if one of them is offline. This is a result of having the \textbf{\emph{Asynchronicity}} property.
+
+\subparagraph{Deniability properties}
+
+Since the ratchet session keys are used for encrypting messages and not the long-term public keys the properties \textbf{\emph{Message unlinkability}} and \textbf{\emph{Message repudiation}} are provided. 
+
+
+\subparagraph{Other properties}
+
+\begin{itemize}
+	\item \textbf{\emph{Participant repudiation}}. Triple-DH achieves full participant repudiation since anyone can forge a transcript between any two participants \cite{sok}.
+	\item \textbf{\emph{Destination validation}}. The Deffie-Hellman ratchet provides this property since the recipients public key is used to generate the chain key \cite{sok}. % Is this true?
+\end{itemize}
 
 
 \subsection{End-to-end security}
