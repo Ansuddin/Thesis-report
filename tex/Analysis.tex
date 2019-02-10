@@ -7,18 +7,34 @@ The second part provides a preliminary analysis of the IFC tools, the selection 
 The security of matrix will be evaluated in the context of secure messaging. An evaluation framework has been proposed in the paper \emph{SoK: Secure messaging} which the evaluation will be loosely based on. 
 
 The evaluation framework covers several areas with \emph{conversation security} being the most relevant for this evaluation. The area \emph{conversation security} describes three categories; \emph{Security and Privacy}, \emph{Adoption}, and \emph{Group Chat}. Obviously the most relevant category for the evaluation is \emph{Security and Privacy}
-\\
-\\
+
+\subsection{Threat model}
+For secure messaging the evaluation framework defines a threat model with three types of adversaries:
+
+\begin{itemize}
+	\item \emph{Local adversary:} The adversary is in control of the local network.
+	\item \emph{Global adversary:} The adversary is in control of great portions of the Internet 
+	\item \emph{Service providers:} A potential adversary for messaging systems with centralized infrastructure.
+\end{itemize}
+Note that an adversary can be of several types.
+In the messaging system the adversary may be a participant with the following properties:
+
+\begin{itemize}
+	\item An adversary can start a conversation.
+	\item An adversary can send messages.
+	\item An adversary can perform any other action that a participant is capable of.
+\end{itemize}
+
+Finally we assume that the endpoints in a secure messaging system are secure.
+
+This evaluation will inherit the described threat model.
+
+\subsection{The Signal Protocol}
 Matrix provides end-to-end encryption by using the Olm and Megolm library with the former being an implementation of the Double Ratchet algorithm also known as the Signal Protocol, and the latter being the algorithm used for group chat. 
 
 Olm is used for securely exchanging message keys/session keys during group chat and is vital part of the end-to-end encryption in Matrix.
 
 Before the Matrix protocol is evaluated the Signal Protocol will be considered. 
-
-%\subsection{Threat model} Describe the threat model in SoK
-
-\subsection{Signal Protocol}
-Olm is an implementation of the Signal Protocol. The Signal Protocol is a messaging protocol with end-to-end encryption between two devices. 
 
 Section xx provides a list of security properties relevant for \emph{conversation security}. These security properties is used for evaluating a secure messaging protocol such as the Signal Protocol.
 %Any messaging application that provides end-to-end encryption is likely an implementation of  the protocol 
@@ -74,6 +90,15 @@ Since the ratchet session keys are used for encrypting messages and not the long
 The evaluation shows that several security properties are provided with the important ones being confidentiality, integrity, authentication, forward secrecy, backward secrecy. 
 
 Furthermore a formal analysis have been made on the Signal Protocol that proves the protocol is free from any major flaws and it satisfy the following security properties; confidentiality, authentication and secrecy \cite{Signal}. 
+
+\paragraph{Application variants}
+
+The Signal Protocol is a secure messaging protocol and have been extensively studied including proof that the standard security properties are assured. 
+
+The Olm library used by Matrix is a variant of the Signal Protocol. There is no implementation analysis of the Olm library hence there is no guarantee that all the security properties defined in xx is inherited by Olm.
+
+The further evaluation relies upon the the security assessment of Matrix. 
+
 
 %The next section provides a brief summary of the analysis.
 
@@ -161,14 +186,8 @@ Furthermore a formal analysis have been made on the Signal Protocol that proves 
 %The proof for the above is provided in detail in the paper \emph{A Formal Security Analysis of the Signal Messaging Protocol} \cite{Signal}.
 
 
-\subsubsection{Application variants}
-
-The Olm library used by Matrix is a variant of the Double Ratchet algorithm. The custom variants invites important changes in need to be analyzed independently. WhatsApp variant of the protocol has a retransmission mechanism which is vulnerable. 
-% if Bob appears to change his identity key, clients will resend messages encrypted under the new value.Hence, an adversary with control over identity registration can disconnect Bob and replace his key, and Alice will re-send the message to the adversary.  
-The further evaluation relies upon the the security assessment on Matrix. 
 
 \subsection{Matrix protocol}
-
 
 
 
@@ -289,6 +308,9 @@ Since the ratchet session keys are used for encrypting messages and not the long
 	\item \textbf{\emph{Participant repudiation}}. Triple-DH achieves full participant repudiation since anyone can forge a transcript between any two participants \cite{sok}.
 	\item \textbf{\emph{Destination validation}}. The Deffie-Hellman ratchet provides this property since the recipients public key is used to generate the chain key \cite{sok}. % Is this true?
 \end{itemize}
+
+
+\paragraph{Security flaw or feature?}
 
 
 \subsection{End-to-end security}
