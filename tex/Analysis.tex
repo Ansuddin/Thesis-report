@@ -9,14 +9,14 @@ The security of matrix will be evaluated in the context of secure messaging. An 
 The evaluation framework covers several areas with \emph{conversation security} being the most relevant for this evaluation. The area \emph{conversation security} describes three categories; \emph{Security and Privacy}, \emph{Adoption}, and \emph{Group Chat}. Obviously the most relevant category for the evaluation is \emph{Security and Privacy}
 
 \subsection{Threat model}
-For secure messaging the evaluation framework defines a threat model with three types of adversaries:
+For secure messaging the evaluation framework defines a threat model with three types of adversaries. Note that an adversary can be of several types:
 
 \begin{itemize}
 	\item \emph{Local adversary:} The adversary is in control of the local network.
 	\item \emph{Global adversary:} The adversary is in control of great portions of the Internet 
 	\item \emph{Service providers:} A potential adversary for messaging systems with centralized infrastructure.
 \end{itemize}
-Note that an adversary can be of several types.
+
 In the messaging system the adversary may be a participant with the following properties:
 
 \begin{itemize}
@@ -25,7 +25,7 @@ In the messaging system the adversary may be a participant with the following pr
 	\item An adversary can perform any other action that a participant is capable of.
 \end{itemize}
 
-Finally we assume that the endpoints in a secure messaging system are secure.
+Furthermore it is assumed that the system's endpoints are secure \cite{sok}.
 
 This evaluation will inherit the described threat model.
 
@@ -69,7 +69,7 @@ Anonymity preservation is lost in the Signal Protocol since the initial key agre
 %Without participant consistency, identity misbinding attacks might be possible. Unknown key share attack
 
 \subparagraph{Speaker consistency}
-This property is partially provided through the key evolution of the ratchets. If a message is dropped then it is not possible to generate message keys for future messages. This also makes the protocol partially have the property \emph{\textbf{Dropped message resilence}}. It will also not go unnoticed if a message is received out of order since this will result in the message's key being an unexpected key. Hence the recipient have to store expired keys to decrypt delayed messages. This makes the property \emph{\textbf{Out-of-order resilient}} only partially provided \cite{sok}.
+This property is partially provided through the key evolution of the ratchets. If a message is dropped then it is not possible to generate message keys for future messages. This also makes the protocol have the property \textbf{\emph{Causality Preserving}} and partially have the property \emph{\textbf{Dropped message resilence}}. It will also not go unnoticed if a message is received out of order since this will result in the message's key being an unexpected key. Hence the recipient have to store expired keys to decrypt delayed messages. This makes the property \emph{\textbf{Out-of-order resilient}} only partially provided \cite{sok}.
 
 \subparagraph{Global transcript} 
 In an asynchrounous messaging protocol there is no global transcript. Both participants have to be online to receive messages hence the participants will not have all the messages if one of them is offline. This is a result of having the \textbf{\emph{Asynchronicity}} property.
@@ -95,7 +95,7 @@ Furthermore a formal analysis have been made on the Signal Protocol that proves 
 
 The Signal Protocol is a secure messaging protocol and have been extensively studied including proof that the standard security properties are assured. 
 
-The Olm library used by Matrix is a variant of the Signal Protocol. There is no implementation analysis of the Olm library hence there is no guarantee that all the security properties defined in xx is inherited by Olm.
+The Olm library used by Matrix is a variant of the Signal Protocol. There is no implementation analysis of the Olm library hence there is no guarantee that all the security properties defined in xx is inherited by Olm. Nevertheless it is assumed that Olm inherits the above properties.
 
 The further evaluation relies upon the the security assessment of Matrix. 
 
@@ -189,37 +189,13 @@ The further evaluation relies upon the the security assessment of Matrix.
 
 \subsection{Matrix protocol}
 
-(Olm) is great at encrypting conversations between pairs of devices, but it starts to get a bit unwieldy when you use it for a group conversation – especially the huge ones we have in Matrix.  Either each sender needs to encrypt each message N times for every device in the room (which doesn’t scale), or you need some other mechanism.
+As described in section xx \emph{rooms} are a fundamental part of Matrix' architecture. There can be multiple participants in a room hence the support for secure group conversation is required.
 
-How megolm works..
+Olm (and the Signal Protocol it is based on) is ideally meant for two party communication.
+Group conversation could be supported with a näive variant of Olm. In a group with N participants each participant would establish a secure Olm session with every other participant. When a message is send each message would then have to be encrypted N times. This solution would scale poorly if N was a large number. This was the motivation for introducing Megolm.
 
 
-
-
-List problems with group chat 
-
-\begin{itemize}
-	\item Lack of post compromise security
-\end{itemize}
-
-There is an tradeoff on security and usability and the security is decreased for group chats. %8.30
-
-As of this moment of writing there exist no implemented protocol that solves these issues in group chat. However recent research has proposed solutions with early implementations for these problems with IETF leading the research on the standard on \emph{Messaging Layer Security}. Matrix has expressed awareness of the protocol and a possibility of adaption in the future.
-
-\subsubsection{Olm}
-Olm is an implementation of the Double Ratchet algorithm and plays a major role in the Megolm library which is used by Matrix group messaging. 
-
-The security assessment provides a review of the Olm and Megolm libraries. However there exist no work that verifies if Olm correctly implements the Double Ratchet described earlier.
-
-Vulnerabilities found in the security assessment. 
-
-\paragraph{Unknown Key Share attack}
-
-In this variant of the unknown key-share (OKs) attack, an attacker will allow highly targeted, known messages to be sent to Bob. In this scenario, Bob will still believe he is talking with Alice. Here, two parties (Donald and Mallory), who may be the same person, will collude against Alice in a group chat situation (Megolm). Donald will be performing the unknown key-share attack. Mallory will be an instigator (attempting to elicit messages from Alice that will later be sent to Bob) who will be able to read the contents of the group chat.
-
-\subsubsection{Megolm}
-
-Each sender has a sender ratchet (Megolm Ratchet). Each recipient has a corresponding receiving ratchet for each sender. So if there are three participants in a group then each participant will have two receiving ratchet. When a session is started a sender will send his initial ratchet key to each recipient, so that the sender ratchet and each recipients ratchet are in sync. This key exchange happens over a secure communication channel (Olm). Also this generates a burst of sending N initial messages when a session is initiated (where N is the number of participants). Until a new session is started no further session keys are exchanged and the corresponding message keys are generated by incrementing the ratchet.
+Megolm is a multicast encryption solution \cite{sok}.Each sender has a sender ratchet (Megolm Ratchet). Each recipient has a corresponding receiving ratchet for each sender. So if there are N participants in a group then each participant will have N-1 receiving ratchets. When a session is started a sender will send his initial ratchet key to each recipient, so that the sender ratchet and each recipients ratchet are in sync. This key exchange happens over a secure communication channel (Olm). Furthermore this generates a burst of sending N-1 initial messages when a session is initiated. Until a new session is started no further session keys are exchanged and the corresponding message keys are generated by incrementing the ratchet.
 
 When a sender sends a message a message key is generated from the ratchet key and the message is encrypted using that message key. The message will be signed so the recipient will know which sender the message is from and which ratchet to utilize. %(not with a long-term I guess? hence providing deniability)
 The message  is then send to the server which relays the message to all recipients over an insecure channel. When they receive the message the same message key is generated using the corresponding receiver ratchet and the message is decrypted. 
@@ -229,96 +205,80 @@ When a new participant joins the latest ratchet key would then be shared by each
 When a participant leaves a new session would be initiated yielding in refreshing the ratchet keys hence not making it possible for that ex-participant to decrypt any further messages.
 
 
-The Megolm protocol does not handle replay attacks and are instead handled in at the application layer. Whenever a message is decrypted a message index is generated and stored. If the exact message is decrypted again the same message index will be generated and can be compared to the stored message index making the replayed message invalid. 
-
-Matrix allows decryption of a message multiple times (if the client cache has been cleared). In that case the message index would be cleared as well hence allowing decryption of messages again.
 
 
- Note there is lack of backward secrecy. If a ratchet key is compromised then an adversary can generate every message key from that point on hence intercept any message that sender sends to the group. This can be prevented strictly by starting a new session with every send message however it would not be possible to keep conversation history (only locally when data is encrypted).
+% add figures for naive olm and multicast encryption solution
 
-Also there is no longer participant consistency hence identity misbinding attacks like Unknown key share attack are possible. %why not?
-
-\paragraph{Message Replays}
-A message can be decrypted successfully multiple times. This means that an attacker can re-send a copy of an old message, and the recipient will treat it as a new message.
-
-To mitigate this it is recommended that applications track the ratchet indices they have received and that they reject messages with a ratchet index that they have already decrypted.
-
-\paragraph{Lack of Transcript Consistency}
-In a group conversation, there is no guarantee that all recipients have received the same messages. For example, if Alice is in a conversation with Bob and Charlie, she could send different messages to Bob and Charlie, or could send some messages to Bob but not Charlie, or vice versa.
-
-Solving this is, in general, a hard problem, particularly in a protocol which does not guarantee in-order message delivery. For now it remains the subject of future research.
-
-\paragraph{Lack of Backward Secrecy}
-Once the key to a Megolm session is compromised, the attacker can decrypt any future messages sent via that session.
-
-In order to mitigate this, the application should ensure that Megolm sessions are not used indefinitely. Instead it should periodically start a new session, with new keys shared over a secure channel.
-
-\paragraph{Partial Forward Secrecy}
-Each recipient maintains a record of the ratchet value which allows them to decrypt any messages sent in the session after the corresponding point in the conversation. If this value is compromised, an attacker can similarly decrypt those past messages.
-
-To mitigate this issue, the application should offer the user the option to discard historical conversations, by winding forward any stored ratchet values, or discarding sessions altogether.
-
-\paragraph{Dependency on secure channel for key exchange}
-The design of the Megolm ratchet relies on the availability of a secure peer-to-peer channel for the exchange of session keys. Any vulnerabilities in the underlying channel are likely to be amplified when applied to Megolm session setup.
-
-For example, if the peer-to-peer channel is vulnerable to an unknown key-share attack, the entire Megolm session become similarly vulnerable. For example: Alice starts a group chat with Eve, and shares the session keys with Eve. Eve uses the unknown key-share attack to forward the session keys to Bob, who believes Alice is starting the session with him. Eve then forwards messages from the Megolm session to Bob, who again believes they are coming from Alice. Provided the peer-to-peer channel is not vulnerable to this attack, Bob will realise that the key-sharing message was forwarded by Eve, and can treat the Megolm session as a forgery.
-
-A second example: if the peer-to-peer channel is vulnerable to a replay attack, this can be extended to entire Megolm sessions.
-
-% Lack of backward secrecy is problematic for the prototype.
-
-%Enforcing new session start every time a patient journal is sent. Could it be enforced with IFC?
-
-
+The Matrix Protocol will be evaluated in the context of Megolm. The evaluation of the Matrix protocol heavily relies on the security assessment by NCC.
 
 
 \subsubsection{Evaluation}
-The evaluation framework in the paper \emph{SoK: Secure Messaging} defines \emph{Conversation Security} as a problem area which contains the following main groups; \emph{Security and Privacy Featues}, \emph{Adoption}, and \emph{Group Chat}.
 
+
+The following table shows the evaluation of Megolm:
 
 \begin{figure}[H]
+	\hspace*{-1.7cm} 
 	\centering
-	\includegraphics[width=12cm]{figures/framework.png}
+	\includegraphics[width=16cm]{figures/framework.png}
 	\caption{Evaluation of Matrix Security.}
 	\label{fig:framework}
 \end{figure}
 
-\subparagraph{Confidentiality} When a message is sent using the Signal Protocol then only the intended recipient can read the message. The senders sending ratchet and receivers receiving ratchet will derive the same message key hence only the two parties will be able to encrypt the messages. 
+\subparagraph{Confidentiality} When a message is send it is encrypted and can only be decrypted by the intended recipients who has the corresponding ratchet session key received over an Olm channel. 
 
-\subparagraph{Integrity} The receiver will only accept a message if it is successfully decrypted hence if in transit a message was modified then the message would be rejected.
+\subparagraph{Integrity} The receiver will only accept a message if it is successfully decrypted hence if in transit a message was modified then the message would be rejected. 
 
-\subparagraph{Authentication} The decryption of a message also gives authentication guarantees since only the intended recipient could compute the message key.
 
-\subparagraph{Forward secrecy} The symmetric ratchet ensures forward secrecy. If a chain session key is compromised then the previous keys can not be generated since the ratchet is one way cryptographic hash function hence secrecy is provided for all previous send messages.  
+\subparagraph{Forward secrecy} Each participant keeps a \emph{initial ratchet state} which holds the earliest ratchet session key for a session. This clearly violates forward secrecy since every message can be decrypted if the \emph{initial ratchet state} value is compromised. However it is a deliberate trade-off for usability to enable historical conversation and storing the value is optional. Since this is an optional feature the forward secrecy is partially provided. 
 
-\subparagraph{Backward secrecy} Diffie-Hellman ratchet have the self-healing property and will generate a new chain session key for the symmetric ratchet hence if a chain key is compromised then secrecy for future messages is still provided because a new chain ratchet key will be generated.
+%From NCC
 
-\subparagraph{Anonymity preserving}
+\subparagraph{Backward secrecy} If a ratchet key is compromised then an adversary can generate every message key from that point on hence intercept any message that sender sends to the group. This can be prevented strictly by starting a new session with every send message however it would not be possible to keep conversation history (only locally when data is encrypted). Hence the property is only partially provided.
 
-Anonymity preservation is lost in the Signal Protocol since the initial key agreement requires long-term public keys hence making them observable during Triple-DH. However \textbf{\emph{participant consistency}} is provided by Triple-DH \cite{sok}. %How?
-%Without participant consistency, identity misbinding attacks might be possible. Unknown key share attack
+% From NCC
+
 
 \subparagraph{Speaker consistency}
-This property is partially provided through the key evolution of the ratchets. If a message is dropped then it is not possible to generate message keys for future messages. This also makes the protocol partially have the property \emph{\textbf{Dropped message resilence}}. It will also not go unnoticed if a message is received out of order since this will result in the message's key being an unexpected key. Hence the recipient have to store expired keys to decrypt delayed messages. This makes the property \emph{\textbf{Out-of-order resilient}} only partially provided \cite{sok}.
 
-\subparagraph{Global transcript} 
-In an asynchrounous messaging protocol there is no global transcript. Both participants have to be online to receive messages hence the participants will not have all the messages if one of them is offline. This is a result of having the \textbf{\emph{Asynchronicity}} property.
-
-\subparagraph{Deniability properties}
-
-Since the ratchet session keys are used for encrypting messages and not the long-term public keys the properties \textbf{\emph{Message unlinkability}} and \textbf{\emph{Message repudiation}} are provided. 
+There is no guarantee for speaker consistency. A well known problem of multi-cast encryption group chat is transcript inconsistency. A sender may send different messages to different recipients. However it requires that the server is in collusion with the sender. This also applies to \emph{\textbf{Causality preserving}} \cite{ncc}.
 
 
-\subparagraph{Other properties}
+\paragraph{Other properties}
+
+The multi-cast encryption design does not provide \emph{participant consistency} \cite{sok}.
+
+The properties \emph{Dropped message resilence} and \emph{Out-of-order resilient} are provided by keeping track of ratchet indices. 
+
+Several properties are inherited from the secure key exchanging channel provided by Olm while other properties are inherited because of asynchronicity of the Megolm protocol.
 
 \begin{itemize}
-	\item \textbf{\emph{Participant repudiation}}. Triple-DH achieves full participant repudiation since anyone can forge a transcript between any two participants \cite{sok}.
-	\item \textbf{\emph{Destination validation}}. The Deffie-Hellman ratchet provides this property since the recipients public key is used to generate the chain key \cite{sok}. % Is this true?
+	
+	\item \emph{Authentication} is provided by Olm since the ratchet session key is send to the recipient through an Olm channel or else the message key could not be derived.
+	\item \emph{Destination validation}. The ratchet session key is exchanged over a secure Olm channel hence only the intended recipient could decrypt it.
+	\item \emph{Anonymity preserving} is not provided since Olm requires the long-term public key in the initial key exchange.
+	\item \emph{Global transcript} is also not provided because of the asynchronous nature of the Megolm protocol.  
+	\item \emph{Asynchronicity} is obviously provided.
+	\item \emph{Deniability} properties are inherited from Olm as well.
 \end{itemize}
 
+All properties related to group chat are also provided. Though they are additional features and not related to security. 
 
-\paragraph{Security flaw or feature?}
 
+\paragraph{Other findings}
+
+\subparagraph{Unknown Key Share attack}
+
+In this variant of the unknown key-share (OKs) attack, an attacker will allow highly targeted, known messages to be sent to Bob. In this scenario, Bob will still believe he is talking with Alice. Here, two parties (Donald and Mallory), who may be the same person, will collude against Alice in a group chat situation (Megolm). Donald will be performing the unknown key-share attack. Mallory will be an instigator (attempting to elicit messages from Alice that will later be sent to Bob) who will be able to read the contents of the group chat.
+
+\subparagraph{Message Replays}
+
+Matrix allows decryption of a message multiple times hence it is vulnerable to replay attacks. Replay attacks are handled at the application layer. Whenever a message is decrypted a message index is generated and stored. If the exact message is decrypted again the same message index will be generated and can be compared to the stored message index making the replayed message invalid. 
+
+
+
+\paragraph{Recent research}
+The way backward secrecy would be provided in Matrix is computationally expensive. Recent research has proposed solutions with early implementations for these problems with IETF leading the research on the standard on \emph{Messaging Layer Security}. Matrix has expressed awareness of the protocol and a possibility of adaption in the future.
 
 \subsection{End-to-end security}
 It can be argued that some of the Matrix shortcomings can be configured on the application layer. This puts a lot of responsibility on the application and that it is configured correctly. 
@@ -343,8 +303,13 @@ Explain how some of the shortcomings in Matrix can be solved with IFC.The initia
 
 \subsection{Summary}
 
+In this section an evaluation of Matrix security was presented. Several security properties are a part of Matrix security model. 
 
+End-to-end encryption is not the end of security. Vulnerable endpoints can still leak and can be secured with Information flow control.
 
+The next session presents the analysis of Information-Flow Control tools.
+
+%Enforcing new session start every time a patient journal is sent. Could it be enforced with IFC?
 
 
 
