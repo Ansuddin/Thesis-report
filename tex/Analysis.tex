@@ -314,8 +314,7 @@ The following figure depicts how end-to-end encryption might be inadequate in su
 	\label{fig:e2esecurity}
 \end{figure}
 
-
-As the system depicts there might be several principals with access to the endpoint. Each principal  retrieving information and the endpoints might be vulnerable for leaking confidential information.   
+As the system depicts there might be several principals accessing the endpoint. Each principal could retrieve some information possibly protected with access control. Assume that the information resting at the endpoint is of confidential nature; access could still be granted with no respect of the confidentially of that information. There clearly lack a mechanism of specifying what information is confidential or public and where it may flow under what conditions.  
 \\
 \\
 Matrix identifies IoT as another use case. A person can have several devices for health tracking, entertainment and so on. The data from the devices are send to vendors - a device might send data to several vendors. Ultimately this give a fragmentation of the person's own data with it being placed at several vendors data back-end. Matrix proposes a solution where all the device data for a person is synchronized and persisted on Matrix. Vendors would be connected to Matrix. This is depicted in figure \ref{fig:matrix_iot} below. 
@@ -327,18 +326,18 @@ Matrix identifies IoT as another use case. A person can have several devices for
 	\label{fig:matrix_iot}
 \end{figure}
 
-
-
+The data flowing from the sensors to Matrix might be of sensitive nature or the owner might only allow some data to flow to some vendors under specific conditions. This issue is not addressed by Matrix. 
 
 \subsection{Summary}
 
-In this section an evaluation of Matrix security was presented. Several security properties are a part of Matrix security model. 
+In this section an evaluation of Matrix security was presented. Several security properties are a part of Matrix security model with forward secrecy and backward secrecy being provided depending on the Matrix configuration.
 
 End-to-end encryption is not the end of security. Vulnerable endpoints can still leak and can be secured with Information flow control.
 \\
 \\
 The next session presents the analysis of Information-Flow Control tools.
 
+\newpage
 %Enforcing new session start every time a patient journal is sent. Could it be enforced with IFC?
 
 
