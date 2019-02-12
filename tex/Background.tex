@@ -1,7 +1,19 @@
 
+This chapter builds the foundation for the thesis introducing relevant concepts and disciplines for the thesis. 
+
+
+Section \ref{evaluationofmatrix} provides an evaluation of the Matrix security model. The security model is evaluated in the context of a secure messaging system.  
+The paper \emph{SoK: Secure Messaging} describes a evaluation framework for evaluating secure messaging systems. They define several security properties related to such systems \cite{sok} which will be presented.
+
+
+All secure messaging systems are based on the Double Ratchet algorithm which will also be described.
+
+
+Finally the architecture of Matrix and concepts related to Information-Flow Control will be introduced.
+
 \section{Information security}
 
-Information security is the discipline of protecting information. The key principles in information security are expressed through the CIA model. For a system to be secure these principles should be guaranteed.
+Information security is the discipline of protecting information. The key principles in information security are expressed through the CIA model. For a system to be secure these principles should be guaranteed \cite{michael2012}.
 
 \begin{figure}[H]
 	\centering
@@ -12,100 +24,103 @@ Information security is the discipline of protecting information. The key princi
 
 
 \subparagraph{Confidentiality}
-Information should only be viewable to people who are authorized to view it. Confidentiality deals with protecting and hiding information from unauthorized people.
- 
-Confidentiality is the ability to hide information from those people unauthorised to view it. It is perhaps the most obvious aspect of the CIA triad when it comes to security; but correspondingly, it is also the one which is attacked most often. Cryptography and Encryption methods are an example of an attempt to ensure confidentiality of data trasferred from one computer to another.
+Confidentiality is keeping information secret from unauthorized people. This is a major goal in information security. Encryption and access control are common ways of ensuring confidentiality \cite{michael2012}.
+
+In a secure messaging system confidentiality would be guaranteed if the message being sent is only readable by the recipient and no one else \cite{sok}.
 
 \subparagraph{Integrity}
-The ability to ensure that data is an accurate and unchanged representation of the original secure information. One type of security attack is to intercept some important data and make changes to it before sending it on to the intended receiver.
-
+Integrity is providing that information is unaltered and can only be changed by authorized people. If information is intercepted and changed during transit it would be a violation of integrity \cite{michael2012}.  
+More specifically for a secure messaging it would mean that no altered message is accepted by the recipient \cite{sok}.
 
 \subparagraph{Availability}
-It is important to ensure that the information concerned is readily accessible to the authorised viewer at all times. Some types of security attack attempt to deny access to the appropriate user, either for the sake of inconveniencing them, or because there is some secondary effect. For example, by breaking the web site for a particular search engine, a rival may become more popular.
+Making sure that information is accessible to authorized people is the goal of availability. Denial of Service attack \footnote{https://en.wikipedia.org/wiki/Denial-of-service\_attack} are common attacks targeting availability. 
 
-
-Information availability, is typically an issue of system availability, where the information itself plays a secondary role.
+Availability is generally more related to the system being available where the information itself plays a minor role \cite{michael2012}.
 \\
 \\
 Depending on the type of system other properties must be satisfied as well. 
 
 
 \subsection{Security properties}
-Section \ref{evaluationofmatrix} provides an evaluation of the Matrix security model. The security model is evaluated in the context of a secure messaging system.  
+The goal in a secure messaging system is to protect the messages being sent. The following properties are related to protecting messages.
 
-The paper \emph{SoK: Secure Messaging} describes a evaluation framework for evaluating secure messaging systems. They define several properties related to such systems \cite{sok}.
-
-
-The goal in a secure messaging system is to protect the messages being sent. The properties below defines properties for p
-
-The definitions 
-
-\subparagraph{Confidentiality} Only the intended recipients are able to read a message. Specifically, the message must not be readable by a server operator that is not a conversation participant.
-
-\subparagraph{Integrity} No honest party will accept a message that has been modified in transit.
 
 \subparagraph{Authentication}
-Each participant in the conversation receives proof of possession of a known long-term secret from all other participants that they believe to be participating in the conversation. In addition, each participant is able to verify that a message was sent from the claimed source.
+When a message is received the participant can verify that the message was sent from the actual sender. Furthermore a participant will receive evidence from a participant in a conversation that hey hold a known long-term secret. 
+
 
 
 \subparagraph{Perfect Forward Secrecy}
-Compromising all key material does not enable decryption of previously encrypted data.
+If all keys are compromised than the decryption of any previously sent message should not be possible. Hence all previous messages would be secure however all future messages would be insecure 
 
-\subparagraph{Future secrecy / Post compromise security}
-Compromising all key material does not enable decryption of succeeding encrypted data. This
-property is also often called future secrecy [43]. The terms are controversial and vague in literature [44]–[46].
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=10cm]{figures/forwardsecrecy.png}
+	\caption{Forward secrecy}
+	\label{fig:forward}
+\end{figure}
 
-\subparagraph{Deniability}
-\emph{Message Unlinkability} If a judge is convinced that a participant authored one message in the conversation, this does not provide evidence that they authored other messages.
+\subparagraph{Backward secrecy}
+If all keys are compromised than the decryption of \emph{future} messages should be possible. This property also goes by the names \emph{future secrecy} and \emph{post compromise security}. 
 
-\emph{Message Repudiation} Given a conversation transcript and all cryptographic keys, there is no evidence that a given message was authored by any particular user. We assume that the accuser has access to the session keys because it is trivial to deny writing a plaintext message when the accuser cannot demonstrate that the ciphertext corresponds to this plaintext. We also assume that the accuser does not have access to the accused participant’s long-term secret keys because then it is simple for the accuser to forge the transcript (and thus any messages are repudiable).
-
-
-\emph{Participation Repudiation} Given a conversation transcript and all cryptographic key material for all but one accused participant, there is no evidence that the honest participant was in a conversation with any of the other participants.
-
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=10cm]{figures/backwardsecrecy.png}
+	\caption{Backward secrecy}
+	\label{fig:backward}
+\end{figure}
 
 
 \subsubsection{Other security properties}
 
 
-\subparagraph{Participant Consistency} At any point when a message is accepted by an honest party, all honest parties are guaranteed to have the same view of the participant list.
+\subparagraph{Participant Consistency} 
+Whenever a message is accepted by a participant all participants are guaranteed to have identical view of the participant list.
 
-\subparagraph{Destination Validation}: When a message is accepted by an honest party, they can verify that they were included in the set of intended recipients for the message.
+\subparagraph{Destination Validation}
+When a participant receives a message it can be verified that the participant was the intended recipient.
 
+\subparagraph{Anonymity Preserving} 
+The anonymity of the participants should be preserved and not linking any key identifiers.
 
-\subparagraph{Anonymity Preserving} Any anonymity features provided by the underlying transport privacy architecture are not undermined (e.g., if the transport privacy system provides anonymity, the conversation security level does not deanonymize users by linking key identifiers).
+\subparagraph{Speaker Consistency} 
+There is consensus among the participants on the sequence of messages they receive by each participant. There might be a mechanism for checking consistency whenever a message is sent or after it has been received.
 
-\subparagraph{Speaker Consistency} All participants agree on the sequence of messages sent by each participant. A protocol might perform consistency checks on blocks of messages during the protocol, or after every message is sent.
+\subparagraph{Causality Preserving}
+Messages must not be displayed before the message that originally precedes it has been displayed.
 
-\subparagraph{Causality Preserving} Implementations can avoid displaying a message before messages that causally precede it. Global Transcript: All participants see all messages in the same order. Note that this implies speaker consistency.
+\subparagraph{Global Transcript} 
+A global order where all messages are viewed in the same order for all participants.
 
-
-\subparagraph{Conversation security} protocols may provide several different forms of deniability. For a detailed treatment of deniability in various contexts, see Appendix A. We define the following deniability-related features:
-
-
-\paragraph{Group}
+\subparagraph{Deniability}
+Deniability is a property where other participants cannot confirm that the message being sent was from the sender. Yet during the conversation there will be assurance for the recipient that the message being sent was authentic and sent by the sender \cite{sok}.
 
 \begin{itemize}
-	\item \emph{Computational Equality:} All chat participants share an equal computational load.
-	\item \emph{Trust Equality:} No participant is more trusted or takes on more responsibility than any other.
-	\item \emph{Subgroup messaging:} Messages can be sent to a subset of participants without forming a new conversation.
-	\item \emph{Contractible Membership:} After the conversation begins, participants can leave without restarting the protocol.
-	\item \emph{Expandable Membership:} After the conversation begins, participants can join without restarting the protocol.
+	\item \emph{Message Unlinkability:} A deniability property that gives no guarantees that if a participant sent a message that other messages was sent by that participant as well. 
+	\item \emph{Message Repudiation:} It can not be proved that a message was authored by a participant given the conversation transcript and all cryptographic key material. 
+	\item \emph{Participant Repudiation:} It can not be proved that a participant was in a group conversation without his conversation transcript and cryptographic key material. 
 \end{itemize}
 
+The following properties are also defined in the paper \emph{SoK: Secure Messaging} but are less relevant for security.
 
-
-
-
-
-\paragraph{Adoption}
+\subparagraph{Group}
 
 \begin{itemize}
-	\item \emph{Out-of-Order Resilient:} If a message is delayed in transit, but eventually arrives, its contents are accessible upon arrival.
-	\item \emph{Dropped Message Resilient:} Messages can be decrypted without receipt of all previous messages. This is desirable for asynchronous and unreliable network services.
-	\item \emph{Asynchronous:} Messages can be sent securely to disconnected	recipients and received upon their next connection.
-	\item \emph{Multi-Device Support:} A user can participate in the conversation using multiple devices at once. Each device must be able to send and receive messages. Ideally, all devices have identical views of the conversation. The devices might use a synchronized long-term key or distinct keys.
-	\item \emph{No Additional Service:} The protocol does not require any infrastructure other than the protocol participants. Specifically, the protocol must not require additional servers for relaying	messages or storing any kind of key material.
+	\item \emph{Computational Equality:} The computational load is equal for all participants.
+	\item \emph{Trust Equality:} There is equal trust among all participants. 
+	\item \emph{Subgroup messaging:} In the same conversation a participant can send messages to a subset of the participants.
+	\item \emph{Contractible Membership:} When a participant leaves a conversation the protocol does not need to restart.
+	\item \emph{Expandable Membership:} When a participant joins a conversation the protocol does not need to restart.
+\end{itemize}
+
+\subparagraph{Adoption}
+
+\begin{itemize}
+	\item \emph{Out-of-Order Resilient:} Messages received out-of-order should be accessible when received.
+	\item \emph{Dropped Message Resilient:} On a unreliable network messages might be dropped in transit however it should not prevent decryption of future messages.
+	\item \emph{Asynchronous:} Messages can be sent securely to recipients while they are offline.
+	\item \emph{Multi-Device Support:} A participant can have multiple devices in a conversation and each device must be synchronized and should have the same historical conversation view
+	\item \emph{No Additional Service:} There is no requirement of additional infrastructure being setup other than the participants. 
 \end{itemize}
 
 
@@ -119,7 +134,6 @@ In information security standard security properties are achieved using cryptogr
  
 
 \subsubsection{Deffie-Hellman Key Exchange}
-
 
 \subsubsection{Key Deriviation function}
 
