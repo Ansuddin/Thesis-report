@@ -1,52 +1,136 @@
 
-\section{Information security }
+\section{Information security}
 
-\subsection{Security principles}
-\subsubsection{Confidentiality}
-\subsubsection{Integrity}
-\subsubsection{Availability}
+Information security is the discipline of protecting information. The key principles in information security are expressed through the CIA model. For a system to be secure these principles should be guaranteed.
 
-\subsection{Encryption}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=10cm]{figures/cia.png}
+	\caption{CIA triad}
+	\label{fig:CIA triad}
+\end{figure}
+
+
+\subparagraph{Confidentiality}
+Information should only be viewable to people who are authorized to view it. Confidentiality deals with protecting and hiding information from unauthorized people.
+ 
+Confidentiality is the ability to hide information from those people unauthorised to view it. It is perhaps the most obvious aspect of the CIA triad when it comes to security; but correspondingly, it is also the one which is attacked most often. Cryptography and Encryption methods are an example of an attempt to ensure confidentiality of data trasferred from one computer to another.
+
+\subparagraph{Integrity}
+The ability to ensure that data is an accurate and unchanged representation of the original secure information. One type of security attack is to intercept some important data and make changes to it before sending it on to the intended receiver.
+
+
+\subparagraph{Availability}
+It is important to ensure that the information concerned is readily accessible to the authorised viewer at all times. Some types of security attack attempt to deny access to the appropriate user, either for the sake of inconveniencing them, or because there is some secondary effect. For example, by breaking the web site for a particular search engine, a rival may become more popular.
+
+
+Information availability, is typically an issue of system availability, where the information itself plays a secondary role.
+\\
+\\
+Depending on the type of system other properties must be satisfied as well. 
+
 
 \subsection{Security properties}
-\subsubsection{Authentication}
-\subsubsection{Deniability}
-\subsubsection{Perfect Forward Secrecy}
-\subsubsection{Future secrecy / Post compromise security}
+Section \ref{evaluationofmatrix} provides an evaluation of the Matrix security model. The security model is evaluated in the context of a secure messaging system.  
 
-\subsection{Basic concepts}
+The paper \emph{SoK: Secure Messaging} describes a evaluation framework for evaluating secure messaging systems. They define several properties related to such systems \cite{sok}.
+
+
+The goal in a secure messaging system is to protect the messages being sent. The properties below defines properties for p
+
+The definitions 
+
+\subparagraph{Confidentiality} Only the intended recipients are able to read a message. Specifically, the message must not be readable by a server operator that is not a conversation participant.
+
+\subparagraph{Integrity} No honest party will accept a message that has been modified in transit.
+
+\subparagraph{Authentication}
+Each participant in the conversation receives proof of possession of a known long-term secret from all other participants that they believe to be participating in the conversation. In addition, each participant is able to verify that a message was sent from the claimed source.
+
+
+\subparagraph{Perfect Forward Secrecy}
+Compromising all key material does not enable decryption of previously encrypted data.
+
+\subparagraph{Future secrecy / Post compromise security}
+Compromising all key material does not enable decryption of succeeding encrypted data. This
+property is also often called future secrecy [43]. The terms are controversial and vague in literature [44]–[46].
+
+\subparagraph{Deniability}
+\emph{Message Unlinkability} If a judge is convinced that a participant authored one message in the conversation, this does not provide evidence that they authored other messages.
+
+\emph{Message Repudiation} Given a conversation transcript and all cryptographic keys, there is no evidence that a given message was authored by any particular user. We assume that the accuser has access to the session keys because it is trivial to deny writing a plaintext message when the accuser cannot demonstrate that the ciphertext corresponds to this plaintext. We also assume that the accuser does not have access to the accused participant’s long-term secret keys because then it is simple for the accuser to forge the transcript (and thus any messages are repudiable).
+
+
+\emph{Participation Repudiation} Given a conversation transcript and all cryptographic key material for all but one accused participant, there is no evidence that the honest participant was in a conversation with any of the other participants.
+
+
+
+\subsubsection{Other security properties}
+
+
+\subparagraph{Participant Consistency} At any point when a message is accepted by an honest party, all honest parties are guaranteed to have the same view of the participant list.
+
+\subparagraph{Destination Validation}: When a message is accepted by an honest party, they can verify that they were included in the set of intended recipients for the message.
+
+
+\subparagraph{Anonymity Preserving} Any anonymity features provided by the underlying transport privacy architecture are not undermined (e.g., if the transport privacy system provides anonymity, the conversation security level does not deanonymize users by linking key identifiers).
+
+\subparagraph{Speaker Consistency} All participants agree on the sequence of messages sent by each participant. A protocol might perform consistency checks on blocks of messages during the protocol, or after every message is sent.
+
+\subparagraph{Causality Preserving} Implementations can avoid displaying a message before messages that causally precede it. Global Transcript: All participants see all messages in the same order. Note that this implies speaker consistency.
+
+
+\subparagraph{Conversation security} protocols may provide several different forms of deniability. For a detailed treatment of deniability in various contexts, see Appendix A. We define the following deniability-related features:
+
+
+\paragraph{Group}
+
+\begin{itemize}
+	\item \emph{Computational Equality:} All chat participants share an equal computational load.
+	\item \emph{Trust Equality:} No participant is more trusted or takes on more responsibility than any other.
+	\item \emph{Subgroup messaging:} Messages can be sent to a subset of participants without forming a new conversation.
+	\item \emph{Contractible Membership:} After the conversation begins, participants can leave without restarting the protocol.
+	\item \emph{Expandable Membership:} After the conversation begins, participants can join without restarting the protocol.
+\end{itemize}
+
+
+
+
+
+
+\paragraph{Adoption}
+
+\begin{itemize}
+	\item \emph{Out-of-Order Resilient:} If a message is delayed in transit, but eventually arrives, its contents are accessible upon arrival.
+	\item \emph{Dropped Message Resilient:} Messages can be decrypted without receipt of all previous messages. This is desirable for asynchronous and unreliable network services.
+	\item \emph{Asynchronous:} Messages can be sent securely to disconnected	recipients and received upon their next connection.
+	\item \emph{Multi-Device Support:} A user can participate in the conversation using multiple devices at once. Each device must be able to send and receive messages. Ideally, all devices have identical views of the conversation. The devices might use a synchronized long-term key or distinct keys.
+	\item \emph{No Additional Service:} The protocol does not require any infrastructure other than the protocol participants. Specifically, the protocol must not require additional servers for relaying	messages or storing any kind of key material.
+\end{itemize}
+
+
+
+
+
+
+\subsection{Concepts}
+In information security standard security properties are achieved using cryptography.
+
+ 
+
 \subsubsection{Deffie-Hellman Key Exchange}
+
+
 \subsubsection{Key Deriviation function}
 
-\newpage
-\section{Matrix} % nævn ting ift IFC hvis nødvendigt, ellers er det fint at de køre i de sport
+\subsubsection{Unknown key share attack}
 
-\subsection{Goals}
-
-\subsubsection{Short term goal}
-
-\subsubsection{Long term goal}
-% https://www.youtube.com/watch?v=-ofZMnKkp_Y 5:00 , 18:30
-
-\subsection{How does it work?}
-
-\subsection{Architecture}
-
-\subsubsection{Room}
-
-\subsubsection{Event}
-
-
-\subsection{Client/Server API}
-
-\subsection{End-to-end Encryption}
-
-\subsection{Double Ratchet algorithm}
+\subsubsection{Double Ratchet algorithm}
 
 The Double Ratchet algorithm has three stages. 
 Before the Double Ratchet algorithm can be used the two parties communicating need to agree on a shared secrey key. In the Signal protocol this is achieved with Triple Deffie-Hellman protocol \emph{(TripleDH)}.
 
-\subsubsection{Triple Deffie-Hellman protocol}
+\paragraph{Triple Deffie-Hellman protocol}
 
 The Triple Deffie-Hellman protocol is a \emph{key agreement protocol}. It involves a server and two parties; Alice and Bob. 
 
@@ -58,7 +142,7 @@ The TripleDH protocol is characterized by three phases:
 	\item \emph{Receiving initial message:} Alice's message is received and processed by Bob.
 \end{enumerate}
 
-\paragraph{Publishing keys}
+\subparagraph{Publishing keys}
 Bob needs to register a \emph{prekey bundle} to the server if he wants Alice to be able to send him messages. Alice will likewise have registered a prekey bundle so anyone can to anyone wants to start a message conversation with her.  
 The prekey bundle exists of:
 
@@ -71,7 +155,7 @@ The prekey bundle exists of:
 	To ensure forward secrecy the private key of the one-time prekeys are deleted once Bob received messages that uses them. The signed prekey is deleted as well. However Bob might hold on to it for some time to get the messages that was delayed.  
 \end{itemize}
 
-\paragraph{Sending initial message}
+\subparagraph{Sending initial message}
 Alice retrieves Bobs public keys from the server. She receives one of Bob's single one-time prekey. The server deletes the one-time prekey that was send.   
 
 
@@ -104,7 +188,7 @@ Bob
 \end{figure}
 
 
-\paragraph{Receiving initial message}
+\subparagraph{Receiving initial message}
 
 Phase three of the X3DH is mostly the same as phase two. Bob retrieves
 Alice’s initial message which contains Alice’s identity key and ephemeral
@@ -123,7 +207,7 @@ encrypted, and the protocol is complete for Bob. He deletes any onetime
 prekey private key that was used during the protocol, to uphold the
 forward secrecy and not get it compromised.
 
-\subsubsection{KDF chain}
+\paragraph{KDF chain}
 
 KDF Chain is a core concept in the Double Ratchet algorithm.
 The job of the KDF chain throughout the Double Ratchet session is to
@@ -146,7 +230,7 @@ and decrypt messages. This is called the symmetric-key ratchet.
 	\label{fig:kdfchain}
 \end{figure}
 
-\subsubsection{Symmetric ratchet}
+\paragraph{Symmetric ratchet}
 The symmetric-key ratchet uses KDF chains for its sending and receiving
 chains. The output keys are unique message keys which are used to either
 encrypt or decrypt messages. The KDF keys for the symmetric-key ratchet
@@ -179,7 +263,7 @@ quite useful when the protocols handles out-of-order messages because a
 participant can store the message key and decrypt the message later when
 they receive the correct message for that message key.
 
-\subsubsection{Deffie-Hellman ratchet}
+\paragraph{Deffie-Hellman ratchet}
 The Double Ratchet is formed by combining the symmetric-key ratchet and
 the Diffie-Hellman ratchet. If the Double Ratchet did not use the Diffie-
 Hellman ratchet to compute new chain keys for the sending and receiving
@@ -293,7 +377,7 @@ uses the KDF output keys as new sending and receiving chain keys
 	\label{fig:dhratchet7}
 \end{figure}
 
-\subsubsection{Double ratchet}
+\paragraph{Double ratchet}
 Double Ratchet is the algorithm we get by combining symmetric-key
 ratchet and Diffie-Hellman ratchet. 
 When a message is sent or received, a symmetric-key ratchet step is
@@ -393,9 +477,27 @@ message, A5.
 \end{figure}
 
 
-\subsubsection{Olm}
 
-\subsubsection{Megolm}
+\newpage
+\section{Matrix}
+
+\subsection{Goals}
+
+\subsubsection{Short term goal}
+
+\subsubsection{Long term goal}
+% https://www.youtube.com/watch?v=-ofZMnKkp_Y 5:00 , 18:30
+
+\subsection{How does it work?}
+
+\subsection{Architecture}
+
+\subsection{Matrix specification}
+
+\subsection{End-to-end Encryption}
+
+
+
 
 
 \newpage

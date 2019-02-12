@@ -3,7 +3,7 @@ This chapter consists of two parts. The first part will provide an evaluation of
 The second part provides a preliminary analysis of the IFC tools, the selection of Paragon and the rationale behind it, and a further analysis of the selected tool Paragon.
 
 
-\section{Evaluation of Matrix security model}
+\section{Evaluation of Matrix security model}\label{evaluationofmatrix}
 The security of matrix will be evaluated in the context of secure messaging. An evaluation framework has been proposed in the paper \emph{SoK: Secure messaging} which the evaluation will be loosely based on. 
 
 The evaluation framework covers several areas with \emph{conversation security} being the most relevant for this evaluation. The area \emph{conversation security} describes three categories; \emph{Security and Privacy}, \emph{Adoption}, and \emph{Group Chat}. Obviously the most relevant category for the evaluation is \emph{Security and Privacy}
@@ -332,11 +332,7 @@ The data flowing from the sensors to Matrix might be of sensitive nature or the 
 
 In this section an evaluation of Matrix security was presented. Several security properties are a part of Matrix security model with forward secrecy and backward secrecy being provided depending on the Matrix configuration.
 
-End-to-end encryption is not the end of security. Vulnerable endpoints can still leak and can be secured with Information flow control.
-\\
-\\
-The next session presents the analysis of Information-Flow Control tools.
-
+End-to-end encryption is not the end of security. Other security measures must be taken to provide confidentiality and integrity. Information Flow Control is such measure and the next section will present a survey on Information Flow Control.
 \newpage
 %Enforcing new session start every time a patient journal is sent. Could it be enforced with IFC?
 

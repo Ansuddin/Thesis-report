@@ -9,33 +9,44 @@
 %\includepdf[pages={1}]{standardfrontpage2.pdf}
 
 %TODO INCLUDE NORMAL FRONTPAGE
-%\include{main/forside}
-
-%\pagebreak
-
-%\setcounter{tocdepth}{3}
-%\tableofcontents*
-%\chapter{List of Tables}
-%\chapter{List of Figures}
+\include{main/forside}
 
 
+\pagenumbering{roman}
+\setcounter{secnumdepth}{-1}
+\frontmatter{}
+
+\chapter{Abstract}
+\input{tex/Abstract}
+
+\chapter{Acknowledgements}
+\input{tex/Acknowledgements}
+
+\pagebreak
+
+
+\setcounter{tocdepth}{3}
+\setcounter{secnumdepth}{3}
+
+\tableofcontents*
+\chapter*{List of Tables}
+\chapter*{List of Figures}
 
 
 
 
-%\chapter{Abstract}
-%\input{tex/Abstract}
 
-%\chapter{Acknowledgements}
-%\input{tex/Acknowledgements}
+
+
 
 \mainmatter{}
 
-%\chapter{Introduction}\label{intro}
-%\input{tex/Introduction}
+\pagenumbering{arabic}
+\chapter{Introduction}\label{intro}
+\input{tex/Introduction}
 
-%\chapter{Background}\label{background}
-%\input{tex/Background}
+\chapter{Background}\label{background}
+\input{tex/Background}
 
 \chapter{Analysis}\label{analysis}
 \input{tex/Analysis}
@@ -66,6 +77,6 @@
 %
 \nocite{*}
 \bibliographystyle{plainnat}
-%\bibliography{bibliography} % bibliography.bib is the bibliography file name
+\bibliography{bibliography} % bibliography.bib is the bibliography file name
 
 \end{document}
