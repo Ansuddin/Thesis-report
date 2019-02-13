@@ -365,27 +365,151 @@ Next Alice receives a message \emph{B1} from Bob. The message header contains a 
 \end{figure}
 
 
-
-
-
 \newpage
 \section{Matrix}
-
-\subsection{Goals}
-
-\subsubsection{Short term goal}
-
-\subsubsection{Long term goal}
+Matrix is a set of open APIs for open-federated Instant Messaging (IM), Voice over IP (VoIP) and Internet of Things (IoT) communication, designed to create and support a new global real-time communication ecosystem. The intention is to provide an open decentralised pubsub layer for the internet for securely persisting and publishing/subscribing JSON objects. 
 % https://www.youtube.com/watch?v=-ofZMnKkp_Y 5:00 , 18:30
 
 \subsection{How does it work?}
+Here are three Matrix homeservers, each with one client connected. The clients are all participating in the same Matrix room, which is synchronised across the three participating servers. 
+
+Alice sends a JSON message to a room on her homeserver. 
+
+Alice's homeserver adds the JSON to its graph of history, linking it to the most recent unlinked object(s) in the graph.The server then signs the JSON including the signatures of the parent objects to calculate a tamper-resistent signature for the history.
+
+The server then sends the signed JSON over HTTPS to any other servers which are participating in the room.
+
+The destination servers perform a series of checks on the message:
+\begin{itemize}
+	\item Validate the message signature to protect against tampering with history
+	\item Validate the HTTP request's auth signature to protect against identity spoofing
+	\item Validate whether Alice's historical permissions allow her to send this particular message
+\end{itemize}
+
+If these checks pass, the JSON is added to the destination servers' graphs.
+
+Destination clients receive Alice's message with a long-lived GET request. (Clients are free to implement more efficient transports than polling as desired).
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=9cm]{figures/matrix1.png}
+	\caption{ Matrix \cite{matrixhome}.}
+	\label{fig:matrix1}
+\end{figure}
+
+Bob sends a response to Alice's message, and his server adds his message into his copy of the room's history, linking it to the most recent unlinked object in the graph - Alice's last message.
+
+Meanwhile, Charlie also responds to Alice's message - racing with Bob's message. Alice, Bob and Charlie's homeservers all have different views of the message history at this point - but Matrix is designed to handle this inconsistency.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=9cm]{figures/matrix2.png}
+	\caption{ Matrix \cite{matrixhome}.}
+	\label{fig:matrix2}
+\end{figure}
+
+Bob's homeserver relays his message through to Alice and Charlie's servers, who accept it. At this point Alice and Bob are in sync, but Charlie's room history has split - both messages 2 and 3 follow on from message 1. This is not a problem; Charlie's client will be told about Bob's message and can handle it however it chooses.
+
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=9cm]{figures/matrix3.png}
+	\caption{ Matrix \cite{matrixhome}.}
+	\label{fig:matrix3}
+\end{figure}
+
+ 
+Charlie's homeserver relays his message through as well, at which point all 3 servers have a consistent view of history again (including the race between Bob and Charlie). All three clients have seen all three messages, and the room history is now back in sync across the participating servers.
+
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=9cm]{figures/matrix4.png}
+	\caption{ Matrix \cite{matrixhome}.}
+	\label{fig:matrix4}
+\end{figure}
+
+Later on, Alice sends another message - her homeserver adds it to her history, and links it to the most recent unlinked objects in the graph: Bob and Charlie's messages. This effectively merges the split in history and asserts the integrity of the room (or at least her view of it). 
+
+Alice's message is then relayed to the other participating servers, which accept it and update their own history with the same rules, ensuring eventual consistency and integrity of the distributed room.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=9cm]{figures/matrix5.png}
+	\caption{ Matrix \cite{matrixhome}.}
+	\label{fig:matrix5}
+\end{figure}
 
 \subsection{Architecture}
+Matrix defines APIs for synchronising extensible JSON objects known as "events" between compatible clients, servers and services. Clients are typically messaging/VoIP applications or IoT devices/hubs and communicate by synchronising communication history with their "homeserver" using the "Client-Server API". Each homeserver stores the communication history and account information for all of its clients, and shares data with the wider Matrix ecosystem by synchronising communication history with other homeservers and their clients.
+
+Clients typically communicate with each other by emitting events in the context of a virtual "room". Room data is replicated across all of the homeservers whose users are participating in a given room. As such, no single homeserver has control or ownership over a given room. Homeservers model communication history as a partially ordered graph of events known as the room's "event graph", which is synchronised with eventual consistency between the participating servers using the "Server-Server API". This process of synchronising shared conversation history between homeservers run by different parties is called "Federation". Matrix optimises for the Availability and Partitioned properties of CAP theorem at the expense of Consistency.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=12cm]{figures/matrix_architecture.png}
+	\caption{ Matrix conceptual architecture \cite{matrixspec}.}
+	\label{fig:matrix_architecture}
+\end{figure}
+
+\subsubsection{Event}
+
+All data exchanged over Matrix is expressed as an "event". Typically each client action (e.g. sending a message) correlates with exactly one event. Each event has a type which is used to differentiate different kinds of data. type values MUST be uniquely globally namespaced following Java's package naming conventions, e.g. com.example.myapp.event. The special top-level namespace m. is reserved for events defined in the Matrix specification - for instance m.room.message is the event type for instant messages. Events are usually sent in the context of a "Room".
+
+Events exchanged in the context of a room are stored in a directed acyclic graph (DAG) called an "event graph". The partial ordering of this graph gives the chronological ordering of events within the room. Each event in the graph has a list of zero or more "parent" events, which refer to any preceding events which have no chronological successor from the perspective of the homeserver which created the event.
+
+Typically an event has a single parent: the most recent message in the room at the point it was sent. However, homeservers may legitimately race with each other when sending messages, resulting in a single event having multiple successors. The next event added to the graph thus will have multiple parents. Every event graph has a single root event with no parent.
+
+\subsubsection{Room}
+A room is a conceptual place where users can send and receive events. Events are sent to a room, and all participants in that room with sufficient access will receive the event. Rooms are uniquely identified internally via "Room IDs", which have the form:
+
+\[!r00m1d:matrix.org\]
+
+There is exactly one room ID for each room. Whilst the room ID does contain a domain, it is simply for globally namespacing room IDs. The room does NOT reside on the domain specified.
+
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=11cm]{figures/matrix_room.png}
+	\caption{ Matrix conceptual architecture \cite{matrixspec}.}
+	\label{fig:matrix_room}
+\end{figure}
+
+Federation maintains shared data structures per-room between multiple homeservers. The data is split into message events and state events.
+
+\subparagraph{Message events}
+These describe transient 'once-off' activity in a room such as an instant messages, VoIP call setups, file transfers, etc. They generally describe communication activity.
+
+\subparagraph{State events}
+These describe updates to a given piece of persistent information ("state") related to a room, such as the room's name, topic, membership, participating servers, etc. State is modelled as a lookup table of key/value pairs per room, with each key being a tuple of state\_key and event type. Each state event updates the value of a given key.
+The state of the room at a given point is calculated by considering all events preceding and including a given event in the graph. Where events describe the same state, a merge conflict algorithm is applied. The state resolution algorithm is transitive and does not depend on server state, as it must consistently select the same event irrespective of the server or the order the events were received in. Events are signed by the originating server (the signature includes the parent relations, type, depth and payload hash) and are pushed over federation to the participating servers in a room, currently using full mesh topology. Servers may also request backfill of events over federation from the other servers participating in a room.
 
 \subsection{Matrix specification}
 
-\subsection{End-to-end Encryption}
+Matrix defines a set of open APIs for decentralised communication, suitable for securely publishing, persisting and subscribing to data over a global open federation of servers with no single point of control. Uses include Instant Messaging (IM), Voice over IP (VoIP) signalling, Internet of Things (IoT) communication, and bridging together existing communication silos - providing the basis of a new open real-time communication ecosystem. 
 
+Matrix two main API specification; Client/Server API and Federated API. Any Matrix SDK implements the API defined at the Client/Server API specification. If a custom homeserver was to be developed from scratch it would have to conform to the Federated API to be able to be a part of Matrix. 
+
+\subparagraph{Client/Server API}
+The client-server API provides a simple lightweight API to let clients send messages, control rooms and synchronise conversation history. It is designed to support both lightweight clients which store no state and lazy-load data from the server as required - as well as heavyweight clients which maintain a full local persistent copy of server state.
+
+\subsection{End-to-end Encryption}
+Privacy is particularly critical for a decentralized network like Matrix, where user data is replicated over all the servers participating in a room and so must be protected. Matrix provides state of the art end-to-end encryption in beta using the Olm and Megolm cryptographic ratchets, and ensuring that only explicitly authorized devices can participate in a conversation. 
+
+Olm and Megolm are examined in section \ref{matrixeval}.
+
+
+The end-to-end encryption is based on the Double Ratcet algorithm.
+
+
+\begin{itemize}
+	\item Provides 1:1 encrypted channels between pairs of devices via the Olm double ratchet 
+	\item Supports group chats with hundreds of devices via the new Megolm shared ratchet, with either perfect forward secrecy or the ability to decrypt conversation history on new devices. 
+	\item Supports multiple devices, tracking verification trust per-device to help spot interception.
+\end{itemize}
+
+
+Currently any apps built on matrix-js-sdk, matrix-ios-sdk or matrix-android-sdk support encryption, which is in beta as of March 2017.  The libolm library itself is considered stable however.
 
 
 
