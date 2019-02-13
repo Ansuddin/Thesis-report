@@ -6,7 +6,7 @@ Section \ref{evaluationofmatrix} provides an evaluation of the Matrix security m
 The paper \emph{SoK: Secure Messaging} describes a evaluation framework for evaluating secure messaging systems. They define several security properties related to such systems \cite{sok} which will be presented.
 
 
-All secure messaging systems are based on the Double Ratchet algorithm which will also be described.
+All secure messaging systems with end-to-end encryption are based on the Double Ratchet algorithm from the Signal Protocol which will also be described.
 
 
 Finally the architecture of Matrix and concepts related to Information-Flow Control will be introduced.
@@ -129,24 +129,57 @@ The following properties are also defined in the paper \emph{SoK: Secure Messagi
 
 
 \subsection{Concepts}
-In information security standard security properties are achieved using cryptography.
 
- 
+\subsubsection{Diffie-Hellman Key Exchange}
 
-\subsubsection{Deffie-Hellman Key Exchange}
+Diffie-Hellman is a key exchange protocol to establish a shared secret over an insecure channel. Public information is send over an insecure and using asymmetric keys two parties can derive the same shared key.
 
-\subsubsection{Key Deriviation function}
 
-\subsubsection{Unknown key share attack}
+The first step is to agree on some public values. Either of the parties start the protocol by picking a large prime \emph{p} and a integer \emph{g} then the values are sent over the insecure channel.  
 
-\subsubsection{Double Ratchet algorithm}
+\begin{figure}[H]
+	\hspace*{-1cm} 
+	\centering
+	\includegraphics[width=14cm]{figures/dh.png}
+	\caption{Simple Diffie-Hellman Key Exchange}
+	\label{fig:dh}
+\end{figure}
 
-The Double Ratchet algorithm has three stages. 
-Before the Double Ratchet algorithm can be used the two parties communicating need to agree on a shared secrey key. In the Signal protocol this is achieved with Triple Deffie-Hellman protocol \emph{(TripleDH)}.
+Alice and Bob will each pick a private key value and compute a public key value. The computed key value is sent over the insecure channel and Alice and Bob will both perform the same computation as previously \cite{crypto101}.
 
-\paragraph{Triple Deffie-Hellman protocol}
 
-The Triple Deffie-Hellman protocol is a \emph{key agreement protocol}. It involves a server and two parties; Alice and Bob. 
+The Diffie-Hellman is vulnerable to man in the middle attack since there is no authentication taking place. There exist a solution to this problem using asymmetric key pairs and signing the messages being sent \cite{crypto101}.
+
+\subsubsection{Key Derivation function}
+
+Assume a secret key is established between two parties and is used to encrypt messages and exchange them over an insecure channel. An adversary listening might store all the messages being send even though he is not able to read them. However at some point he manages to compromise the secret key hence being able to decrypting every message ever sent.
+
+To overcome the above scenario ephemeral keys are used. Such keys are short lived and are discarded after use.   
+
+New secret keys can be generated using a \emph{Key Derivation Function} (KDF).
+A KDF is a one way function that derives one or more randomized secret keys based on a secret key (or multuple) and optionally some input value \cite{crypto101}. Figure \ref{fig:kdf} illustrates this.
+
+ \begin{figure}[H] 
+ 	\centering
+ 	\includegraphics[width=8cm]{figures/kdf.png}
+ 	\caption{Key derivation function}
+ 	\label{fig:kdf}
+ \end{figure}
+
+
+A core concept in the Double Ratchet algorithm is KDF chains which build a chain of secret keys using KDF \cite{doubleratchet}. 
+
+
+\subsubsection{Signal Protocol}
+
+The Signal Protocol provides end-to-end encryption and was developed in 2013 and was first introduced in the app TextSecure\footnote{https://en.wikipedia.org/wiki/TextSecure}.
+
+The Signal Protocol consists of two parts; The \emph{Triple Diffie-Hellman protocol} (TripleDH) and the Double Ratchet algorithm.
+
+\paragraph{Triple Diffie-Hellman protocol}\label{tripledh}
+Before the Double Ratchet algorithm can be used the two parties communicating need to agree on a shared secret key. In the Signal protocol this is achieved with Triple Diffie-Hellman protocol \emph{(TripleDH)}.
+
+The Triple Diffie-Hellman protocol is a \emph{key agreement protocol}. It involves a server and two parties; Alice and Bob. 
 
 The TripleDH protocol is characterized by three phases:
 
@@ -170,28 +203,30 @@ The prekey bundle exists of:
 \end{itemize}
 
 \subparagraph{Sending initial message}
-Alice retrieves Bobs public keys from the server. She receives one of Bob's single one-time prekey. The server deletes the one-time prekey that was send.   
+Alice retrieves Bobs public keys from the server. She receives one of Bob's single one-time prekey. The server deletes the one-time prekey that was send. It might be the case that all the one-time prekeys at the server has been used \cite{tripledh}.  
 
 
-Alice verifies the prekey signature if the verification fails the protocol is aborted. 
-
-Alice provides the following public keys to generate a shared secret:
+Alice verifies the prekey signature if the verification fails the protocol is aborted or else the following public keys are provided to generate a shared secret:
 
 \begin{itemize}
-	\item Identity key \emph{IK\textsubscript{B}}. Her own identity key. 
-	\item Ephemeral key \emph{EK\textsubscript{B}}. The public key from a generated ephemeral key pair.
+	\item Identity key \emph{IK\textsubscript{A}}. Her own identity key. 
+	\item Ephemeral key \emph{EK\textsubscript{A}}. The public key from a generated ephemeral key pair.
 \end{itemize}
 
 
-Now she can generate the shared secret.
+To generate the shared secret the following calculations are made:
 
-The calculation and concatenation of DH4 is optional since there might not be anymore one-time prekeys on the server. 
+\[DH_1 = DH(IK_A, SPK_B)\]
+\[DH_2 = DH(EK_A, IK_B) \]
+\[DH_3 = DH(EK_A, SPK_B)\]
+\[DH_4 = DH(EK_A, OPK_B)\]
+\[SK = KDF(DH_1 || DH_2 || DH_3 || DH_4)\]
 
-Alice’s initial ciphertext is typically used as the first message in a post-
-X3DH communication protocol, such as the Double Ratchet protocol from
-section 3.1. The ciphertext has two roles, serving as the first message within
-some post-X3DH protocol, and as part of Alice’s X3DH initial message to
-Bob
+There are performed atleast three Diffie-Hellman where \emph{DH\textsubscript{4}} is optional depending on if the server had more one-time prekeys.
+
+Authentication is provided by \emph{DH\textsubscript{1}} and \emph{DH\textsubscript{2}} while \emph{DH\textsubscript{3}} and \emph{DH\textsubscript{4}} provides forward secrecy.
+
+The figure \ref{tripledh} illustrates the calculations. 
 
 
 \begin{figure}[H]
@@ -201,67 +236,46 @@ Bob
 	\label{fig:tripledh}
 \end{figure}
 
+Alice then deletes the DH values and her private key associated to the ephemeral key to uphold forward secrecy and sends the initial message to Bob which consists of \cite{tripledh}: 
+
+\begin{itemize}
+	\item Cypher text with AEAD encryption  \footnote{https://en.wikipedia.org/wiki/Authenticated\_encryption} with \emph{associated data} using her own and Bob's identity keys.
+	\item Her identity key \emph{IK\textsubscript{A}}.
+	\item Her ephemeral key \emph{EK\textsubscript{A}}.
+	\item Some identifiers to which of Bob's prekeys she used.
+	
+\end{itemize} 
+
 
 \subparagraph{Receiving initial message}
 
-Phase three of the X3DH is mostly the same as phase two. Bob retrieves
-Alice’s initial message which contains Alice’s identity key and ephemeral
-key from the message. Bob will then load his identity private key and the
-private key(s) corresponding to the signed prekey and one-time prekey that
-Alice used.
-Bob repeats the same steps with DH and KDF calculations to derive his
-own SK and then deletes the DH values the same as Alice did. Afterwards,
-he constructs the AD byte sequence, and in the end, tries to decrypt the
-initial ciphertext using the SK and AD. The decryption is the only difference
-Bob does to what Alice did on her side. If the decryption fails, Bob will
-delete the SK and the protocol aborts and the participants need to restart
-the protocol from the start.
-If the decryption is successful, he gets the information that Alice had
-encrypted, and the protocol is complete for Bob. He deletes any onetime
-prekey private key that was used during the protocol, to uphold the
-forward secrecy and not get it compromised.
+When Bob receives Alice's initial message he performs the exact same calculations in phase two and derives the same shared secret key \emph{SK}.
 
-\paragraph{KDF chain}
+Bob then decrypts the cypher text with the shared key and \emph{associated data} using his own and Alice's identity keys. If the decryption fails the protocol is aborted and \emph{SK} is deleted. Otherwise the protocol is complete and Bob deletes the one-time private prekey. 
+The shared secret key can then be used for the Double Ratchet algorithm \cite{tripledh}.  
 
-KDF Chain is a core concept in the Double Ratchet algorithm.
-The job of the KDF chain throughout the Double Ratchet session is to
-store each parties KDF key for three chains: a root chain, a sending chain, and
-a receiving chain.
-The KDF chains are both part of the Diffie-Hellman ratchet step and
-the Symmetric-key ratchet step. While the parties exchange messages, they
-need to exchange new Diffie-Hellman public keys. The secrets from the DH
-output become the inputs to the root chain for the KDF chain, and then the output keys from the root chain become new KDF keys for the sending and
-receiving chains. This is the Diffie-Hellman ratchet.
-The outputs from the Diffie-Hellman ratchet, the sending and receiving
-chains advances for each sending and receiving message, by using the
-chains as inputs in the KDF and the output keys are then used to encrypt
-and decrypt messages. This is called the symmetric-key ratchet.
+\paragraph{Double Ratchet algorithm}
 
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=7cm]{figures/kdfchain.png}
-	\caption{Processing of three inputs and the resulting outputs in KDF chain \cite{doubleratchet}.}
-	\label{fig:kdfchain}
-\end{figure}
+After a shared secret key has been established the Double Ratchet algorithm can then be used to send and receive encrypted messages.
 
-\paragraph{Symmetric ratchet}
-The symmetric-key ratchet uses KDF chains for its sending and receiving
-chains. The output keys are unique message keys which are used to either
-encrypt or decrypt messages. The KDF keys for the symmetric-key ratchet
-chains will be called chain keys throughout the rest of the Double Ratchet
-description.
-The KDF chains used for the sending and receiving chains are constant;
-they do not need to be random or a secret because the chain key is derived
-from the Diffie-Hellman KDF chain which is cryptographically secure. The
-documentation explains the constant can be a single byte 0x01 for the
-message key and then a single byte 0x02 for the chain key. The sending
-and receiving chains ensure that each message is encrypted or decrypted
-with a unique key and can be deleted after use. There is only a single
-symmetric-key ratchet step to calculate a new message and chain key from
-an already given chain key. The diagram below shows two steps in this
-process. The first KDF gets a chain key from the Diffie-Hellman KDF chain
-and outputs a new chain key for the next KDF and a message key to encrypt
-or decrypt a message.
+Each party has three chains; root chain, sender chain and receive chain. The chains are KDF chains and will take two keys as input (a KDF chain key and some other input key) and output new two keys (a new KDF chain key and some other output key). The KDF chain is illustrated in figure \ref{symkeyratchet}.
+
+The algorithm has a \emph{Diffie-Hellman ratchet} step and \emph{symmetric ratchet} step and the chains are used across both steps.
+
+\begin{itemize}
+	\item \emph{Diffie-Hellman ratchet:} The parties exchanges new Diffie-Hellman public keys with the messages being sent. New secrets are then derived using Diffie-Hellman (DH). The secret that DH outputs is used as input to the root chain. The root chain then output new chain keys for the receiving and sending chains. 
+	
+	\item \emph{Symmetric ratchet:} The sending and receiving chains uses the chain keys derived from the root chain and for each message sent and received the chains are advanced. The output from the receiving and sending chains are keys for encrypting or decrypting messages. 
+\end{itemize}
+
+
+\subparagraph{Symmetric ratchet}
+The symmetric ratchet provides message key through the receiving and sending chains. A message key is used for encryption or decryption of a message.
+
+In the symmetric ratchet a single ratchet step is the calculation of the next key chain and message key. The inputs are the current chain key and a constant. Figure \ref{fig:symkeyratchet} illustrates two steps in a symmetric ratchet.
+
+\emph{Forward secrecy} is provided since KDF is a one-way function and it is not possible to go backward and get the input chain key from the output chain key. However since the other input is simply a constant all future keys chain keys and message keys can be derived from an older chain key.
+
 
 \begin{figure}[H]
 	\centering
@@ -270,125 +284,43 @@ or decrypt a message.
 	\label{fig:symkeyratchet}
 \end{figure}
 
-The message key that is derived from the KDF chain is not used later on to derive new message keys or chaining keys. Because of this, it is fully
-possible to store the message key without affecting the security of other
-keys, only the message that belongs to the particular message key. It is
-quite useful when the protocols handles out-of-order messages because a
-participant can store the message key and decrypt the message later when
-they receive the correct message for that message key.
 
-\paragraph{Deffie-Hellman ratchet}
-The Double Ratchet is formed by combining the symmetric-key ratchet and
-the Diffie-Hellman ratchet. If the Double Ratchet did not use the Diffie-
-Hellman ratchet to compute new chain keys for the sending and receiving
-chain keys, an attacker could steal one of the chain keys and then compute
-all future message keys and decrypt all future messages.
-For this to work, each party generates a DH key pair, a public and a
-private key, which will be their first ratchet key pair. When a message
-is sent, the header must contain the current public key. When a message
-is received, the receiver checks the public keys that are given with the
-message and do a DH ratchet step to replace the receiver’s current ratchet
-key pair with a new one.
-The result is a kind of ”ping-pong” behavior as the two parties take
-turns replacing their key pairs. The attacker will have a harder time to get
-any valuable information from the parties, since if one of the messages gets
-compromised, and the attacker learns the value of the current private key,
-it will not make any difference since the private key will soon be replaced
-with a new, uncompromised key.
-From this point onwards, this section will present an example of how
-the Diffie-Hellman ratchet works to get a shared sequence of DH outputs.
-The initialization starts with Bob sending his ratchet public key to Alice,
-while Bob does not know Alice’s ratchet public key. Alice will now do
-the initialization step by performing a DH calculation between her ratchet
-public key and Bobs ratchet public key.
-Figure
+\newpage
+\subparagraph{Diffie-Hellman ratchet}
+To solve the problem ... the symmetric ratchet is combined with the Diffie-Hellman Ratchet resulting in a Double Ratchet.
+
+Every message from either party begins with a header which contains the sender's current ratchet public key. Whenever a new ratchet public key is received a new ratchet key pair is generated; a secret is derived through Diffie-Hellman with the input being the received ratchet public key and the ratchet private key from the new generated key pair.
+
+Assume that the message exchanged is a continuation from the TripleDH key exchange described in section \ref{tripledh}. Alice had sent an initial message. The initial ratchet public key would be Bob's signed prekey \emph{SPK\textsubscript{B}} and the new ratchet key pair would be the Alice's ephemeral key pair that she generated. Alice had derived a shared secret key \emph{SK} which would be the input to her \emph{sending chain}. At the receiving end Bob derived the same shared secret which would be the input to his \emph{receiving chain}. Alice's sending chain and Bob's receiving chain share the same secret hence he can derive the message key and decrypt the message sent from Alice. When Bob sends a reply to Alice he would generate a new ratchet key pair and derive a new secret which would be input to his \emph{sending chain}.
+
+Figure \ref{fig:dhratchet1} shows an ongoing message exchange with new secrets being derived and the sending and receiving chains being advanced.
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=10cm]{figures/dhratchet1.png}
-	\caption{Diffie-Hellman ratchet 1 \cite{doubleratchet}.}
+	\includegraphics[width=9cm]{figures/dhratchet5.png}
+	\caption{Diffie-Hellman ratchet \cite{doubleratchet}.}
 	\label{fig:dhratchet1}
 \end{figure}
 
-The figure shows Alice advertise her ratchet public key to Bob after she
-is done with her Diffie-Hellman calculation. When Bob receives Alice’s
-initial message, he performs a Diffie-Hellman ratchet step by calculating
-the new DH output between Alice’s ratchet public key and his ratchet private key, which equals Alice’s DH output. The DH outputs are equal
-because the figures are a simplification of the DH ratchet, and there is a
-KDF chain which uses a Root Key (shared secret between Alice and Bob) to
-output the same keys. He then replaces his ratchet key pair and calculates
-a new DH output.
+
+When Alice receive the reply from Bob she would perform the exact same steps. This ultimately results in a continous loop of generating new ratchet key pairs and using Diffie-Hellman to derive the same shared secret key. A continuation is shown in figure \ref{fig:dhratchet2}
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=10cm]{figures/dhratchet2.png}
-	\caption{Diffie-Hellman ratchet 2 \cite{doubleratchet}.}
+	\includegraphics[width=9cm]{figures/dhratchet6.png}
+	\caption{Continuation of Diffie-Hellman ratchet  \cite{doubleratchet}.}
 	\label{fig:dhratchet2}
 \end{figure}
 
-Bob sends his next message with the new ratchet public key. Eventually,
-Alice receives Bob’s new message with his new ratchet public key. Alice
-derives a newDHoutput with her ratchet private key and Bob’s new public
-key to get the same DH output as Bob for decrypting the message and then
-generates a new DH ratchet key pair to replace her old key pair. With the
-new DH ratchet key pair, Alice derives another DH output with her new
-ratchet private key and the same ratchet public key from Bob, which is used
-in the next message exchange. These exchanges continue for each message
-sent with a new ratchet public key and new DH output.
 
-%\begin{figure}[H]
-%	\centering
-%	\includegraphics[width=10cm]{figures/dhratchet3.png}
-%	\caption{Diffie-Hellman ratchet 3 \cite{doubleratchet}.}
-%	\label{fig:dhratchet3}
-%\end{figure}
-
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=10cm]{figures/dhratchet4.png}
-	\caption{Diffie-Hellman ratchet 4 \cite{doubleratchet}.}
-	\label{fig:dhratchet4}
-\end{figure}
-
-Until now the DH outputs have only been called outputs to simplify the
-description of the DH ratchet, but the DH outputs are used in a KDF to get
-the sending and receiving chain keys for the symmetric-key ratchet. Figure
-3.5 shows the DH outputs are changed with sending or receiving chains.
-The first time Alice sends out her message with her ratchet public key and
-DH output, a sending chain is derived from the DH output through a KDF
-chain, and Bob on his side derives a receiving chain key from hisDHoutput
-by using Alice’s public key and his private key. Bob then derives a new
-sending chain key from his second DH output.
+As mentioned in the beginning of the Double Ratchet section the Diffie-Hellman ratchet does have a root chain which would provide inputs to the sending and receiving chains. A more correct view of the process in Diffie-Hellman is shown in figure \ref{fig:dhratchetcon}. 
 
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=10cm]{figures/dhratchet5.png}
-	\caption{Diffie-Hellman ratchet 5 \cite{doubleratchet}.}
-	\label{fig:dhratchet5}
-\end{figure}
-
-
-
-The figures shown until now have been a simplification of the DH
-ratchet. The DH ratchet takes the output keys and uses them as KDF inputs
-to a root chain, and then the KDF outputs are used as a sending or receiving
-key. Using a KDF chain here improves the resilience and break-in recovery.
-Figure 3.6 shows that the DH ratchet updates the root KDF chain twice, and
-uses the KDF output keys as new sending and receiving chain keys
-
-%\begin{figure}[H]
-%	\centering
-%	\includegraphics[width=10cm]{figures/dhratchet6.png}
-%	\caption{Diffie-Hellman ratchet 6 \cite{doubleratchet}.}
-%	\label{fig:dhratchet6}
-%\end{figure}
-
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=10cm]{figures/dhratchet7.png}
+	\includegraphics[width=9cm]{figures/dhratchet7.png}
 	\caption{Diffie-Hellman ratchet 7 \cite{doubleratchet}.}
-	\label{fig:dhratchet7}
+	\label{fig:dhratchetcon}
 \end{figure}
 
 \paragraph{Double ratchet}
@@ -482,13 +414,6 @@ ratchet private key to derive a new RK and a new sending CK with Bob’s
 new ratchet public key. The sending CK is used to do a symmetric-key
 ratchet step to derive a new CK and a message key to encrypt her new
 message, A5.
-
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=10cm]{figures/doubleratchet5.png}
-	\caption{Double ratchet 5 \cite{doubleratchet}.}
-	\label{fig:doubleratchet5}
-\end{figure}
 
 
 

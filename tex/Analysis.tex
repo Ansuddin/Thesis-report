@@ -290,9 +290,9 @@ All properties related to group chat are also provided. Although they are additi
 
 Matrix allows decryption of a message multiple times hence it is vulnerable to replay attacks. Replay attacks are handled at the application layer. Whenever a message is decrypted a message index is generated and stored. If the exact message is decrypted again the same message index will be generated and can be compared to the stored message index making the replayed message invalid. 
 
-\subparagraph{Unknown Key Share attack}
+\subparagraph{Unknown key-share attack}
 
-A vulnerability found with a high risk in Megolm. The vulnerability is inherited from Olm and occurs after the initial message in Triple-DH. The attack is described in section xx.
+The \emph{Unknown key-share attack}\footnote{https://en.wikipedia.org/wiki/Unknown\_key-share\_attack} is a vulnerability found with a high risk in Megolm. The vulnerability is inherited from Olm and occurs after the initial message in Triple-DH. 
 
 The vulnerability has been mitigated at the application layer by providing a unique identifier for the sender and receiver into each message and then checking the values when decrypted \cite{ncc}.
 
@@ -321,7 +321,7 @@ Matrix identifies IoT as another use case. A person can have several devices for
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=12cm]{figures/matrix_iot.png}
+	\includegraphics[width=10cm]{figures/matrix_iot.png}
 	\caption{End goal for Matrix IoT}
 	\label{fig:matrix_iot}
 \end{figure}
@@ -334,16 +334,17 @@ In this section an evaluation of Matrix security was presented. Several security
 
 End-to-end encryption is not the end of security. Other security measures must be taken to provide confidentiality and integrity. Information Flow Control is such measure and the next section will present a survey on Information Flow Control.
 \newpage
+
+
+
+\section{Survey of IFC Tools}
 %Enforcing new session start every time a patient journal is sent. Could it be enforced with IFC?
-
-
-
 % Tools issue: java sdk for matrix is beta and not fully implemented. 
 % Best supported sdk is for javascript or python. Problem of running javascript code or python code with Paragon (java)
 % Maybe better to use JSFlow instead 
 
 
-%\section{Survey of IFC Tools}
+
 %Having established that end-to-end security is not the end of security we will now look at Information-Flow Control tools. 
 
 %The approach to the section will be from a programmers perspective hence usability and practicality will play a role in which IFC tool is chosen. 
