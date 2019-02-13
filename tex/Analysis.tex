@@ -189,7 +189,7 @@ The further evaluation relies upon the the security assessment of Matrix.
 
 \subsection{Matrix protocol}\label{matrixeval}
 
-As described in section xx \emph{rooms} are a fundamental part of Matrix' architecture. There can be multiple participants in a room hence the support for secure group conversation is required.
+As described in section xx \emph{rooms} are a fundamental part of Matrix' architecture. There can be multiple participants in a room hence the support for secure group conversation is required. 
 
 Olm (and the Signal Protocol it is based on) is ideally meant for two party communication.
 Group conversation could be supported with a näive variant of Olm. In a group with N participants each participant would establish a secure Olm session with every other participant. When a message is send each message would then have to be encrypted N times. This solution would scale poorly if N was a large number. This was the motivation for introducing Megolm.

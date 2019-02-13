@@ -3,3 +3,10 @@ Is it possible to define policies based on type?
 
 The above might be false!
 
+
+
+Implementation:
+    Limitation of Matrix SDK
+        JS is the main SDK.
+        Java SDK does not support e2e
+        Python does support defining custom types.
