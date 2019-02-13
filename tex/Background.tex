@@ -127,6 +127,7 @@ The following properties are also defined in the paper \emph{SoK: Secure Messagi
 
 
 
+\newpage
 
 \subsection{Concepts}
 
@@ -274,7 +275,7 @@ The symmetric ratchet provides message key through the receiving and sending cha
 
 In the symmetric ratchet a single ratchet step is the calculation of the next key chain and message key. The inputs are the current chain key and a constant. Figure \ref{fig:symkeyratchet} illustrates two steps in a symmetric ratchet.
 
-\emph{Forward secrecy} is provided since KDF is a one-way function and it is not possible to go backward and get the input chain key from the output chain key. However since the other input is simply a constant all future keys chain keys and message keys can be derived from an older chain key.
+\emph{Forward secrecy} is provided since KDF is a one-way function and it is not possible to go backward and get the input chain key from the output chain key. However since the other input is simply a constant all future keys chain keys and message keys can be derived from an older chain key more specifically there is lack of backward secrecy.
 
 
 \begin{figure}[H]
@@ -287,11 +288,12 @@ In the symmetric ratchet a single ratchet step is the calculation of the next ke
 
 \newpage
 \subparagraph{Diffie-Hellman ratchet}
-To solve the problem ... the symmetric ratchet is combined with the Diffie-Hellman Ratchet resulting in a Double Ratchet.
+
+Double ratchet provides backward secrecy by comining the Symmetric ratchet with a Diffie-Hellman ratchet hence the name \emph{Double Ratchet}.
 
 Every message from either party begins with a header which contains the sender's current ratchet public key. Whenever a new ratchet public key is received a new ratchet key pair is generated; a secret is derived through Diffie-Hellman with the input being the received ratchet public key and the ratchet private key from the new generated key pair.
 
-Assume that the message exchanged is a continuation from the TripleDH key exchange described in section \ref{tripledh}. Alice had sent an initial message. The initial ratchet public key would be Bob's signed prekey \emph{SPK\textsubscript{B}} and the new ratchet key pair would be the Alice's ephemeral key pair that she generated. Alice had derived a shared secret key \emph{SK} which would be the input to her \emph{sending chain}. At the receiving end Bob derived the same shared secret which would be the input to his \emph{receiving chain}. Alice's sending chain and Bob's receiving chain share the same secret hence he can derive the message key and decrypt the message sent from Alice. When Bob sends a reply to Alice he would generate a new ratchet key pair and derive a new secret which would be input to his \emph{sending chain}.
+Alice starts a conversation with Bob and uses his published public key as a ratchet public key. Alice then generates a new ratchet key pair and derives a shared secret key using Diffie-Hellman and would that as input to her \emph{sending chain}. Alice then sends her new ratchet public key to Bob. At the receiving end Bob derives the same shared secret which would be the input to his \emph{receiving chain}. Alice's sending chain and Bob's receiving chain share the same secret hence he can derive the message key and decrypt the message sent from Alice. When Bob sends a reply to Alice he would generate a new ratchet key pair and derive a new secret which would be input to his \emph{sending chain}.
 
 Figure \ref{fig:dhratchet1} shows an ongoing message exchange with new secrets being derived and the sending and receiving chains being advanced.
 
@@ -324,27 +326,18 @@ As mentioned in the beginning of the Double Ratchet section the Diffie-Hellman r
 \end{figure}
 
 \paragraph{Double ratchet}
-Double Ratchet is the algorithm we get by combining symmetric-key
-ratchet and Diffie-Hellman ratchet. 
-When a message is sent or received, a symmetric-key ratchet step is
-applied to the sending or receiving chain to derive the message key.
-When a new ratchet public key is received, a DH ratchet step is performed prior to the symmetric-key ratchet to replace the chain keys.
 
-This section is about how these algorithms work together to form the
-Double Ratchet, seen from Alice’s perspective. The figure shows after Alice
-has done her initialization with Bob’s ratchet public key, and the Root Key
-(RK) is the shared secret used as the initial root key for the KDF chain.
-Alice generates her ratchet key pair and then sends the DH output to
-the root KDF chain to calculate a new root key and a sending chain key
-(CK). The figure is split up into four different parts. The ratchet is
-where the ratchet key pair changes and sends Alice’s ratchet private key
-and Bob’s ratchet public key to generate a DH output for the root KDF
-chain input. The sending column is where the message key for encryption
-generates through the symmetric-key KDF chain. The last column is where
-the message key for decrypting the received message gets also derived by
-the symmetric-key KDF chain. To ensure that the secrecy throughout the
-Double Ratchet is upheld, the old RK gets deleted after it has been used to
-derive a new RK.
+When combining Diffie-Hellman ratchet and symmetric-key ratchet the result is the Double ratchet.
+
+\begin{itemize}
+	\item When sending or receiving a message the corresponding message key is derived by performing a symmetric-key ratchet step.
+	\item Upon receiving a new ratchet public key the Diffie-Hellman ratchet step performed right before the symmetric-key ratchet step with the goal of replacing old chain keys with new ones.  
+\end{itemize}
+
+Assume that the message exchanged is a continuation from the TripleDH key exchange described in section \ref{tripledh}. Alice had sent an initial message. The initial ratchet public key would be Bob's signed prekey \emph{SPK\textsubscript{B}} and the new ratchet key pair would be the Alice's ephemeral key pair that she generated. Alice calculated a shared secret which is the \emph{root key}. She then generates a new ratchet key pair and takes the output from Diffie-Hellman and use it as input for the \emph{root chain}. The root chain then outputs a new root key \emph{RK} and a sending chain key {CK}.
+
+The figure \ref{doubleratchet1} depicts this with a view of Alice's chains.
+
 
 \begin{figure}[H]
 	\centering
@@ -353,11 +346,7 @@ derive a new RK.
 	\label{fig:doubleratchet1}
 \end{figure}
 
-The next figure shows Alice sending her first message to Bob, message A1.
-The sending CK is used on a symmetric-key ratchet step to derive a new
-CK and a message key, A1, to encrypt her message. The new CK is stored
-for later use, while the old CK and the message key can be deleted since it
-no longer is of any use to Alice.
+When Alice then sends a message \emph{A1} the symmetric-key ratchet step will return a new chain key and a message key. The message can then be encrypted with the message key.
 
 \begin{figure}[H]
 	\centering
@@ -366,15 +355,7 @@ no longer is of any use to Alice.
 	\label{fig:doubleratchet2}
 \end{figure}
 
-The figure shows Alice receiving her first response from Bob, message
-B1, and he has sent his new ratchet public key, which means Alice needs
-to calculate a new ratchet key pair. Alice applies a new DH ratchet step to
-derive a new receiving and sending chain keys. Alice uses her old ratchet
-private key and Bob’s new public key, to derive a new RK and a CK for
-the receiving KDF chain. The receiving chain key is used to derive a new
-receiving chain key and a message key to decrypt Bob’s message. Then she
-derives a new DH output for the next root KDF chain with her new ratchet
-private key to derive a new RK and a sending CK.
+Next Alice receives a message \emph{B1} from Bob. The message header contains a new ratchet public key and a Diffie-Hellman ratchet step is performed. New sending and receiving chain keys are derived and followed by a symmetric-key ratchet step to derive the receiving message key to decrypt the message.
 
 \begin{figure}[H]
 	\centering
@@ -383,37 +364,7 @@ private key to derive a new RK and a sending CK.
 	\label{fig:doubleratchet3}
 \end{figure}
 
-The next figure shows how many ratchet steps Alice does when
-sending a message A2, receiving a message B2 with Bob’s old ratchet public
-key, and then send two new messages A3 and A4 to Bob. Alice received
-a message B2 with Bob’s old ratchet keys, which means that Alice only
-needs to do a symmetric-key ratchet step to derive a new receiving CK
-and a message key to decrypt message B2. Before Alice sends her second
-message A2, she needs to do a symmetric-key ratchet step to derive a new
-sending CK and a message key to encrypt her message A2. The same must
-be done with message A3 and A4, by ratcheting the symmetric-key ratchet
-two more times to derive the correct message keys.
 
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=10cm]{figures/doubleratchet4.png}
-	\caption{Double ratchet 4 \cite{doubleratchet}.}
-	\label{fig:doubleratchet4}
-\end{figure}
-
-This figure shows the state when Alice receives messages B3 and B4
-from Bob with his new ratchet public key, and the sending of Alice’s last
-message, A5. Alice receives new messages from Bob with his new ratchet
-public key, and she first derives a new DH output to ratchet the root KDF
-chain to get a new RK and a new receiving CK to decrypt Bob’s messages.
-The receiving CK is used to run the symmetric-key ratchet step two times,
-ones to derive a new CK and a new message key for decryption of message
-B3 and then another ratchet step to derive the second CK and message key
-for message B4. Alice generates a new ratchet key pair and uses her new
-ratchet private key to derive a new RK and a new sending CK with Bob’s
-new ratchet public key. The sending CK is used to do a symmetric-key
-ratchet step to derive a new CK and a message key to encrypt her new
-message, A5.
 
 
 
