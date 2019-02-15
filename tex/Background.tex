@@ -501,24 +501,66 @@ Security is a high priority for Matrix design. Especially with the decentralized
 \newpage
 \section{Information Flow Control} %mere konkret og teknisk
 %Selvom jeg ikke kiggr på fx trafic analysis så er det vigtigt at nævne og påpege det ikkeer noget jeg løser
+In the beginning of this chapter the security properties confidentiality and integrity were mentioned which are major security goals for a system. If there is \emph{secure information flow} throughout the system then confidentiality and integrity is achieved \cite{Hedin2011}. Secure information flow means that only authorized flow on information is allowed \cite{Denning1976}
 
-\subsection{The Lattice Model}
-adsadsad
+Denning defines secure information flow as: 
+
+``You \emph{were} a little grave,'' said Alice.''
+
+Security is equivalent to \emph{secure information flow}
+
+ meaning that it is not possible for information 
+
+means here that no unauthorized flow of information is
+possible. 
+
+.
+
+
+
+
+Encryption and access control are common techniques for addressing confidentiality however 
+
+Information Flow Control is a language-based security technique that can enforce defined policies concerning confidentiality and integrity of data. It enables us to express where data may flow to and under what conditions. 
 
 \subsection{Noninterference}
-dasdsa
+The general definition of secure information flow is expressed through \emph{noninterference}.
 
-\subsection{Static policies}
+If a user wishes to keep some data confidential, he or
+she might state a policy stipulating that no data visible
+to other users is affected by confidential data.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=8cm]{figures/noninterference.png}
+	\caption{ Noninterference}
+	\label{fig:noninterference}
+\end{figure}
 
 
-sadsad
-\subsection{Dynamic policies}
-sadsadsad
+\subparagraph{Termination-sensitive}
+
+\subparagraph{Termination-insensitive}
 
 
-\subsection{Declassification}
+\subsection{Decentralized label model}
+
+\subsubsection{Lattice model}
+
+
+\subsubsection{Declassification}
 Taking some specific information and changing it to a lower security classification.
 
 Identify: What to classify, who declassifies, where the declassification happens and when the declassification happens
+
+
+\subsection{Enforcement}
+
+\subsubsection{Static enforcement}
+
+
+\subsubsection{Dynamic enforcement}
+
+
 
 \section{Summary}

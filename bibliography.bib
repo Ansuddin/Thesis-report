@@ -270,3 +270,131 @@ title = {{Client-Server API}},
 url = {https://matrix.org/docs/spec/client{\_}server/r0.4.0.html{\#}types-of-room-events},
 urldate = {2019-02-13}
 }
+
+
+@article{Askarov2008,
+abstract = {Current tools for analysing information flow in$\backslash$nprograms build upon ideas going back to Denning's$\backslash$nwork from the 70's. These systems enforce an$\backslash$nimperfect notion of information flow which has$\backslash$nbecome known as termination-insensitive$\backslash$nnoninterference. Under this version of$\backslash$nnoninterference, information leaks are permitted if$\backslash$nthey are transmitted purely by the program's$\backslash$ntermination behaviour (i.e., whether it terminates$\backslash$nor not). This imperfection is the price to pay for$\backslash$nhaving a security condition which is relatively$\backslash$nliberal (e.g. allowing while-loops whose termination$\backslash$nmay depend on the value of a secret) and easy to$\backslash$ncheck. But what is the price exactly? We argue that,$\backslash$nin the presence of output, the price is higher than$\backslash$nthe "one bit" often claimed informally in the$\backslash$nliterature, and effectively such programs can leak$\backslash$nall of their secrets. In this paper we develop a$\backslash$ndefinition of termination-insensitive$\backslash$nnoninterference suitable for reasoning about$\backslash$nprograms with outputs. We show that the definition$\backslash$ngeneralises "batch-job" style definitions from the$\backslash$nliterature and that it is indeed satisfied by a$\backslash$nDenning-style program analysis with output. Although$\backslash$nmore than a bit of information can be leaked by$\backslash$nprograms satisfying this condition, we show that the$\backslash$nbest an attacker can do is a brute-force attack,$\backslash$nwhich means that the attacker cannot reliably (in a$\backslash$ntechnical sense) learn the secret in polynomial time$\backslash$nin the size of the secret. If we further assume that$\backslash$nsecrets are uniformly distributed, we show that the$\backslash$nadvantage the attacker gains when guessing the$\backslash$nsecret after observing a polynomial amount of output$\backslash$nis negligible in the size of the secret.},
+author = {Askarov, Aslan and Hunt, Sebastian and Sabelfeld, Andrei and Sands, David},
+doi = {10.1007/978-3-540-88313-5-22},
+file = {:C$\backslash$:/Users/ansuddin/Dropbox/Thesis/Andet/Materiale/Papers/Relevant/+Termination-Insensitive Noninterference Leaks more than just a bit.pdf:pdf},
+isbn = {3540883126},
+issn = {03029743},
+journal = {Lecture Notes in Computer Science (including subseries Lecture Notes in Artificial Intelligence and Lecture Notes in Bioinformatics)},
+pages = {333--348},
+title = {{Termination-insensitive noninterference leaks more than just a bit}},
+volume = {5283 LNCS},
+year = {2008}
+}
+@article{Askarov2005,
+abstract = {Security protocols are critical for protecting modern communication infrastructures and are therefore subject to thorough analysis. However practical implementations of these protocols lack the same level of attention and thus may be more exposed to attacks. This paper discusses security assurance provided by security-typed languages when implementing cryptographic protocols. Our results are based on a case study using Jif, a Java-based security-typed language, for implementing a non-trivial cryptographic protocol that allows playing online poker without a trusted third party. The case study deploys the largest program written in a security-typed language to date and identifies insights ranging from security guarantees to useful patterns of secure programming.},
+author = {Askarov, Asian and Sabelfeld, Andrei},
+doi = {10.1007/11555827_12},
+file = {:C$\backslash$:/Users/ansuddin/Dropbox/Thesis/Andet/Materiale/Papers/Relevant/+Security-typed languages for implementation of cryptographic protocols.pdf:pdf},
+isbn = {3540289631},
+issn = {03029743},
+journal = {Lecture Notes in Computer Science (including subseries Lecture Notes in Artificial Intelligence and Lecture Notes in Bioinformatics)},
+pages = {197--221},
+title = {{Security-typed languages for implementation of cryptographic protocols: A case study}},
+volume = {3679 LNCS},
+year = {2005}
+}
+@article{Myers2003,
+abstract = {Stronger protection is needed for the confidentiality and integrity of data, because programs containing untrusted code are the rule rather than the exception. Information flow control allows the enforcement of end-to-end security policies, but has been difficult to put into practice. This article describes the decentralized label model, a new label model for control of information flow in systems with mutual distrust and decentralized authority. The model improves on existing multilevel security models by allowing users to declassify information in a decentralized way, and by improving support for fine-grained data sharing. It supports static program analysis of information flow, so that programs can be certified to permit only acceptable information flows, while largely avoiding the overhead of run-time checking. The article introduces the language Jif, an extension to Java that provides static checking of information flow using the decentralized label model.},
+author = {Myers, Andrew C. and Liskov, Barbara},
+doi = {10.1109/FITS.2003.1264929},
+file = {:C$\backslash$:/Users/ansuddin/Dropbox/Thesis/Andet/Materiale/Papers/Relevant/+Protecting Privacy using the Decentralized Label Model.pdf:pdf},
+isbn = {076952057X},
+issn = {1049331X},
+journal = {Foundations of Intrusion Tolerant Systems, OASIS 2003},
+keywords = {Confidentiality,D.4.6 [operating systems]: security and protection - information flow controls,Declassification,Downgrading,End-to-end,Information flow controls,Integrity,Lattice,Policies,Principals,Programming languages,Roles,Security,Type checking},
+number = {212},
+pages = {89--116},
+title = {{Protecting privacy using the decentralized label model}},
+volume = {1},
+year = {2003}
+}
+@article{Hedin2014,
+abstract = {JavaScript drives the evolution of the web into a powerful application$\backslash$nplatform. Increasingly, web applications combine services from different$\backslash$nproviders. The script inclusion mechanism routinely turns barebone web$\backslash$npages into fully-fledged services built up from third-party code. Such$\backslash$ncode provides a range of facilities from helper utilities (such as jQuery)$\backslash$nto readily available services (such as Google Analytics and Tynt). This$\backslash$nposes a security challenge of ensuring that the integrated third-party code$\backslash$nrespects security and privacy.$\backslash$nThis paper presents$\backslash$nJSFlow$\backslash$n, a security-enhanced JavaScript interpreter$\backslash$nfor fine-grained tracking of information flow. We show how to resolve$\backslash$npractical challenges for enforcing information-flow policies for the full$\backslash$nJavaScript language, as well as the challenges of tracking information in$\backslash$nthe presence of libraries, as provided by browser APIs.$\backslash$nThe interpreter is itself written in JavaScript, which enables deploy-$\backslash$nment as a Firefox extension. Using this extension we have performed$\backslash$npractical studies to provide in-depth understanding of information manip-$\backslash$nulation by third-party scripts such as Google Analytics. The experiments$\backslash$nshow that different sites intended to provide similar services effectuate$\backslash$nrather different security policies for the user's sensitive information: some$\backslash$nensure it does not leave the browser, others share it with the originating$\backslash$nserver, while yet others freely propagate it to third parties.},
+author = {Hedin, Daniel and Birgisson, Arnar and Bello, Luciano and Sabelfeld, Andrei},
+doi = {10.1145/2554850.2554909},
+file = {:C$\backslash$:/Users/ansuddin/Dropbox/Thesis/Andet/Materiale/Papers/Relevant/+JSFlow - Tracking Information Flow in JavaScript and its APIs.pdf:pdf},
+isbn = {9781450324694},
+issn = {1069-417X},
+journal = {Proceedings of the 29th Annual ACM Symposium on Applied Computing - SAC '14},
+keywords = {dynamic analysis,information flow,javascript},
+pages = {1663--1671},
+title = {{[103]JSFlow{\_} Tracking information flow in JavaScript and its APIs}},
+url = {http://dl.acm.org/citation.cfm?doid=2554850.2554909},
+year = {2014}
+}
+@article{Myers1998,
+abstract = {The growing use of mobile code in downloaded applications and$\backslash$nservlets has increased interest in robust mechanisms for ensuring$\backslash$nprivacy and secrecy. Information flow control is intended to directly$\backslash$naddress privacy and secrecy concerns, but most information flow models$\backslash$nare too restrictive to be widely used. The decentralized label model is$\backslash$na new information flow model that extends traditional models with$\backslash$nper-principal information flow policies and also permits a safe form of$\backslash$ndeclassification. This paper extends this new model further, making it$\backslash$nmore flexible and expressive. We define a new formal semantics for$\backslash$ndecentralized labels and a corresponding new rule for relabeling data$\backslash$nthat is both sound and complete. We also show that these extensions$\backslash$npreserve the ability to statically check information flow},
+author = {Myers, A.C. and Liskov, B.},
+doi = {10.1109/SECPRI.1998.674834},
+file = {:C$\backslash$:/Users/ansuddin/Dropbox/Thesis/Andet/Materiale/Papers/Relevant/+Complete, Safe Information Flow with Decentralized Labels.pdf:pdf},
+isbn = {0-8186-8386-4},
+issn = {1081-6011},
+journal = {Proceedings. 1998 IEEE Symposium on Security and Privacy (Cat. No.98CB36186)},
+number = {May},
+pages = {186--197},
+pmid = {15474832},
+title = {{Complete, safe information flow with decentralized labels}},
+url = {http://ieeexplore.ieee.org/document/674834/},
+year = {1998}
+}
+
+
+
+@article{Denning1976,
+author = {{Dorothy E. Denning}},
+doi = {10.1145/360051.360056},
+file = {:C$\backslash$:/Users/ansuddin/Dropbox/Thesis/Andet/Materiale/Papers/Relevant/+A Lattice Model of Secure Information Flow.pdf:pdf},
+isbn = {0001-0782},
+issn = {0001-0782},
+journal = {Communications of the ACM},
+keywords = {and phrases,information flow,lattice,program,protection,security,security class},
+number = {5},
+pages = {236--243},
+title = {{A lattice model of secure information flow}},
+url = {http://dl.acm.org/citation.cfm?id=360056},
+volume = {19},
+year = {1976}
+}
+@article{Myers1997,
+abstract = {This paper presents a newmodel for controlling information flow in systems with mutual distrust and decentralized au- thority. The model allows users to share information with distrusted code (e.g., downloaded applets), yet still control howthat code disseminates the shared information to others. The model improves on existing multilevel security models by allowing users to declassify information in a decentralized way, and by improving support for fine-grained data sharing. The paper also shows how static program analysis can be used to certify proper information flows in this model and to avoid most run-time information flow checks.},
+author = {Myers, Andrew C. and Liskov, Barbara},
+doi = {10.1145/269005.266669},
+file = {:C$\backslash$:/Users/ansuddin/Dropbox/Thesis/Andet/Materiale/Papers/Relevant/+A Decentralized Model for Information Flow Control.pdf:pdf},
+isbn = {0897919165},
+issn = {01635980},
+journal = {ACM SIGOPS Operating Systems Review},
+number = {5},
+pages = {129--142},
+title = {{A decentralized model for information flow control}},
+url = {http://portal.acm.org/citation.cfm?doid=269005.266669},
+volume = {31},
+year = {1997}
+}
+@article{Sabelfeld2003,
+abstract = {Current standard security practices do not provide substantial assurance that the end-to-end behavior of a computing system satisfies important security policies such as confidentiality. An end-to-end confidentiality policy might assert that secret input data cannot be inferred by an attacker through the attacker's observations of system output; this policy regulates information flow. Conventional security mechanisms such as access control and encryption do not directly address the enforcement of information-flow policies. Previously, a promising new approach has been developed: the use of programming-language techniques for specifying and enforcing information-flow policies. In this paper, we survey the past three decades of research on information-flow security, particularly focusing on work that uses static program analysis to enforce information-flow policies. We give a structured view of work in the area and identify some important open challenges.},
+author = {Sabelfeld, Andrei and Myers, Andrew C.},
+doi = {10.1109/JSAC.2002.806121},
+file = {:C$\backslash$:/Users/ansuddin/AppData/Local/Mendeley Ltd./Mendeley Desktop/Downloaded/Sabelfeld, Myers - 2003 - Language-based information-flow security.pdf:pdf},
+isbn = {0733-8716},
+issn = {07338716},
+journal = {IEEE Journal on Selected Areas in Communications},
+keywords = {Computer security,Concurrency,Confidentiality,Covert channels,Information flow,Noninterference,Security policies,Security-type systems},
+number = {1},
+pages = {5--19},
+title = {{Language-based information-flow security}},
+volume = {21},
+year = {2003}
+}
+
+@article{Hedin2011,
+author = {Hedin, Daniel and Sabelfeld, Andrei},
+file = {:C$\backslash$:/Users/ansuddin/Dropbox/Thesis/Andet/Materiale/Papers/Relevant/+A Perspective on Information-Flow Control.pdf:pdf},
+title = {{A Perspective on Information-Flow Control}},
+year = {2011}
+}
+

@@ -10,3 +10,8 @@ Implementation:
         JS is the main SDK.
         Java SDK does not support e2e
         Python does support defining custom types.
+
+Discussion:
+    Other use cases for information flow control for matrix:
+    Implementing SDK in IFC tool 
+    Protection of ratchet keys with IFC. 
