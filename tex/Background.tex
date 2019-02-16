@@ -463,7 +463,7 @@ As previously mentioned a room is a conceptual place for sending and receiving e
 Every data exchange in Matrix is an event. Events are used to express state changes in a room as well as messages being sent. An event has a type used to differ between what kind of event is being sent and what kind of data it might hold. Matrix comes with reserved name spaces; \emph{m.room.message} is a type for instant messaging. The following is an example of a event of type \emph{m.room.message} \cite{matrixspec}.
 
 
-\begin{lstlisting}
+\begin{lstlisting}[style=json]
 {
 	"content": {
 		"body": "Hello world!",
@@ -501,19 +501,48 @@ Security is a high priority for Matrix design. Especially with the decentralized
 \newpage
 \section{Information Flow Control} %mere konkret og teknisk
 %Selvom jeg ikke kiggr på fx trafic analysis så er det vigtigt at nævne og påpege det ikkeer noget jeg løser
-In the beginning of this chapter the security properties confidentiality and integrity were mentioned which are major security goals for a system. If there is \emph{secure information flow} throughout the system then confidentiality and integrity is achieved \cite{Hedin2011}. Secure information flow means that only authorized flow on information is allowed \cite{Denning1976}
+In the beginning of this chapter the security properties confidentiality and integrity were mentioned which are major security goals for a system. If there is \emph{secure information flow} throughout the system then confidentiality and integrity is achieved \cite{Hedin2011}. Secure information flow means that only authorized flow of information is allowed \cite{Denning1976}. There are two aspects to secure information flow; the reading of the information (confidentiality) and the writing of the information (integrity) \cite{Hedin2011}. 
 
+\emph{Information Flow Control} is a \emph{security mechanism}\footnote{"A security mechanism is a method, tool, or procedure for enforcing a security policy" \cite{Bishop2014}} for achieving secure information flow.
+Information Flow Control is a language-based security technique that can enforce defined \emph{security policies}\footnote{"A security policy is a statement of what is, and what is not, allowed." \cite{Bishop2014}} concerning confidentiality and integrity of data. It enables us to express where data may flow to and under what conditions. Consider the following policy; we define a \emph{high} value which holds secret information and a \emph{low} variable which can hold public information.  For preserving confidentiality information from high must under no circumstances flow to low. Now consider the following code which is an \emph{explicit flow}:
+
+\begin{lstlisting}
+	low = high;
+\end{lstlisting}
+
+This is an insecure flow of information where the high value is directly copied into the low value which obviously is a violation of the policy \cite{Hedin2011}. Another example of insecure information flow is \emph{implicit flow}:
+
+\begin{lstlisting}[language=ALGOL]
+low = false;
+if high then low = true
+\end{lstlisting}
+
+In this example the high value affects the control flow and some information is leaked about the high value. Hence this also violates the policy. When secret values can affect the control flow there is an implicit flow. An implicit flow is a type of \emph{covert channel}.
 %Security is equivalent to \emph{secure information flow}
 
+\subparagraph{Covert channels} The explicit and implicit flows can also be considered as \emph{channels} that signal information \cite{Kashyap2011} \cite{Sabelfeld2003}. \emph{Covert channels} are channels that are not meant to signal information but somehow leaks information \cite{Kashyap2011}. The most prominent covert channels are: 
+\begin{itemize}
+	\item \emph{Implicit channels} leaks information through the path the program takes in the control flow.
+	\item \emph{Termination channels} leaks information by considering if a program terminates.
+	\item \emph{Timing channels} leaks information by considering when an action occurs or how much time a program takes.
+\end{itemize}
 
-Information Flow Control is a language-based security technique that can enforce defined policies concerning confidentiality and integrity of data. It enables us to express where data may flow to and under what conditions. 
+Other channel are \emph{probabilistic channels}, \emph{resource exhaustion channels}, and \emph{power channels}. It is not necessarily all covert channels that are of concern and in th end depends on what is observable by an adversary \cite{Sabelfeld2003}.
 
 \subsection{Noninterference}
+
+Secure information flow can be expressed by the concept of \emph{noninterference}. The policy we previously defined is a noninterference policy. 
+
 The general definition of secure information flow is expressed through \emph{noninterference}.
 
 If a user wishes to keep some data confidential, he or
 she might state a policy stipulating that no data visible
 to other users is affected by confidential data.
+
+
+independence of public (or,
+in the case of integrity, trusted) output from secret (or, in the case of integrity, untrusted)
+input
 
 \begin{figure}[H]
 	\centering
