@@ -503,66 +503,103 @@ Security is a high priority for Matrix design. Especially with the decentralized
 %Selvom jeg ikke kiggr på fx trafic analysis så er det vigtigt at nævne og påpege det ikkeer noget jeg løser
 In the beginning of this chapter the security properties confidentiality and integrity were mentioned which are major security goals for a system. If there is \emph{secure information flow} throughout the system then confidentiality and integrity is achieved \cite{Hedin2011}. Secure information flow means that only authorized flow of information is allowed \cite{Denning1976}. There are two aspects to secure information flow; the reading of the information (confidentiality) and the writing of the information (integrity) \cite{Hedin2011}. 
 
-\emph{Information Flow Control} is a \emph{security mechanism}\footnote{"A security mechanism is a method, tool, or procedure for enforcing a security policy" \cite{Bishop2014}} for achieving secure information flow.
-Information Flow Control is a language-based security technique that can enforce defined \emph{security policies}\footnote{"A security policy is a statement of what is, and what is not, allowed." \cite{Bishop2014}} concerning confidentiality and integrity of data. It enables us to express where data may flow to and under what conditions. Consider the following policy; we define a \emph{high} value which holds secret information and a \emph{low} variable which can hold public information.  For preserving confidentiality information from high must under no circumstances flow to low. Now consider the following code which is an \emph{explicit flow}:
+\emph{Information Flow Control} is a \emph{security mechanism}\footnote{"A security mechanism is a method, tool, or procedure for enforcing a security policy" \cite{Bishop2004}} for achieving secure information flow.
+Information Flow Control is a language-based security technique that can enforce defined \emph{security policies}\footnote{"A security policy is a statement of what is, and what is not, allowed." \cite{Bishop2004}} concerning confidentiality and integrity of data. It enables us to express where information may flow to and under what conditions. 
+
+\subsection{Lattice model}\label{lattice}
+
+By classifying information with \emph{security levels} we can express where information may flow. Consider the following confidentiality policy; we classify \emph{secret} as secret information, and classify \emph{public} as public information. For the two secuirty levels it holds that flow from public to public is allowed, public to secret is allowed, and secret to secret is allowed. For preserving confidentiality flow from secret to public is under no circumstances allowed.  This can be expressed as \emph{public $\leq$ secret} and gives us a simple lattice\footnote{https://en.wikipedia.org/wiki/Lattice\_(order)} structure where information flows upwards shown in figure \ref{fig:lattice}a \cite{Smith}.
+
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=12cm]{figures/lattice.png}
+	\caption{ Lattice model for confidentiality and integrity \cite{Musard2014}}
+	\label{fig:lattice}
+\end{figure}
+
+Likewise a policy for integrity can be specified where information from an \emph{untrusted} source must not flow to information with a security level of \emph{trusted} which is somewhat opposite of the confidentiality policy. Figure \ref{fig:lattice}b illustrates an integrity lattice. By combining the two we get a more complex lattice show in figure \ref{fig:lattice}c.
+
+\subsection{Explicit and implicit flow}
+The problem with mainstream programming languages is that they are unable to enforce defined policies such as the confidentiality and integrity policies described in the previous section. Consider the following flow:
 
 \begin{lstlisting}
-	low = high;
+	public = secret;
 \end{lstlisting}
 
-This is an insecure flow of information where the high value is directly copied into the low value which obviously is a violation of the policy \cite{Hedin2011}. Another example of insecure information flow is \emph{implicit flow}:
+This is an \emph{explicit flow} and is where the \emph{secret} value is directly copied into the \emph{public} value which obviously is a violation of the confidentiality policy and is an insecure flow of information \cite{Hedin2011}. 
+
+Another example of insecure information flow is \emph{implicit flow}:
 
 \begin{lstlisting}[language=ALGOL]
-low = false;
-if high then low = true
+public = false;
+if secret then public = true
 \end{lstlisting}
 
-In this example the high value affects the control flow and some information is leaked about the high value. Hence this also violates the policy. When secret values can affect the control flow there is an implicit flow. An implicit flow is a type of \emph{covert channel}.
+In this example the \emph{secret} value affects the control flow and some information is leaked about the \emph{secret} value. Hence this also violates the confidentiality policy. When secret values can affect the control flow there is an implicit flow. An implicit flow is a type of \emph{covert channel} \cite{Sabelfeld2003}.
 %Security is equivalent to \emph{secure information flow}
 
-\subparagraph{Covert channels} The explicit and implicit flows can also be considered as \emph{channels} that signal information \cite{Kashyap2011} \cite{Sabelfeld2003}. \emph{Covert channels} are channels that are not meant to signal information but somehow leaks information \cite{Kashyap2011}. The most prominent covert channels are: 
+\subsection{Covert channels} The explicit and implicit flows can also be considered as \emph{channels} that signal information \cite{Kashyap2011} \cite{Sabelfeld2003}. \emph{Covert channels} are channels that are not meant to signal information but somehow leaks information \cite{Kashyap2011}. The most prominent covert channels are: 
 \begin{itemize}
 	\item \emph{Implicit channels} leaks information through the path the program takes in the control flow.
 	\item \emph{Termination channels} leaks information by considering if a program terminates.
 	\item \emph{Timing channels} leaks information by considering when an action occurs or how much time a program takes.
 \end{itemize}
 
-Other channel are \emph{probabilistic channels}, \emph{resource exhaustion channels}, and \emph{power channels}. It is not necessarily all covert channels that are of concern and in th end depends on what is observable by an adversary \cite{Sabelfeld2003}.
+Other channel are \emph{probabilistic channels}, \emph{resource exhaustion channels}, and \emph{power channels}. It is not necessarily all covert channels that are of concern and in the end depends on what is observable by an adversary \cite{Sabelfeld2003}.
 
 \subsection{Noninterference}
+Secure information flow can be expressed by the concept of \emph{noninterference}. The notion of noninterference is that someone observing the public input and output of a system should not be able to learn anything about the secret input of the system. If the secret input interferes with the public output then there is information leak. The figure \ref{fig:noninterference} illustrates noninterference \cite{Hedin2011}.  
 
-Secure information flow can be expressed by the concept of \emph{noninterference}. The policy we previously defined is a noninterference policy. 
+% The policies defined in section \ref{lattice} are noninterference policies \cite{Sabelfeld2003}. 
 
-The general definition of secure information flow is expressed through \emph{noninterference}.
-
-If a user wishes to keep some data confidential, he or
-she might state a policy stipulating that no data visible
-to other users is affected by confidential data.
-
-
-independence of public (or,
-in the case of integrity, trusted) output from secret (or, in the case of integrity, untrusted)
-input
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=8cm]{figures/noninterference.png}
-	\caption{ Noninterference}
+	\includegraphics[width=8cm]{figures/noninterference2.png}
+	\caption{ Noninterference \cite{Musard2014}}
 	\label{fig:noninterference}
 \end{figure}
 
+The figure illustrates that the \emph{L output} (public) should be independent of the \emph{H input} (secret). In other words if a program is executed with fixed public input but with different secret input; then there should not be any changes to the public output \cite{Hedin2011}.
 
-\subparagraph{Termination-sensitive}
 
-\subparagraph{Termination-insensitive}
+Depending on what an observer is capable of observing; different variations of noninterference can be expressed. Two of such variants are \emph{termination-insensitive} and \emph{termination-sensitive}.
+
+
+\subparagraph{Termination-insensitive noninterference}
+
+Termination-insensitive noninterference would guarantee that when a program terminates; the program's public output remains unaffected of the secret input. However it is possible to leak information through termination channels. By observing termination; 1 bit leaks can be achieved for each run of the program \cite{Hedin2011}:
+
+\begin{lstlisting}
+	if (secret == public) then while (true) do skip done
+\end{lstlisting}
+
+If the program does terminate then the observer has learned that the secret is not equal to the public value hence 1 bit of information is leaked. 
+
+%Save the argument of more than 1 bit leak to the discussion.
+
+\subparagraph{Termination-sensitive noninterference}
+The alternative is the termination-sensitive noninterference variant. The public output is independent of the secret input. Furthermore if the program is run with secret input \emph{s\textsubscript{1}} and it terminates; then the program run with secret input \emph{s\textsubscript{2}} would terminate as well. Hence if \emph{s\textsubscript{1}} did not terminate then \emph{s\textsubscript{2}} would not either \cite{Hedin2011}.
+
+
+This variant of noninterference would be achieved by not allowing secret variables as guards in loops and if-else-than statements. This variant would be more restrictive and disallow flows as such \cite{Kashyap2011}:
+
+\begin{lstlisting}
+if (secret == true) then skip
+\end{lstlisting}
+
 
 
 \subsection{Decentralized label model}
 
-\subsubsection{Lattice model}
 
 
 \subsubsection{Declassification}
+
+Noninterference is a very strict policy and is not practical. Consider the classic example of a user logging into a system which violates noninterference. It is unavoidable that a login attempt gives some information away about the password. If the password is incorrect the login fails and partial information is given away. There is no problem with the above and is regarded as secure.
+
+
 Taking some specific information and changing it to a lower security classification.
 
 Identify: What to classify, who declassifies, where the declassification happens and when the declassification happens
@@ -574,7 +611,6 @@ Identify: What to classify, who declassifies, where the declassification happens
 
 
 \subsubsection{Dynamic enforcement}
-
 
 
 \section{Summary}
