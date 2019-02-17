@@ -586,26 +586,35 @@ The alternative is the termination-sensitive noninterference variant. The public
 This variant of noninterference would be achieved by not allowing secret variables as guards in loops and if-else-than statements. This variant would be more restrictive and disallow flows as such \cite{Kashyap2011}:
 
 \begin{lstlisting}
-if (secret == true) then skip
+if (secret == true) then secret = false
 \end{lstlisting}
 
+\subsection{Declassification}
+Noninterference is a very strict policy and not practical. Consider the classic example of a user logging into a system which violates noninterference. It is unavoidable that a login attempt gives some information away about the password. If the password is incorrect the login fails and partial information is given away. There is no problem with the above and is regarded as secure. Another example is sending encrypted data over an insecure channel; secret input is encrypted and the cipher text would then be send over an insecure channel. However this goes against noninterference since the secret input clearly interferes with public output \cite{Hedin2011}.
+
+Declassifying of information is necessary. Taking some specific information from a higher security class and changing it to a lower security classification is declassification. When declassifying information the following four dimensions needs to be addressed \cite{Sabelfeld2009}:
+
+\begin{itemize}
+	\item \emph{What} information should be declassified. We would like to specify what information is released.
+	\item \emph{Who} can declassify the information. By specifying exactly who can release information it rules out that someone unspecified can make unintended leaks through declassification.
+	\item \emph{Where} the information can flow. The dimension describes which security levels the declassified information may flow to and also where in the code the declassification occurs. 
+	\item \emph{When} the declassification occurs. The release of information is only allowed relative to some even e.g. only after a purchase can a software key be released.
+\end{itemize}
 
 
-\subsection{Decentralized label model}
+
+\subsubsection{Decentralized label model}
+\emph{Decentralized Label Model} allows us to define flow policies and address declassification of information in a program. A policy is defined by adding \emph{labels} to a value. A value can hold information for different \emph{principals} called \emph{owners}. A label \emph{L} specifies an \emph{owners} set \emph{owners(L)}. Each owner can allow a list of principals called readers \emph{readers(L,O)} that the information may be released to. \emph{Effective readers} are readers that all owners agree on the information can be released to. An example of a label is \textbf{\{\emph{o\textsubscript{1}}:\emph{r\textsubscript{1},r\textsubscript{2}}; \emph{o\textsubscript{2}}:\emph{r\textsubscript{2},r\textsubscript{3}}\}}; where  \emph{o\textsubscript{1}} and \emph{o\textsubscript{2}} are the different owners with their specified readers \cite{Myers1997}. The example \emph{L} has the following:
+
+\[owners(L) = \{o_1, o_2\}\]
+\[readers(L,o_1) = \{r_1, r_2\} \]
+\[readers(L,o_2) = \{r_2, r_3\} \]
+\[effectiveReaders(L) = \{r_2\} \]
+
+Such labeling makes it possible for each owner to have an independent flow policy and give control of where the information may flow. Declassification is possible if the program detects it is one of the owners trying to declassify the information \cite{Myers1997} \cite{Myers1998}.
 
 
-
-\subsubsection{Declassification}
-
-Noninterference is a very strict policy and is not practical. Consider the classic example of a user logging into a system which violates noninterference. It is unavoidable that a login attempt gives some information away about the password. If the password is incorrect the login fails and partial information is given away. There is no problem with the above and is regarded as secure.
-
-
-Taking some specific information and changing it to a lower security classification.
-
-Identify: What to classify, who declassifies, where the declassification happens and when the declassification happens
-
-
-\subsection{Enforcement}
+\subsection{Information-flow enforcement}
 
 \subsubsection{Static enforcement}
 
