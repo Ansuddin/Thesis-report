@@ -520,7 +520,7 @@ By classifying information with \emph{security levels} we can express where info
 
 Likewise a policy for integrity can be specified where information from an \emph{untrusted} source must not flow to information with a security level of \emph{trusted} which is somewhat opposite of the confidentiality policy. Figure \ref{fig:lattice}b illustrates an integrity lattice. By combining the two we get a more complex lattice show in figure \ref{fig:lattice}c.
 
-\subsection{Explicit and implicit flow}
+\subsection{Explicit and implicit flow}\label{explicitimplicit}
 The problem with mainstream programming languages is that they are unable to enforce defined policies such as the confidentiality and integrity policies described in the previous section. Consider the following flow:
 
 \begin{lstlisting}
@@ -583,10 +583,10 @@ If the program does terminate then the observer has learned that the secret is n
 The alternative is the termination-sensitive noninterference variant. The public output is independent of the secret input. Furthermore if the program is run with secret input \emph{s\textsubscript{1}} and it terminates; then the program run with secret input \emph{s\textsubscript{2}} would terminate as well. Hence if \emph{s\textsubscript{1}} did not terminate then \emph{s\textsubscript{2}} would not either \cite{Hedin2011}.
 
 
-This variant of noninterference would be achieved by not allowing secret variables as guards in loops and if-else-than statements. This variant would be more restrictive and disallow flows as such \cite{Kashyap2011}:
+This variant of noninterference would be achieved by not allowing secret variables as guards in loops and if-else-than statements. This variant would be more restrictive and disallow flows as such \cite{Hedin2011}:
 
 \begin{lstlisting}
-if (secret == true) then secret = false
+while (secret == true) do ... done
 \end{lstlisting}
 
 \subsection{Declassification}
@@ -611,15 +611,75 @@ Declassifying of information is necessary. Taking some specific information from
 \[readers(L,o_2) = \{r_2, r_3\} \]
 \[effectiveReaders(L) = \{r_2\} \]
 
-Such labeling makes it possible for each owner to have an independent flow policy and give control of where the information may flow. Declassification is possible if the program detects it is one of the owners trying to declassify the information \cite{Myers1997} \cite{Myers1998}.
+Such labeling makes it possible for each owner to have an independent flow policy and give control of where the information may flow. Declassification is possible if the program detects it is running as the authority of one of the owners \cite{Myers1997} \cite{Myers1998}.
 
 
 \subsection{Information-flow enforcement}
+There exist two general techniques for enforcing secure information flow; \emph{static analysis} through a type system and \emph{dynamic analysis} through a monitor. Both techniques give the assurance of termination-insensitive noninterference \cite{Sabelfeld2010}. The static analysis have the advantage that it does not have the runtime overhead as the dynamic analysis while the dynamic analysis is more permissive \cite{Sabelfeld2010}. 
+
 
 \subsubsection{Static enforcement}
+Enforcement of information-flow through static analysis is done using type systems.
+A simple type system is presented and shown in figure \ref{fig:typesystem}. 
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=12cm]{figures/securitytypesystem.png}
+	\caption{ Typing rules \cite{Sabelfeld2010}}
+	\label{fig:typesystem}
+\end{figure}
+
+We assume that the security lattice has the levels \emph{L} for low (public) and \emph{H} for high (secret). $\Gamma$ denotes a typing environment that takes a variable \emph{x} and maps it to a security level. The function \emph{lev(e)} takes an expression \emph{e} and returns a security level; if \emph{e} holds a high variable then \emph{H} is returned or else \emph{L} is returned. The security level of the context is kept tracked of by the program counter \emph{pc}. The typing judgment for commands is denoted by \emph{pc $\vdash$ c} \cite{Sabelfeld2010}.
+
+The typing rule \emph{pc $\vdash$ x := e} is for assignment; it prevent assignment of a expression that holds a high variable to a low variable \cite{Sabelfeld2010}. Hence the explicit flow would be detected by the type system:
+
+\begin{lstlisting}
+low = high
+\end{lstlisting}
+
+Furthermore implicit flow are detectable through the program counter \emph{pc}. If there is a high guard then the \emph{pc} has the security level \emph{H} and would expect assignments of high variables hence preventing low assignments \cite{Sabelfeld2010}. The implicit flow would be detected by the typing system as well:
+
+\begin{lstlisting}
+if high then low = true else low = false
+\end{lstlisting}
 
 
 \subsubsection{Dynamic enforcement}
+Dynamic analysis is provided with \emph{monitors}. Monitoring can only consider one path when running. This has led to the belief that the dynamic approach falls short compared to the static enforcement. However both dynamic enforcement and static enforcement achieve termination-insensitive noninterference hence they give the same security assurance \cite{Sabelfeld2010}. 
 
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=12cm]{figures/monitoringrules.png}
+	\caption{ Monitoring rules \cite{Sabelfeld2010}}
+	\label{fig:monitoring}
+\end{figure}
+
+The figure \ref{fig:monitoring} shows monitoring rules for a monitor. Programs generates events and the monitor chooses to accept an event or block it by halting. Security levels are tracked by stack \emph{st} which is called a \emph{monitor configuration} and serves the same purpose as the program counter; keeping track of the current security context.  The monitor can execute following \emph{events}: 
+
+\begin{itemize}
+	\item \emph{nop event:} signals a skip and the monitor always this event. It does not change the state of the monitor.
+	\item \emph{assignment event a(x,e):} assigns the value of expression \emph{e} to variable \emph{x}. It does not change the state of the monitor but the monitor has the following two conditions:
+	\begin{enumerate}
+		\item \emph{lev}(\emph{e}) $\sqsubseteq$ $\Gamma(x)$: the expression \emph{e}'s security level is equal or lower than variable \emph{x}'s security level.
+		\item \emph{lev}(\emph{st}) $\sqsubseteq$ $\Gamma(x)$: the highest security level in the stack is equal or lower than variable \emph{x}'s security level 
+	\end{enumerate} 
+	\item \emph{branching event b(e)}: branches on \emph{e} and changes the state of the monitor. The security level of \emph{e} is pushed on the stack.
+	\item \emph{event f}: signals are loop or if-else statement has finished evaluating. The security level pushed to the stack \emph{st} would be popped when evaluation is finished.
+\end{itemize}
+
+The first condition for the assignment event prevents explicit flows. The second condition prevents implicit flows as such: 
+
+\begin{lstlisting}
+if high then low=true else low=false
+\end{lstlisting}
+
+The mechanism related to the branching event aids in preventing implicit flows by pushing the security level of \emph{st} to the stack. Now consider the following code: 
+
+\begin{lstlisting}
+if high then low=true else skip
+\end{lstlisting}
+
+If high is \emph{false} then the code would continue however if high is \emph{true} the execution would be stopped. Hence 1 bit would be leaked and is acceptable in context of termination-insensitive noninterference.
 
 \section{Summary}
+The background section introduces security properties necessary for a secure system. Several other security properties are described relevant for a secure messaging system which is relevant for the section \ref{evaluationofmatrix} where Matrix security is evaluated. This section also presented a description of the Signal Protocol necessary for the evaluation as well. Furthermore Matrix and its architecture was described and finally the basic concepts of Information-Flow Control was presented.
