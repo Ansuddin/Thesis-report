@@ -349,19 +349,41 @@ Other relevant features that Jif supports are label inference\footnote{http://ww
 
 
 \subsection{JSFlow}
-%Simple policy definition
 
-% Declassification (lock)
+JSFlow is a tool for tracking information flow in JavaScript web applications. This tool is not a programming language as the two previously described tool but a JavaScript interpreter that supports full non-strict ECMA-262 \cite{jsflowsite}. JSFlow enforces secure information flow through dynamic analysis and can detect explicit and implicit flows. JSFlow uses a program counter \emph{pc} to track the security context. JSFlow defines two built-in security levels; \emph{public} and \emph{secret}, it also supports custom security labels on values. JSFlow allows pure explicit flows by upgrading the security label of the variable being assigned to \cite{jsflowsite}:
 
-% Dynamic labels (locks)
+\begin{lstlisting}
+	high = lbl(true);
+	low = high;
+\end{lstlisting}
+ 
+The variable \emph{high} is assigned a secret value denoted by the \emph{lbl} function. When \emph{high} is assigned to \emph{low} the security label is upgraded for low. JSFlow prevents implicit flow through \emph{no sensitive update} that under secret control disallows changes to security labels \cite{Hedin2014}:
+
+\begin{lstlisting}
+	high = lbl(true);
+	if(high){
+		l = true;
+	}
+\end{lstlisting}
+
+The execution would halt for the above code since no sensitive update is allowed. 
+
+As mentioned before security labels can be assigned to variables. In the following examples \emph{l}, \emph{m} and \emph{h} is defined with different labels.
+
+\begin{lstlisting}
+	var l = lbl(10, 'low');
+	var m = lbl(15, 'mid');
+	var h = lbl(20, 'mid', 'high');
+	if(m === 15) {
+		h=m; // OK
+		l=m; // BAD
+	}
+\end{lstlisting}
+
+JSFlows uses a subset lattice hence \emph{m} can flow to \emph{h} since \emph{m}'s label is a subset of \emph{h}'s labels \cite{jsflowsite}. The assignment \emph{l=h} would halt since the \emph{m}'s labels is not a subset of \emph{l}'s labels.
 
 
-% Other features
-
-
-Not possible to use Matrix library with JSFlow because of missing support for libaries such as require (in node). Also overhead with configuring JSFlow to be the interpretor.
-
-
+JSFlow is an exciting tool for dynamic Information-Flow Control. However the JSFlow is still immature and does not support important features such as declassification.
 
 \subsection{Selection of IFC tool}
 The selection of the IFC tool used for developing the prototype is based the following defined parameters.
@@ -374,6 +396,10 @@ Parameters: Hard parameters are related to language features. Soft parameters ar
 Hard parameters: declassification, parameterized class
 
 Soft parameters: simplicity, documentation, support for external libraries, programmer-friendly
+
+
+% Not possible to use Matrix library with JSFlow because of missing support for libaries such as require (in node). Also overhead with configuring JSFlow to be the interpretor.
+
 
 \subsubsection{Comparison}
 
