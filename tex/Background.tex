@@ -603,16 +603,17 @@ Declassifying of information is necessary. Taking some specific information from
 
 
 
-\subsubsection{Decentralized label model}
-\emph{Decentralized Label Model} allows us to define flow policies and address declassification of information in a program. A policy is defined by adding \emph{labels} to a value. A value can hold information for different \emph{principals} called \emph{owners}. A label \emph{L} specifies an \emph{owners} set \emph{owners(L)}. Each owner can allow a list of principals called readers \emph{readers(L,O)} that the information may be released to. \emph{Effective readers} are readers that all owners agree on the information can be released to. An example of a label is \textbf{\{\emph{o\textsubscript{1}}:\emph{r\textsubscript{1},r\textsubscript{2}}; \emph{o\textsubscript{2}}:\emph{r\textsubscript{2},r\textsubscript{3}}\}}; where  \emph{o\textsubscript{1}} and \emph{o\textsubscript{2}} are the different owners with their specified readers \cite{Myers1997}. The example \emph{L} has the following:
+\subsubsection{Decentralized label model}\label{dlm}
+\emph{Decentralized Label Model} allows us to define flow policies and address declassification of information in a program. A policy is defined by adding \emph{labels} to a value. A value can hold information for different \emph{principals} called \emph{owners}. A label \emph{L} specifies an \emph{owners} set \emph{owners(L)}. Each owner can allow a list of principals called readers \emph{readers(L,O)} that the information may be released to. \emph{Effective readers} are readers that all owners agree on the information can be released to and is essentially those where information can flow to. An example of a label is \textbf{\{\emph{o\textsubscript{1}}:\emph{r\textsubscript{1},r\textsubscript{2}}; \emph{o\textsubscript{2}}:\emph{r\textsubscript{2},r\textsubscript{3}}\}}; where  \emph{o\textsubscript{1}} and \emph{o\textsubscript{2}} are the different owners with their specified readers \cite{Myers1997}. The example \emph{L} has the following:
 
 \[owners(L) = \{o_1, o_2\}\]
 \[readers(L,o_1) = \{r_1, r_2\} \]
 \[readers(L,o_2) = \{r_2, r_3\} \]
 \[effectiveReaders(L) = \{r_2\} \]
 
-Such labeling makes it possible for each owner to have an independent flow policy and give control of where the information may flow. Declassification is possible if the program detects it is running as the authority of one of the owners \cite{Myers1997} \cite{Myers1998}.
+Such labeling makes it possible for each owner to have an independent flow policy and give control of where the information may flow. Declassification is possible if the program detects it is running as the authority of one of the owners \cite{Myers1997} \cite{Myers1998}. This is known as the \emph{principal hierarchy} and can allow a principal to act for another principal.
 
+%Apart from labels, there is one other important component to the DLM, namely the principal hierarchy, specified by a reflexive and transitive acts-for relationship. If Eve acts for Dave then Eve can do anything that Dave can. In the example above this means Eve can also read data with the label given above.
 
 \subsection{Information-flow enforcement}
 There exist two general techniques for enforcing secure information flow; \emph{static analysis} through a type system and \emph{dynamic analysis} through a monitor. Both techniques give the assurance of termination-insensitive noninterference \cite{Sabelfeld2010}. The static analysis have the advantage that it does not have the runtime overhead as the dynamic analysis while the dynamic analysis is more permissive \cite{Sabelfeld2010}. 

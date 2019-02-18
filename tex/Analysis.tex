@@ -100,93 +100,6 @@ The Olm library used by Matrix is a variant of the Signal Protocol. There is no 
 The further evaluation relies upon the the security assessment of Matrix. 
 
 
-%The next section provides a brief summary of the analysis.
-
-%\newpage
-%
-%\subsubsection{Summary of the security analysis of Signal Protocol}
-%\emph{**NOTE: Is this section even relevant to have in the report? **}
-%
-%
-%As described earlier in section xx the Signal Protocol consists of three stages.
-%
-%\begin{itemize}
-%	\item Initial stage (Triple-DH). For establishing a shared secret. 
-%	\item Deffie-Hellman ratchet. For generating session key. 
-%	\item Symmetric ratchet. For generating message key.
-%\end{itemize}
-%
-%
-%
-%\paragraph{Threat model}
-%The threat model defined in the analysis assumes that the adversary have full control over the network.
-%
-%The adversary can observe traffic over the network and can drop and send messages.
-%
-%For an adversary to break security he must be able to
-%
-%For an adversary to break security he must obtain 
-%
-%In assymmetric messaging a party can be offline over 
-%
-%\paragraph{Security properties}
-%
-%The high-level properties we aim to prove are secrecy and authentication of message keys
-%
-%\begin{itemize}
-%	
-%	\item Secrecy. If Alice and Bob complete an exchange to generate a key k, nobody other than Alice and Bob should be able to learn anything about k. Forward secrecy are not explicit goals; instead, derived session keys should remain secret under a variety of compromise scenarios.
-%	\item (Implicit) Authentication. If Alice believes that she shares the key k with Bob, nobody other than Bob should be able to learn anything about k. Note that this property is implied by secrecy. Authentication will be implicit meaning that only the intended party could compute the key rather than explicit (get a guarantee that the intended party did compute the key).
-%\end{itemize}
-%
-%%and thereby distinguish any fresh message encryption key from random
-%
-%
-%As described earlier a group chat is represented by a session which has three stages; initial exchange, asymmetric and symmetric. Each stage will generate a key 
-%
-%
-%By proving that the session keys generated at each stage are key indistinguishable it can be argued that the session keys at each stage are safe...
-%
-%
-%We find if the above goals are fulfilled by looking at the freshness of the session keys in the different stages. By defining under what conditions the session keys are fresh and by proving that they indeed are fresh then it has been proved that the above security properties are provided. 
-%
-%
-%\paragraph{Freshness and cleanness} 
-%
-%Our goal when defining fresh is to describe the best security condition that might be provable for each of
-%Signal’s message keys based on the protocol’s design; here, “best” is with respect to the maximal combinations
-%of secrets learned by the adversary.
-%That is, we use the structure of the protocol to infer which attacks cannot
-%possibly be prevented, and rule them out by restricting the adversary.
-%
-%For each session there are different definition of freshness.
-%
-%The cleanness predicate defines under what conditions the session keys are .....
-%
-%
-%
-%\subparagraph{Stage 0}
-%We can prove the security of the stage 0 key (output by the triple key exchange during session setup) if one of the following is upheld cleanLM(u,i), cleanEL(u,i,0), cleanEM(u,i,0).
-%
-%\subparagraph{Asymmetric stages}
-%In this stage there are two types; asym-ir (sending) or asym-ri (receiving).
-%
-%By satisfying the cleanness predicates for each type of state we can prove the security of this stage.
-%
-%Most cases are of the form cleanEE, and for these we obtain a probability bound by replacing the DH ratchet keys and shared secrets with values from a GDH challenger.
-%
-%The only case not of this form involves clean\_state, which describes a scenario where both recent ratchet keys were compromised but the previous stage was still secure. Secrecy here is intuitive, and the bound follows from an inductive argument: if an adversary could win in this manner, then, assuming GDH and ROM security, there is an adversary which could win against the previous stage.
-%
-%
-%\subparagraph{Symmetric stages}
-%To ensure security of session key in this stage we only need to consider the following case. We replace the keys used to initialise the current sending chain with uniformly random values, since an adversary who could detect this could win against that
-%previous stage.
-%\\
-%\\
-%The proof for the above is provided in detail in the paper \emph{A Formal Security Analysis of the Signal Messaging Protocol} \cite{Signal}.
-
-
-
 \subsection{Matrix protocol}\label{matrixeval}
 
 As described in section xx \emph{rooms} are a fundamental part of Matrix' architecture. There can be multiple participants in a room hence the support for secure group conversation is required. 
@@ -328,7 +241,7 @@ Matrix identifies IoT as another use case. A person can have several devices for
 
 The data flowing from the sensors to Matrix might be of sensitive nature or the owner might only allow some data to flow to some vendors under specific conditions. This issue related to confidentiality is not addressed by Matrix. 
 
-\subsection{Summary}
+\subsection{Evaluation summary}
 
 In this section an evaluation of Matrix security was presented. Several security properties are a part of Matrix security model with forward secrecy and backward secrecy being provided depending on the Matrix configuration.
 
@@ -336,7 +249,7 @@ End-to-end encryption is not the end of security. Other security measures must b
 
 
 \newpage
-%\section{Survey of IFC Tools}
+\section{Analysis of IFC Tools}
 %Enforcing new session start every time a patient journal is sent. Could it be enforced with IFC?
 % Tools issue: java sdk for matrix is beta and not fully implemented. 
 % Best supported sdk is for javascript or python. Problem of running javascript code or python code with Paragon (java)
@@ -344,28 +257,130 @@ End-to-end encryption is not the end of security. Other security measures must b
 
 
 
-%Having established that end-to-end security is not the end of security we will now look at Information-Flow Control tools. 
+Having established that end-to-end encryption is not the end of security we will now look at Information-Flow Control tools. 
 
-%The approach to the section will be from a programmers perspective hence usability and practicality will play a role in which IFC tool is chosen. 
+The approach to the section will be from a programmers perspective hence usability and practicality will play a role in choosing an IFC tool. 
 
-%\subsection{JIF}
+\subsection{Jif}
 
-%\subsection{Paragon}
+Jif is a Java based security-typed programming language that provides information flow control through static enforcement. Jif implements the Decentralized Label Model (DLM) described in section \ref{dlm}. Policies are defined conforming to the DLM. The policies are enforced at compile time with support for enforcement of dynamic policies at runtime. If a Jif program adheres to the specified policies the Jif compiler then compiles it to a secure Java program \cite{jifmanual}. 
 
-%\subsection{JSFlow}
-%Not possible to use Matrix library with JSFlow because of missing support for libaries such as require (in node). Also overhead with configuring JSFlow to be the interpretor.
+A policy is defined by labels and are associated with program variables. A policy can specify multiple principles that have readers or writers. A policy is defined as: 
 
-%Swift, SIF, FlowR, JFlow, LIO
+\begin{lstlisting}[mathescape]
+int {Alice$\rightarrow$Bob; Alice$\leftarrow$Bob} x;
+\end{lstlisting}
+
+The policy specifies two things; that first part with "$\rightarrow$" expresses \emph{Alice} controls the variable x and the variable can be read by \emph{Bob}, the second part with "$\leftarrow$ expresses that bob can write to it \cite{jifmanual}. 
+
+The following code shows another example:
+
+\begin{lstlisting}[mathescape]
+	int {Alice} x;
+	int {Alice$\rightarrow$Bob} y;
+	x = y; // OK
+	y = x; // BAD
+\end{lstlisting}
 
 
-%\subsection{Selection of IFC tool}
-%The selection of the IFC tool used for developing the prototype is based the following defined parameters.
-%The selection of IFC tool put emphasis on the practical usage in combination with Matrix. 
-
-%\subsection{Paragon analysis}
-
-%\subsection{Summary}
+Variable  \emph{x} has a policy that \emph{Alice} controls with no readers. The variable \emph{y} is owned by \emph{Alice} with \emph{Bob} being able to read hence the label is less restrictive than \emph{x}'s label. The compiler allows the \emph{x = y} since \emph{Bob} is specified as a reader for \emph{x}. However the expression \emph{y = x} is illegal since \emph{x} has a stronger policy than y and the explicit flow is caught \cite{jifmanual}.
 
 
-%\section{Summary}
-%In this chapter the Matrix security model has been evaluated. Matrix provides end-to-end security and uses the Double Ratchet algorithm by Signal. The evaluation found that there are no major flaws in the design. To achieve end-to-end security the endpoints need to be secured as well \cite{Sabelfeld2003} this leads us to the chapter's second part. The chapter analyzed information-flow control tools and justifies the selection of Paragon which the prototype is programmed in. 
+A important feature for security-typed languages are declassification. Noninterference is too strict for practical programs thus it is necessary to declassify information at times. The following example has two variables with different labels. Variable \emph{x} is more restrictive than \emph{y}; that has \emph{Bob} as a reader. The example depicts an implicit flow: 
+
+\begin{lstlisting}[mathescape]
+	void implicitFlow(){
+		int {Alice$\rightarrow$} x;
+		int {Alice$\rightarrow$Bob} y;
+		if (x == 1) { 
+			// pc has label {Alice$\rightarrow$}
+			y = 0; // BAD
+		}
+	}
+\end{lstlisting}
+
+When the code branches on the if statement the pc has the label \emph{\{Alice$\rightarrow$\}} and the expression \emph{y = 0} becomes illegal since it has the label \emph{\{Alice$\rightarrow$Bob\}} which is less restrictive than the label pc is holding. If for some reason we would want the expression to become valid we would have to declassify it:
+
+\begin{lstlisting}[mathescape]
+	void declassificationExample() where authority(Alice) {
+		int{Alice$\rightarrow$} x;
+		int{Alice$\rightarrow$Bob} y;
+		 // PC has label {}
+		if (x == 1) {
+			 // PC has label {Alice$\rightarrow$}
+			declassify({Alice$\rightarrow$} to {Alice$\rightarrow$Bob}) {
+				y = 0; // OK
+			}
+		}
+	}
+\end{lstlisting}
+
+To be able to declassify it must be through the authority of the owner. This has to be specified at the method definition. When the code branches on the if statement the program counter \emph{pc} has the label \emph{\{Alice$\rightarrow$\}} which can then be declassified to a label as restrictive as \emph{y}'s label \cite{jifmanual} \cite{Srikant}.
+
+Another interesting feature is dynamic labels. Jif provides a run-time library which compares labels at runtime using a syntax that resembles if-statements.
+\begin{lstlisting}[mathescape]
+	void m(int{*lbl} i, label{} lbl) {
+		int{Alice$\rightarrow$} x;
+		if (lbl <= new label {Alice$\rightarrow$}) {
+			x = i; // OK, since {*lbl} <= {Alice$\rightarrow$}
+		}
+		else {
+			x = 0;
+		}
+	}
+\end{lstlisting}
+
+The parameter variable \emph{i} has the label held by the label \emph{lbl} which would be resolved at runtime. Since the variable \emph{x} has label \emph{\{Alice$\rightarrow$\}} we can allow a flow to that variable as long it is less or equally restrictive. The static analysis of the program will pass and the program will be able to compile.  
+%Dynamic label example
+
+
+Other relevant features that Jif supports are label inference\footnote{http://www.cs.cornell.edu/jif/doc/jif-3.3.0/language.html\#inference}, parameterized classes\footnote{http://www.cs.cornell.edu/jif/doc/jif-3.3.0/language.html\#parameterized-classes} and polymorphism \footnote{http://www.cs.cornell.edu/jif/doc/jif-3.3.0/language.html\#label-polymorphism}.
+
+\subsection{Paragon}
+
+%Simple policy definition
+
+% Declassification (lock)
+
+% Dynamic labels (locks)
+
+
+% Other features
+
+
+\subsection{JSFlow}
+%Simple policy definition
+
+% Declassification (lock)
+
+% Dynamic labels (locks)
+
+
+% Other features
+
+
+Not possible to use Matrix library with JSFlow because of missing support for libaries such as require (in node). Also overhead with configuring JSFlow to be the interpretor.
+
+
+
+\subsection{Selection of IFC tool}
+The selection of the IFC tool used for developing the prototype is based the following defined parameters.
+The selection of IFC tool put emphasis on the practical usage in combination with Matrix. 
+
+\subsubsection{Requirements}
+
+\subsubsection{Decision matrix}
+Parameters: Hard parameters are related to language features. Soft parameters are related to outside the language and that are relevant for a programmer.
+Hard parameters: declassification, parameterized class
+
+Soft parameters: simplicity, documentation, support for external libraries, programmer-friendly
+
+\subsubsection{Comparison}
+
+\subsection{Paragon analysis}
+
+\subsection{IFC tools summary}
+
+
+\section{Summary}
+In this chapter the Matrix security model has been evaluated. Matrix provides end-to-end security and uses the Double Ratchet algorithm by Signal. The evaluation found that there are no major flaws in the design. To achieve end-to-end security the endpoints need to be secured as well \cite{Sabelfeld2003} this leads us to the chapter's second part. The chapter analyzed information-flow control tools and justifies the selection of Paragon which the prototype is programmed in. 

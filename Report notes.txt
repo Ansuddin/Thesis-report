@@ -13,5 +13,9 @@ Implementation:
 
 Discussion:
     Other use cases for information flow control for matrix:
-    Implementing SDK in IFC tool 
-    Protection of ratchet keys with IFC. 
+        Implementing SDK in IFC tool 
+        Protection of ratchet keys with IFC.
+
+    Auto generate paragon .pi interface files with parameterized classes
+        NOTE: the Jif compiler does not verify that the Java code conforms to these provided signatures.
+        Make paragon verify that the signature provided for java class is correct.

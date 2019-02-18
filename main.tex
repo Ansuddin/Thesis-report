@@ -9,26 +9,26 @@
 %\includepdf[pages={1}]{standardfrontpage2.pdf}
 
 %TODO INCLUDE NORMAL FRONTPAGE
-%\include{main/forside}
-%
-%
-%\pagenumbering{roman}
-%\setcounter{secnumdepth}{-1}
-%\frontmatter{}
-%
+\include{main/forside}
+
+
+\pagenumbering{roman}
+\setcounter{secnumdepth}{-1}
+\frontmatter{}
+
 %\chapter{Abstract}
 %\input{tex/Abstract}
-%
+
 %\chapter{Acknowledgements}
 %\input{tex/Acknowledgements}
-%
-%\pagebreak
-%
-%
-%\setcounter{tocdepth}{3}
-%\setcounter{secnumdepth}{3}
-%
-%\tableofcontents*
+
+\pagebreak
+
+
+\setcounter{tocdepth}{3}
+\setcounter{secnumdepth}{3}
+
+\tableofcontents*
 %\chapter*{List of Tables}
 %\chapter*{List of Figures}
 
@@ -51,29 +51,19 @@
 \chapter{Analysis}\label{analysis}
 \input{tex/Analysis}
 
-%\chapter{Implementation}\label{design}
-%\input{tex/Implementation}
-%
-%\chapter{Discussion}\label{results}
-%\input{tex/Discussion}
-%
-%\chapter{Conclusion}\label{conclusion}
-%\input{tex/Conclusion}
-%
+
 %\chapter*{Appendices}
 %\addcontentsline{toc}{chapter}{Appendices}
-%
+
 %\renewcommand{\thesection}{\Alph{section}}
 %\setcounter{section}{0}
 %\input{tex/Appendiks}
-%
-%
-%
-%% The final section contains the sources of any and all references to other
-%% group documents, articles, books, etc.  that you used in creating this
-%% document.  You need to have created the file analysis.bib with
-%% entries for all of your sources.
-%%
+
+% The final section contains the sources of any and all references to other
+% group documents, articles, books, etc.  that you used in creating this
+% document.  You need to have created the file analysis.bib with
+% entries for all of your sources.
+
 \nocite{*}
 \bibliographystyle{plainnat}
 \bibliography{bibliography} % bibliography.bib is the bibliography file name
