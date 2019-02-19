@@ -338,6 +338,11 @@ Other relevant features that Jif supports are label inference\footnote{http://ww
 
 \subsection{Paragon}
 
+Paragon is a programming language that extends Java with the ability to express security policies for data. Paragon has similar characteristics to Jif and essentially solving the same problem. Paragon have a different approach to defining information flow policies; \emph{Paralocks} \cite{paralocks} \cite{paragonpaper}.
+At the core \emph{Paralocks} is based on the concepts; \emph{actors} and \emph{locks} \cite{paralocks}. An actor is a user with some role. For information can flow to an actor there might be a condition that states; that the actor must be of a specific role. These conditions are represented by boolean variables \emph{locks} and can be modified throughout program execution. These locks are called \emph{parameterized locks} since they are parameterized over actors. Policies are specified by parameterized locks and \emph{actor polymorphism} allows us to reason about all actors \cite{paragonpaper}.
+
+
+
 %Simple policy definition
 
 % Declassification (lock)
@@ -389,8 +394,6 @@ JSFlow is an exciting tool for dynamic Information-Flow Control. However the JSF
 The selection of the IFC tool used for developing the prototype is based the following defined parameters.
 The selection of IFC tool put emphasis on the practical usage in combination with Matrix. 
 
-\subsubsection{Requirements}
-
 \subsubsection{Decision matrix}
 Parameters: Hard parameters are related to language features. Soft parameters are related to outside the language and that are relevant for a programmer.
 Hard parameters: declassification, parameterized class
@@ -403,7 +406,7 @@ Soft parameters: simplicity, documentation, support for external libraries, prog
 
 \subsubsection{Comparison}
 
-\subsection{Paragon analysis}
+%\subsection{Paragon analysis}
 
 \subsection{IFC tools summary}
 
