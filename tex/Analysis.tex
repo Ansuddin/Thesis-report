@@ -334,24 +334,73 @@ The parameter variable \emph{i} has the label held by the label \emph{lbl} which
 %Dynamic label example
 
 
-Other relevant features that Jif supports are label inference\footnote{http://www.cs.cornell.edu/jif/doc/jif-3.3.0/language.html\#inference}, parameterized classes\footnote{http://www.cs.cornell.edu/jif/doc/jif-3.3.0/language.html\#parameterized-classes} and polymorphism \footnote{http://www.cs.cornell.edu/jif/doc/jif-3.3.0/language.html\#label-polymorphism}.
-
+Other relevant features that Jif supports are label inference\footnote{http://www.cs.cornell.edu/jif/doc/jif-3.3.0/language.html\#inference} and parameterized classes\footnote{http://www.cs.cornell.edu/jif/doc/jif-3.3.0/language.html\#parameterized-classes}.
 \subsection{Paragon}
 
 Paragon is a programming language that extends Java with the ability to express security policies for data. Paragon has similar characteristics to Jif and essentially solving the same problem. Paragon have a different approach to defining information flow policies; \emph{Paralocks} \cite{paralocks} \cite{paragonpaper}.
 At the core \emph{Paralocks} is based on the concepts; \emph{actors} and \emph{locks} \cite{paralocks}. An actor is a user with some role. For information can flow to an actor there might be a condition that states; that the actor must be of a specific role. These conditions are represented by boolean variables \emph{locks} and can be modified throughout program execution. These locks are called \emph{parameterized locks} since they are parameterized over actors. Policies are specified by parameterized locks and \emph{actor polymorphism} allows us to reason about all actors \cite{paragonpaper}.
 
 
+In Paragon policies are immutable and are defined as such:
 
-%Simple policy definition
+\begin{lstlisting}
+	public static final policy low  = { Object x: };
+	public static final policy high = { };
+\end{lstlisting}
 
-% Declassification (lock)
+Policies for \emph{low} and \emph{high} can encoded in different ways. The encoding specifies the most liberal policy that anyone can see the data that has the policy of \emph{low}. The actor is any \emph{Object x} hence anyone can read. The encoding for \emph{high} is the most strict policy and specifies that actors so no one can see the data.
 
-% Dynamic labels (locks)
+To support a simple declassification mechanism a lock would have to be introduced and the \emph{high} policy definition would have to be redefined:
 
+\begin{lstlisting}
+	private lock Declassify;
+	public static final policy low  = { Object x: };
+	public static final policy high = { Object x: Declassify};
+\end{lstlisting} 
 
-% Other features
+The \emph{high} policy now specifies that information can only be read if the \emph{ declassify lock} is open. The following method can now allow declassification:
 
+\begin{lstlisting}
+	public static ?low int declassify(?high int x){
+		open Declassify { return x; } 
+	}
+\end{lstlisting} 
+
+The method is a custom declassification method for variables with type \emph{int}. By using Java generics the same method could be used for any type. The \emph{declassify()} method takes a parameter that has the policy \emph{high} and returns the parameter with the lower policy \emph{low}. The method opens the lock hence allowing the value of \emph{x} to be read and returned. 
+%Java generics is used to allow declassification of any type.
+ 
+\begin{lstlisting}
+publicVariable = declassify(secretVariable); // OK
+\end{lstlisting} 
+ 
+ 
+The example illustrates a simple declassify method however it can be called by anyone. To ensure that only those with the right authority can call it the example could easily be extended with another lock \cite{paralocks}. 
+
+It is possible to support policies at runtime with locks. Suppose we have a customer who buys some software. The software keys should only be given when the customer has paid. We define the following:
+
+\begin{lstlisting}
+	public static lock Paid;
+	?{customer: } String customerData
+	?{customer: Paid} String softwareKey
+\end{lstlisting}
+
+When the the customer's payment is processed the lock \emph{Paid} should only be open if the payment is successful. 
+
+\begin{lstlisting}
+	public void processPayment() {
+		// customer pays for item
+		if (paymentSuccessful) { open Paid; } else { ... }
+	}
+\end{lstlisting}
+
+It is not possible for the compiler to learn the state of the lock \emph{Paid}. By using the lock in a conditional statement the lock will be checked at runtime.
+
+\begin{lstlisting}
+	processPayment();
+	if (Paid) { customerData = softwareKey; } else { ... }
+\end{lstlisting}   
+
+Paragon is a powerful tool for Information-Flow Control and has an interesting policy language with support for expressive dynamic policies. Other relevant features in paragon are policy inference and Java generics.
 
 \subsection{JSFlow}
 
