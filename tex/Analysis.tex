@@ -439,34 +439,39 @@ JSFlow is an exciting tool for dynamic Information-Flow Control. However the JSF
 
 \subsection{Selection of IFC tool}
 The approach to selecting a tool is from a programmer's perspective with emphasis on choosing the right tool for developing rather than the tool that achieves the best security.
-For selection of the tool is based on different parameters that falls into two categories; \emph{technical parameters} and \emph{soft parameters}. The technical parameters are related to features that are necessary for developing the prototype while the soft parameters considers other aspects such as documentation, flexibility, expressiveness etc. 
-\\
-\\
-%Briefly describe the parameters
-Parameters: Security labels, confidentiality policies, integrirty policies, declassification, policy inference, run-time label checking, support for external libraries
+For selection of the tool is based on different parameters that falls into two categories; \emph{technical features} and \emph{soft parameters}. The technical parameters are related to features that are necessary for developing the prototype while the soft parameters considers other aspects such as documentation, flexibility and permissiveness.
 
-Soft parameters: documentation, expressiveness, flexibility, permissiveness 
+The technical features are relevant for applying the tool. It must have the feature following features; 
 
-The table below the three tools related to the parameters. 
+\begin{itemize}
+	\item \emph{Define policies:} It certainly must be possible to express where information may flow.
+	\item \emph{Declassification:} Noninterference is too strict and the ability to declassify information is necessary. 
+	\item \emph{Policy inference:} The tool can automatically infer labels to avoid retyping labels.
+	\item \emph{Eupport for external libraries:} An important feature since the tool should be applicable to a Matrix SDK library.
+	\item \emph{Run-time label checking} to enforce dynamic labeling.
+\end{itemize}
+
+The soft parameters are indirectly related to the tool. It can be an overhead developing if the program is to strict hence \emph{permissiveness} is defined as a parameter. The parameter \emph{flexibility} covers the flexibility and restrictiveness of the tool; it should be uncomplicated and straightforward work with the policy language. The final soft parameter is \emph{documentation}.
+
+The table below gives an overview of the three tools related to the parameters. 
 
 \begin{table}[H]
-	\hspace*{-1.5cm} 
+	\hspace*{-1.2cm} 
 	\centering
 	\begin{tabular}{r|ccccccccc}
 		&
 		\rot{Defining policies} &
 		\rot{Declassification} &
 		\rot{Run-time label checking} &
-		\rot{Support for external libraries} &
 		\rot{Policy inference} &
+		\rot{Support for external libraries} &
 		\rot{Documentation} &
-		\rot{Expressiveness} &
 		\rot{Flexibility} &
 		\rot{Permissiveness}
 		\\ \hline
-		Jif     & X & X & X & X & X & X &   &   &    \\ 
-		Paragon & X & X & X & X & X &   & X & X &    \\
-		JSFlow  & X &   & X &   &   &   &   &   & X  \\ 
+		Jif     & X & X & X & X & X & X &   &    \\ 
+		Paragon & X & X & X & X & X &   & X &    \\
+		JSFlow  & X &   & X & x &   &   &   & X  \\ 
 	\end{tabular}
 
 	\caption{Comparison of IFC tools}
@@ -477,13 +482,13 @@ The table below the three tools related to the parameters.
 % Not possible to use Matrix library with JSFlow because of missing support for libaries such as require (in node). Also overhead with configuring JSFlow to be the interpretor.
 
 
-JSFlow is still an immature tool and lack support important features. JSFlow does currently provide support for use with external libraries. It also lacks a mechanism for declassification and the subset lattice they use does not cover integrity policies. Although JSFlow would have been an interesting tool since the main Matrix SDK is for Javascript and because of the dynamic enforcement that makes it more permissive. 
+JSFlow is still an immature tool and lack support important features. JSFlow does currently provide support for use with external libraries. It also lacks a mechanism for declassification. JSFlow would have been an interesting tool because of the permissiveness that comes with dynamic enforcement but also since the main Matrix SDK is for Javascript. 
 
-Jif and Paragon offer many of the same features with the fundamental difference being the policy language. The policy language of Paragon is expressive, flexible and intuitive. Paragon is less restrictive and more flexible regarding the policies it specifies. The programming experience in Paragon is more as an extension to Java then a different programming language which is the experience you get when programming in Jif. Jif however has a more complete documentation and more application example to showcase. 
+Jif and Paragon offer many of the same features with the fundamental difference being the policy language. The policy language of Paragon is expressive, flexible and intuitive. Paragon is less restrictive and more flexible regarding the policies it specifies \cite{paragonpaper}. The programming experience in Paragon is more as an extension to Java then a different programming language which is the experience you get when programming in Jif. Jif however has a more complete documentation and more code examples to showcase. 
 
 Another important aspect is the support for external libraries. Matrix can be used through client SDK's hence support for external libraries is necessary. Both Jif and Paragon supports this by allowing interacting with external Java classes. Both languages must specify a signature for the external Java class. This was an overhead in Jif and even though Paragon uses the same approach it was easier to manage in Paragon.
 
-Based on the consideration and the technical and soft parameters Paragon was selected as the tool. 
+Based on the consideration and parameters Paragon was selected as the tool used in the case study. 
 
 
 \section{Summary}
