@@ -448,26 +448,30 @@ Parameters: Security labels, confidentiality policies, integrirty policies, decl
 Soft parameters: documentation, expressiveness, flexibility, permissiveness 
 
 The table below the three tools related to the parameters. 
-\\
-\\
-\begin{tabular}{r|ccccccccc}
-	&
-	\rot{Defining policies} &
-	\rot{Declassification} &
-	\rot{Run-time label checking} &
-	\rot{Support for external libraries} &
-	\rot{Policy inference} &
-	\rot{Documentation} &
-	\rot{Expressiveness} &
-	\rot{Flexibility} &
-	\rot{Permissiveness}
-	\\ \hline
-	Jif     & X & X & X & X & X & X &   &   &    \\ 
-	Paragon & X & X & X & X & X &   & X & X &    \\
-	JSFlow  & X &   & X &   &   &   &   &   & X    \\ \hline
-\end{tabular}
-\\
-\\
+
+\begin{table}[H]
+	\hspace*{-1.5cm} 
+	\centering
+	\begin{tabular}{r|ccccccccc}
+		&
+		\rot{Defining policies} &
+		\rot{Declassification} &
+		\rot{Run-time label checking} &
+		\rot{Support for external libraries} &
+		\rot{Policy inference} &
+		\rot{Documentation} &
+		\rot{Expressiveness} &
+		\rot{Flexibility} &
+		\rot{Permissiveness}
+		\\ \hline
+		Jif     & X & X & X & X & X & X &   &   &    \\ 
+		Paragon & X & X & X & X & X &   & X & X &    \\
+		JSFlow  & X &   & X &   &   &   &   &   & X  \\ 
+	\end{tabular}
+
+	\caption{Comparison of IFC tools}
+	\label{fig:toolcomparison}
+\end{table}
 
 
 % Not possible to use Matrix library with JSFlow because of missing support for libaries such as require (in node). Also overhead with configuring JSFlow to be the interpretor.
