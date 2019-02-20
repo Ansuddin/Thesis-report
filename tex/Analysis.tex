@@ -1,6 +1,8 @@
-This chapter consists of two parts. The first part will provide an evaluation of the Matrix security model and relies on the paper \emph{SoK: Secure Messaging} \cite{sok} and \emph{The Olm Cryptographic Review} by NCC Group \cite{ncc}. 
+The case study leverages Matrix as a secure communication channel and Paragon as the Information-Flow Control tool for securing the endpoints. 
 
-The second part provides a preliminary analysis of the IFC tools, the selection of Paragon and the rationale behind it, and a further analysis of the selected tool Paragon.
+This chapter consists of two parts. The first part will provide an evaluation of the Matrix security and relies on the paper \emph{SoK: Secure Messaging} \cite{sok} and \emph{The Olm Cryptographic Review} by NCC Group \cite{ncc}. 
+
+The second part provides a preliminary analysis of some IFC tools, the selection of Paragon and the rationale behind it.
 
 
 \section{Evaluation of Matrix security model}\label{evaluationofmatrix}
@@ -255,11 +257,7 @@ End-to-end encryption is not the end of security. Other security measures must b
 % Best supported sdk is for javascript or python. Problem of running javascript code or python code with Paragon (java)
 % Maybe better to use JSFlow instead 
 
-
-
-Having established that end-to-end encryption is not the end of security we will now look at Information-Flow Control tools. 
-
-The approach to the section will be from a programmers perspective hence usability and practicality will play a role in choosing an IFC tool. 
+Different Information-Flow Control tools were considering for the case study. Before developing the prototype several tools were studied. This section describe three of those tools; \emph{Jif}, \emph{Paragon} and \emph{JSFlow}. This section further justify the selection of Paragon.
 
 \subsection{Jif}
 
@@ -348,7 +346,7 @@ In Paragon policies are immutable and are defined as such:
 	public static final policy high = { };
 \end{lstlisting}
 
-Policies for \emph{low} and \emph{high} can encoded in different ways. The encoding specifies the most liberal policy that anyone can see the data that has the policy of \emph{low}. The actor is any \emph{Object x} hence anyone can read. The encoding for \emph{high} is the most strict policy and specifies that actors so no one can see the data.
+Policies for \emph{low} and \emph{high} can encoded in different ways. The encoding specifies the most liberal policy that anyone can see the data that has the policy of \emph{low}. The actor is any \emph{Object x} hence anyone can read. The encoding for \emph{high} is the most strict policy and specifies that actors so no one can see the data \cite{paragonprogramming}.
 
 To support a simple declassification mechanism a lock would have to be introduced and the \emph{high} policy definition would have to be redefined:
 
@@ -376,7 +374,7 @@ publicVariable = declassify(secretVariable); // OK
  
 The example illustrates a simple declassify method however it can be called by anyone. To ensure that only those with the right authority can call it the example could easily be extended with another lock \cite{paralocks}. 
 
-It is possible to support policies at runtime with locks. Suppose we have a customer who buys some software. The software keys should only be given when the customer has paid. We define the following:
+It is possible to support policies at runtime with locks \cite{paragonprogramming}. Suppose we have a customer who buys some software. The software keys should only be given when the customer has paid. We define the following:
 
 \begin{lstlisting}
 	public static lock Paid;
@@ -393,7 +391,7 @@ When the the customer's payment is processed the lock \emph{Paid} should only be
 	}
 \end{lstlisting}
 
-It is not possible for the compiler to learn the state of the lock \emph{Paid}. By using the lock in a conditional statement the lock will be checked at runtime.
+It is not possible for the compiler to learn the state of the lock \emph{Paid}. By using the lock in a conditional statement the lock will be checked at runtime \cite{paragonprogramming}.
 
 \begin{lstlisting}
 	processPayment();
@@ -440,24 +438,48 @@ JSFlows uses a subset lattice hence \emph{m} can flow to \emph{h} since \emph{m}
 JSFlow is an exciting tool for dynamic Information-Flow Control. However the JSFlow is still immature and does not support important features such as declassification.
 
 \subsection{Selection of IFC tool}
-The selection of the IFC tool used for developing the prototype is based the following defined parameters.
-The selection of IFC tool put emphasis on the practical usage in combination with Matrix. 
+The approach to selecting a tool is from a programmer's perspective with emphasis on choosing the right tool for developing rather than the tool that achieves the best security.
+For selection of the tool is based on different parameters that falls into two categories; \emph{technical parameters} and \emph{soft parameters}. The technical parameters are related to features that are necessary for developing the prototype while the soft parameters considers other aspects such as documentation, flexibility, expressiveness etc. 
+\\
+\\
+%Briefly describe the parameters
+Parameters: Security labels, confidentiality policies, integrirty policies, declassification, policy inference, run-time label checking, support for external libraries
 
-\subsubsection{Decision matrix}
-Parameters: Hard parameters are related to language features. Soft parameters are related to outside the language and that are relevant for a programmer.
-Hard parameters: declassification, parameterized class
+Soft parameters: documentation, expressiveness, flexibility, permissiveness 
 
-Soft parameters: simplicity, documentation, support for external libraries, programmer-friendly
+The table below the three tools related to the parameters. 
+\\
+\\
+\begin{tabular}{r|ccccccccc}
+	&
+	\rot{Defining policies} &
+	\rot{Declassification} &
+	\rot{Run-time label checking} &
+	\rot{Support for external libraries} &
+	\rot{Policy inference} &
+	\rot{Documentation} &
+	\rot{Expressiveness} &
+	\rot{Flexibility} &
+	\rot{Permissiveness}
+	\\ \hline
+	Jif     & X & X & X & X & X & X &   &   &    \\ 
+	Paragon & X & X & X & X & X &   & X & X &    \\
+	JSFlow  & X &   & X &   &   &   &   &   & X    \\ \hline
+\end{tabular}
+\\
+\\
 
 
 % Not possible to use Matrix library with JSFlow because of missing support for libaries such as require (in node). Also overhead with configuring JSFlow to be the interpretor.
 
 
-\subsubsection{Comparison}
+JSFlow is still an immature tool and lack support important features. JSFlow does currently provide support for use with external libraries. It also lacks a mechanism for declassification and the subset lattice they use does not cover integrity policies. Although JSFlow would have been an interesting tool since the main Matrix SDK is for Javascript and because of the dynamic enforcement that makes it more permissive. 
 
-%\subsection{Paragon analysis}
+Jif and Paragon offer many of the same features with the fundamental difference being the policy language. The policy language of Paragon is expressive, flexible and intuitive. Paragon is less restrictive and more flexible regarding the policies it specifies. The programming experience in Paragon is more as an extension to Java then a different programming language which is the experience you get when programming in Jif. Jif however has a more complete documentation and more application example to showcase. 
 
-\subsection{IFC tools summary}
+Another important aspect is the support for external libraries. Matrix can be used through client SDK's hence support for external libraries is necessary. Both Jif and Paragon supports this by allowing interacting with external Java classes. Both languages must specify a signature for the external Java class. This was an overhead in Jif and even though Paragon uses the same approach it was easier to manage in Paragon.
+
+Based on the consideration and the technical and soft parameters Paragon was selected as the tool. 
 
 
 \section{Summary}
