@@ -1,16 +1,97 @@
-\section{Object Oriented Analysis and Design}
+This chapter describes the implementation of the prototype in the case study. The prototype is a system for sending and retrieving patient journals among different hospitals. The system relies on Matrix as the secure communication channel and synchronization storage.
 
-\subsection{Requirement}
+\section{Journal system}
 
-\subsection{Analysis}
+% Describe the requirements for the journal system.
 
-\subsection{Design}
-
-\section{Matrix Design}
-
-\subsection{Design choices}
+The journal system sends an retrieves patient journals. A
 
 
 
+The case study 
+
+The journal system developed in the case study is inspired by the Danish \emph{e-journal} system described in section \ref{journalintro}. 
+
+The journal system is a platform where patients and medical employees from different hospitals
+
+\subsection{Requirements}
+
+Overall requirements:
+- Hospitals needs shared access to patient journal. 
+
+- Each hospital has a homeserver running.
+
+- A room represents a patient journal with the participants in the room being the respective hospitals that share the journal. 
+
+- The global Patient journal state is stored in matrix.
+
+- Employees in a hospital shares the same matrix login.
+
+- Patient journals are append only.
+
+- A hospital has two principals: Doctor and Secretary.
+
+- A doctor can see full patient journal.
+
+- A secretary can only see some parts of the journal.
+
+
+Technical requirements:
+-Msg type should be "m.text" when sending patient journal (JSON format). The convertion of string to JSON and vice versa should happen in the client.
+
+
+Configurations for room:
+- Rooms are precreated and each hospital are aware of each room. 
+- Hospitals in a Room are preconfigured and every client knows from the beginning which hospitals are in the room / or can join the room.
+- The room is invite-only
+- Default user level is 100. Anyone can kick, ban and invite users. 
+
+Test cases (Two preinvited hospitals in a precreated room):
+- Doctor retrieves journal
+- Secretary retrieves journal
+- Doctor edits journal 
+- Secretary edits journal
+
+TODO:
+- Exception handling for when users are banned or cannot join the room
+- Enable encryption (Use E2E beta repo)
+- Setup federation of homeservers
+
+
+
+A central authority (the government) would be managing the room which all participants in the room trust. 
+
+
+
+\subsection{Matrix}
+
+
+
+\subsection{System design}
+% Describe how the design with matrix would be
+
+
+\subsubsection{Limitations}
+
+A design problem is the concurrent writes to a journal from multiple hospital. When writing to a journal the latest version of the journal is first retrieved and then the writes are appended to the journal. However multiple hospitals might have retrieved the latest journal and different doctors might have committed changes to the journal and send it to Matrix hence one of the writes would be lost since only the latest journal is retrieved.
+
+This is a common issue in distributed systems but is not handled in this solution.
+
+% Solution merging data like version control systems like git.
+
+
+
+\section{Paragon implementation}
+
+\subsection{The Matrix interface}
+
+\subsection{Locks and actors}
+
+\subsubsection{Lattice}
+
+\subsection{Declassification}
+
+
+\subsection{Limitations}
 
 \section{Summary}
