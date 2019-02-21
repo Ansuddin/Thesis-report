@@ -10,40 +10,58 @@ The lack of secure information is evident and the prototype demonstrates how Inf
 
 \subsection{Requirements}
 
-Overall requirements:
-- Hospitals needs shared access to patient journal. 
+The following requirements are described for the prototype:
 
-- Each hospital has a homeserver running.
+\begin{itemize}
+	\item A patient journal contains high (secret) and low (public) information.
+	\item A patient journal is send and received securely over a channel.
+	\item A Patient journal is append only. 
+	\item Hospitals have shared access to patient journals. 
+	\item A hospital has two principals: Doctor and Secretary.
+	\item A doctor must have the patient in care to access the high information in a journal.
+	\item The doctor can see the full patient journal.
+	\item The doctor can add to secret fields of a patient journal.
+	\item The secretary must work under the Doctor who has the patient in care to access it.
+	\item A secretary can only see some parts of the journal.
+	\item A secretary can edit the public parts of a journal.
+\end{itemize}
+
+
+
+
+
+
+
+
+\subsection{System design}
+
+The medical staff can only retrieve patient journals from the hospital.
 
 - A room represents a patient journal with the participants in the room being the respective hospitals that share the journal. 
+- Each hospital has a homeserver running.
 
 - The global Patient journal state is stored in matrix.
 
 - Employees in a hospital shares the same matrix login.
 
-- Patient journals are append only.
+A central authority (the government) would be managing the room which all participants in the room trust. The room can be considerably large since many different types of clinics and hospitals needs access to a patient journal. This puts a lot of responisbility on securing the endpoints. If a clinic or hospital is present in a room it means that the patient has been referred to that clinic. We assume that all emergency hospitals have access to the room.
+% Describe how the design with matrix would be
 
 
-- A hospital has two principals: Doctor and Secretary.
-
-- A doctor can see full patient journal.
-
-- The doctor must have the patient in care to access the high information in a journal.
-
-- A secretary can only see some parts of the journal.
-
-- The must be 
-
-- If the hospital is an ER any doctor should access it 
-
-
-The medical staff can only retrieve patient journals from the hospital.
+\begin{figure}[H] 
+	\hspace*{-1.7cm}
+	\centering
+	\includegraphics[width=16cm]{figures/journalsystem_class.png}
+	\caption{Class diagram for the Journal system}
+	\label{fig:journalsystem}
+\end{figure}
 
 
 
+\subsubsection{Matrix}
 
 
-\subsection{Matrix}
+%Matrix API's
 
 
 
@@ -55,11 +73,14 @@ Configurations for room:
 - Default user level is 100. Anyone can kick, ban and invite users. 
 
 
+\begin{figure}[H] 
+	\hspace*{-1cm}
+	\centering
+	\includegraphics[width=14cm]{figures/matrix_component.png}
+	\caption{Matrix interface}
+	\label{fig:matrix_component}
+\end{figure}
 
-\subsection{System design}
-
-A central authority (the government) would be managing the room which all participants in the room trust. The room can be considerably large since many different types of clinics and hospitals needs access to a patient journal. This puts a lot of responisbility on securing the endpoints. If a clinic or hospital is present in a room it means that the patient has been referred to that clinic. We assume that all emergency hospitals have access to the room.
-% Describe how the design with matrix would be
 
 
 \subsubsection{Limitations}
@@ -76,7 +97,10 @@ This is a common issue in distributed systems but is not handled in this solutio
 
 \subsection{The Matrix interface}
 
+
 \subsection{Policies and locks}
+
+%D Declaration examples
 
 \subsubsection{Lattice}
 
