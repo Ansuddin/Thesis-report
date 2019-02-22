@@ -435,7 +435,7 @@ Alice sends a new message and is linked to the most recent unlinked objects (bot
 %In the example above the message is represnted by a JSON object and could be of any kind of object.
 
 
-\subsection{Architecture}
+\subsection{Architecture} \label{matrix:architecture}
 The previous section introduced the notion of a\emph{room} which clients sends messages to. The messages being in Matrix are actually JSON objects called \emph{events}. The events can be of any kind of structure hence it is not limited to messaging. Events are stored at homeservers and the communication history for a room is modelled using \emph{directed acyclic graph} called\emph{event graphs}. Matrix provides a specification for Client-Server API which is used for sending and synchronizing events between the client and its belonging homeserver. Matrix also provides specification for a Server-Server API which synchronizes data among homeservers with eventual consistency. The synchronization process between homeservers is defined by the term \emph{Federation} \cite{matrixspec}. 
 
 
@@ -447,7 +447,7 @@ The previous section introduced the notion of a\emph{room} which clients sends m
 \end{figure}
 
 
-As previously mentioned a room is a conceptual place for sending and receiving events. Each room is uniquely identified by a \emph{Room ID}. The figure \ref{fig:matrix_room} shows how events are send and received from a room.
+As previously mentioned a room is a conceptual place for sending and receiving events with the room data being distributed over each homeserver. Each room is uniquely identified by a \emph{Room ID}. The figure \ref{fig:matrix_room} shows how events are send and received from a room.
 
 
 
