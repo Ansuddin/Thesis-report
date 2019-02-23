@@ -56,34 +56,34 @@ Matrix provides several SDK libraries that client application can be build on to
 \subsubsection{Matrix}
 %Matrix API's
 % A lot of things are handled under the hood by the matrix SDK.
-Matrix is an important component in the system. It manages the transmission and storage of patient journals through rooms. As described in section \ref{matrix:architecture} a room is a conceptual place for sending an receiving events and events can be any of any structure. The event history in a rooms is replicated at each homeserver. 
+Matrix is an important component in the system. It manages the transmission and storage of patient journals through rooms while managing end-to-end encryption. The encryption mechanism is automatically provided and the SDK manages the session keys under the hood.  As described in section \ref{matrix:architecture} a room is a conceptual place for sending an receiving events and events can be any of any structure. The event history in a rooms is replicated at each homeserver. 
 
 The following design choices and assumptions are made regarding Matrix and the system: 
 
 \begin{itemize}
-	\item Each event represents a version of a patient journal.
-	\item A room represents a single patient journal's version history. 
+	\item A homeserver represents a hospital server that replicates the history of a patient journal. 
+	\item A room represents a single patient journal's version history.
+	\item An event represents a patient journal.  
 	\item The latest event in a room is the global state of the patient journal.
 	\item A hospital is represented by a single matrix user that participates in a room.
-	\item A homeserver represents a hospital server that replicates the history of a patient journal. 
+	\item A hospital's matrix user is used by doctors and secretaries to access patient journals. 
 \end{itemize}
 
 
-
-- Employees in a hospital shares the same matrix login.
-
-A central authority (the government) would be managing the room which all participants in the room trust. The room can be considerably large since many different types of clinics and hospitals needs access to a patient journal. This puts a lot of responsibility on securing the endpoints. If a clinic or hospital is present in a room it means that the patient has been referred to that clinic. We assume that all emergency hospitals have access to the room.
-
-
-
-Configurations for room:
-- Rooms are precreated and each hospital are aware of each room. 
-- Hospitals in a Room are preconfigured and every client knows from the beginning which hospitals are in the room / or can join the room.
-- The room is invite-only
-- Default user level is 100. Anyone can kick, ban and invite users. 
+The room can be considerably large since many different types of hospitals needs access to a patient journal. This puts a lot of responsibility on securing the endpoints but also adds concern to who controls the rooms and how hospitals are added. A central authority would be managing all room whom all participants in the room trust. That authority would be the government which are responsible for creating and managing the rooms. Only the authority can invite and remove Hospitals from a room. Hospitals can only join a room if they have been invited. The rooms  
 
 
 \subsubsection{Client}
+
+
+ The hospital keeps track of all journals they have access to through a hashmap with key being the CPR and the value being the roomid. When a doctor or secretary want to retrieve a journal; the latest journal from the patient journal's room is fetched.
+ he hospital retrieves the latest event 
+ 
+ 
+ 
+The sessions between a doctor and a 
+
+A patient journal the PatientJournal class depicts 
 
 % Describe how the design with matrix would be
 Figure \ref{fig:journalsystem} depicts the class diagram for the system.
@@ -106,7 +106,10 @@ Figure \ref{fig:journalsystem} depicts the class diagram for the system.
 
 %Incompatibility with Paragon
 
+
 A design problem is the concurrent writes to a journal from multiple hospital. Before writing to a journal; the latest version of the journal in Matrix is first retrieved and then the writes are appended to the journal. However multiple hospitals might have retrieved the latest journal and different doctors might have committed changes to the journal and send it to Matrix hence one of the writes would be lost since only the latest journal is retrieved. 
+
+Another limitation is that the rooms a hospital can access are precreated and the hospitals in a room are preconfigured. 
 
 %This is a common issue in distributed systems but is not handled in this solution. 
 
