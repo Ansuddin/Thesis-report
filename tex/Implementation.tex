@@ -20,11 +20,12 @@ The following requirements are defined for the prototype:
 	\item Hospitals have shared access to patient journals. 
 	\item A hospital has two actors: Doctor and Secretary.
 	\item A doctor must have the patient in care to access the high information in a journal.
-	\item The doctor can see the full patient journal.
-	\item The doctor can add to secret fields of a patient journal.
+	\item A doctor can see the full patient journal.
+	\item A doctor can edit the public part of the patient journal.
+	\item A doctor can only add to a secret fields in a patient journal if he has that patient in care.
 	%\item The secretary must work under the Doctor who has the patient in care to access it.
 	\item A secretary can only see some parts of the journal.
-	\item A secretary can edit the public parts of a journal.
+	\item A secretary can edit the public parts of a journal only if she 
 \end{itemize}
 
 The following non-functional requirements are defined:
@@ -124,15 +125,27 @@ Another limitation is that the rooms a hospital can access are precreated and th
 
 \subsection{Policies and locks}
 
+\subsubsection{Journal system}
+% The policies defined for confidentiality are with fresh actors and the objects correspond to the entities where information may flow. By using fresh actors the policies can be combined with other policies that would otherwise have interfered with eachother. The integrity policy is more general in nature and has defines two actors; trusted and untrusted observers. The policies are defined as follows: ?(Policy.high + Policy.trusted).
+
+
+% Dynamic policy is used for when a doctor adds notes to session. The lock IsDoctor must be open for the method addToSession() can be invoked. This is checked at runtime as seen in the code snippet:
+
 \subsubsection{Matrix API}
 
-\subsubsection{Journal system}
+
 
 %D Declaration examples
 
-\subsubsection{Lattice}
+%\subsubsection{Lattice}
 
 \subsection{Declassification}
+
+% Declassification is necessary for the input and output channels. The journals might be print to the user over the output channel. In order to do so the journal must be declassified correctly. 
+
+%Another concern is the input channel where the input needs to be endorsed. The client requires input from both secretary and doctor. Input channels are untrusted and need to be endorced/sanitized based on which actor the input came from.
+
+% The following table shows the rules for declassification and endorsement throughout the system.
 
 \subsection{Exception handling}
 
