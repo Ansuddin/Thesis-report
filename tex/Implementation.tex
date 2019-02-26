@@ -125,6 +125,15 @@ Another limitation is that the rooms a hospital can access are precreated and th
 
 \subsection{Policies and locks}
 
+\subsubsection{Lattice}
+% Show confidentiality lattice and combined lattice.
+
+\subsubsection{Policies}
+% Show table of policies and how they are defined and how they are used for low, high and medium.
+
+\subsubsection{Locks}
+% Show table for locks and how they are defined and how they are used.
+
 \subsubsection{Journal system}
 % The policies defined for confidentiality are with fresh actors and the objects correspond to the entities where information may flow. By using fresh actors the policies can be combined with other policies that would otherwise have interfered with eachother. The integrity policy is more general in nature and has defines two actors; trusted and untrusted observers. The policies are defined as follows: ?(Policy.high + Policy.trusted).
 
@@ -153,6 +162,8 @@ Since encryption is still in early beta it has to be turned on manually. The mos
 
 
 \subsection{Limitations}
+ 
+ 
  
 %Technical requirements: -Msg type should be "m.text" when sending patient journal (JSON format). The convertion of string to JSON and vice versa should happen in the client.
 
