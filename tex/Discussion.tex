@@ -1,4 +1,8 @@
 
+% This section discuss and demonstrates the increased security guarantee with Matrix and IFC
+%Preferably with code snippets
+
+
 
 \subsection{The Policy system}
 % The implementation presents a prototype inspired by journal systems. 
@@ -6,7 +10,10 @@
 
 \subsection{Matrix API}
 
-% This section discuss and demonstrates the increased security guarantee with Matrix and IFC
+
+\paragraph{Encryption}
+Since encryption is still in early beta it has to be turned on manually. The most common use case of Matrix is as a secure messaging system. It is a important requirement in secure messaging system that encryption is "easy to work with" hence the encryption mechanism largely happens under the hood and has little to no when using the Matrix SDK.
+%D Declaration examples
 
 %Reflekter over Matrix interfacet. Muligheder og begrænsinger
 % Hvad er manglerne på Matrix og pointerer præcis hvor de er.
@@ -17,23 +24,28 @@
 % Lave en kryptering fra java til python og reducering hvor meget man stoler på python. Der foregår dobbelkryptering og så behøver man ikke stoler på python.
 % How does it affect the information flow that the matrix interface is essentially written in python through a java foreign class and that the interface itself is 
 
+\subsection{Paragon}
+
+% Policy first approach or code first approach
 
 %Reflekter over Paragon som værktøj. Hvad er godt og hvad er mindre godt 
 % Mindre teknisk forbedring genering af .pi interface filer.
 % Hvor godt vil locks virke med concurrency? 
 
 
-
-
-
 % Can IFC provide immutability or append-only features?
 
 % The relation between actor and entity in the system might be blurry 
 % The same policies can be defined several ways. Which way is best? The prototype type takes a more dynamic labeling approach.
+
+% The integrity policy could be build upon with actors as well but 
+
 % The policies interferes with eachother if the same actor is used in multiple policies.
 % Hence using an entity as actor 
 % Perhaps better way of specifying what the policy context for some object is?
 % Declassifying methods? 
 % More expressiveness when putting "must open" locks signature
+
+% Should be carefully considered when locks should be opended and when declassification and as well as endorsement should occur. The 
 
 \section{Summary}

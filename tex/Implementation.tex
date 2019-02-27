@@ -14,18 +14,17 @@ The lack of secure information flow is evident and the prototype demonstrates ho
 The following requirements are defined for the prototype:
 
 \begin{itemize}
-	\item A patient journal contains high (secret) and low (public) information.
+	\item A patient journal contains low (public), medium (confidential) and high (secret)  information.
 	\item A patient journal is send and received securely over a channel.
 	%\item A patient journal can only be appended to. 
 	\item Hospitals have shared access to patient journals. 
 	\item A hospital has two actors: Doctor and Secretary.
-	\item A doctor must have the patient in care to access the high information in a journal.
-	\item A doctor can see the full patient journal.
-	\item A doctor can edit the public part of the patient journal.
-	\item A doctor can only add to a secret fields in a patient journal if he has that patient in care.
-	%\item The secretary must work under the Doctor who has the patient in care to access it.
-	\item A secretary can only see some parts of the journal.
-	\item A secretary can edit the public parts of a journal only if she 
+	\item A secretary can only see low parts of the journal.
+	\item A secretary can edit the public parts of a journal.
+	\item A doctor can see the everything up to confidential information.
+	\item A doctor must have the patient in care to gain the journal's secret information.
+	\item A doctor can edit the public part and confidential parts of a patient journal.
+	\item A doctor can only add to a secret fields in a patient journal if the patient has been referred to the doctor.
 \end{itemize}
 
 The following non-functional requirements are defined:
@@ -71,10 +70,21 @@ The following design choices and assumptions are made regarding Matrix and the s
 \end{itemize}
 
 
-The room can be considerably large since many different types of hospitals needs access to a patient journal. This puts a lot of responsibility on securing the endpoints but also adds concern to who controls the rooms and how hospitals are added. A central authority would be managing all room whom all participants in the room trust. That authority would be the government which are responsible for creating and managing the rooms. Only the authority can invite and remove Hospitals from a room. Hospitals can only join a room if they have been invited. The rooms  
+The room can be considerably large since many different types of hospitals needs access to a patient journal. This puts a lot of responsibility on securing the endpoints but also adds concern to who controls the rooms and how hospitals are added. It is assumed that a central authority would be managing all room whom all participants in the room trust. That authority would be the government which are responsible for creating and managing the rooms. Only the authority can invite and remove Hospitals from a room. Hospitals can only join a room if they have been invited.
 
 
 \subsubsection{Client}
+
+%Program flow
+%Program starts as either a Doctor or secretary. If Doctor then IsDoctor is opened.
+%The program runs a while loop and presents a list of patients which the user can select.
+%When user selects a journal it is first checked who the user is.
+%If the user is doctor then it is checked if the patient is referred and the lock IsReferred would then open
+%The user then receives the journal through the receive method and can perform some action: 
+%If the user is a secretary than the user can print the journal, or edit the public note.
+%If the user is a doctor then the journal can be printed, public note can be edited or 
+%a public session note can be added. If the patient is referred then the doctor can add to private session
+%When the user has done some action the program returns to the main loop.  
 
 
  The hospital keeps track of all journals they have access to through a hashmap with key being the CPR and the value being the roomid. When a doctor or secretary want to retrieve a journal; the latest journal from the patient journal's room is fetched.
@@ -110,7 +120,7 @@ Figure \ref{fig:journalsystem} depicts the class diagram for the system.
 
 A design problem is the concurrent writes to a journal from multiple hospital. Before writing to a journal; the latest version of the journal in Matrix is first retrieved and then the writes are appended to the journal. However multiple hospitals might have retrieved the latest journal and different doctors might have committed changes to the journal and send it to Matrix hence one of the writes would be lost since only the latest journal is retrieved. 
 
-Another limitation is that the rooms a hospital can access are precreated and the hospitals in a room are preconfigured. 
+%Another limitation is that the rooms a hospital can access are precreated and the hospitals in a room are preconfigured. 
 
 %This is a common issue in distributed systems but is not handled in this solution. 
 
@@ -122,35 +132,85 @@ Another limitation is that the rooms a hospital can access are precreated and th
 
 \section{Paragon implementation}
 
+A \emph{policy-first} approach is used when implementing the prototype. The first step is to carefully specify the policies for the system. A journal has several parts that may only be obtained by appropriate users; the policies should uphold that. In the \emph{PatientJournal} class the field are decorated with labels that specifies the policy for that specific field. 
 
-\subsection{Policies and locks}
+For confidentiality three labels are defined with \emph{low} being the most liberal, \emph{High} being the most strict and \emph{medium} in the middle. The figure \ref{fig:lattice_confidentiality} depicts a lattice for the three labels where information can only flow upwards. In the figure \emph{public} represents low, \emph{confidential} represents medium and \emph{secret} represents high. 
 
-\subsubsection{Lattice}
+Based on the requirements the information labeled with secret should only be obtainable by the Doctor that the patient has been referred to. There could be defined a similar independent secret labels e.g. for information that only the patient's psychiatrist could view.  
+
 % Show confidentiality lattice and combined lattice.
 
-\subsubsection{Policies}
-% Show table of policies and how they are defined and how they are used for low, high and medium.
+\begin{figure}[H] 
+	\centering
+	\includegraphics[width=6cm]{figures/lattice_confidentiality.png}
+	\caption{Lattice in the system}
+	\label{fig:lattice_confidentiality}
+\end{figure}
 
-\subsubsection{Locks}
-% Show table for locks and how they are defined and how they are used.
+The lattice in figure \ref{fig:lattice_confidentiality}b illustrates the integrity policy and states that data labeled as \emph{untrusted} can not flow to \emph{trusted}. The trusted and untrusted labels serves the purpose of disallowing flows to the journal.
 
-\subsubsection{Journal system}
+The fields in the PatientJournal class are decorated with a combination of confidentiality labels. The \emph{product lattice} is illustrated in the figure \ref{fig:lattice_product}.
+
+\begin{figure}[H] 
+	\centering
+	\includegraphics[width=7cm]{figures/lattice_product.png}
+	\caption{Product lattice}
+	\label{fig:lattice_product}
+\end{figure}
+
+
+The next section will show how the policies have been defined and used in paragon. 
+
+
+
+\subsection{Policies}\label{policies} 
+
+
+
 % The policies defined for confidentiality are with fresh actors and the objects correspond to the entities where information may flow. By using fresh actors the policies can be combined with other policies that would otherwise have interfered with eachother. The integrity policy is more general in nature and has defines two actors; trusted and untrusted observers. The policies are defined as follows: ?(Policy.high + Policy.trusted).
-
 
 % Dynamic policy is used for when a doctor adds notes to session. The lock IsDoctor must be open for the method addToSession() can be invoked. This is checked at runtime as seen in the code snippet:
 
-\subsubsection{Matrix API}
 
+% Policy definition
+% Policy usage
 
+% Show table of policies and how they are defined and how they are used for low, high and medium.
 
-\paragraph{Encryption}
-Since encryption is still in early beta it has to be turned on manually. The most common use case of Matrix is as a secure messaging system. It is a important requirement in secure messaging system that encryption is "easy to work with" hence the encryption mechanism largely happens under the hood and has little to no when using the Matrix SDK.
-%D Declaration examples
+%Integrity. Are used for ensuring that data from untrusted sources can not interfere with trusted. Only used for input. Integrity of who can declassify what information is based dynamically enforced through locks.
+\subsection{Locks}
+% Show table for locks and how they are defined and how they are used.
+% IsReferred is used to check if the current doctor has the patient in care
+% It opens the lock Referred.
+% Would be a problem in a concurrent system then the Referred lock would be shared by multiple users at the same time. Another design would be to have a list of global users or what? 
 
-%\subsubsection{Lattice}
+% Primary mechanism for ensuring integrity and the trusted untrusted labeling for mainly input.
+
+\subsection{Modularity}
+
+\paragraph{Read effects}
+
+\paragraph{Write effects}
 
 \subsection{Declassification}
+
+\begin{table}[H]
+	\hspace*{-2cm}
+	\centering
+	\begin{tabular}{|l|l|l|l|l|} 
+		\hline
+		& Who               & What                                                                                                   & Where                                                                         & When                       \\ 
+		\hline
+		1 & Anyone~           & \begin{tabular}[c]{@{}l@{}}Journal.Name\\Journal.SSN\\Journal.Address\\Journal.PublicNote\end{tabular} & Util.printJournal()                                                           & Printing the journal       \\
+		& Doctor            & Journal.PublicSessions                                                                                 & Util.printJournal()                                                           & Printing the journal       \\
+		& Doctor (Referred) & Journal.PrivateSessions                                                                                & Util.printJournal()                                                           & Printing the journal       \\
+		&                   &                                                                                                        &                                                                               &                            \\ 
+		\hline
+		2 & Anyone            & User input                                                                                             & \begin{tabular}[c]{@{}l@{}}secretary.receive()\\doctor.receive()\end{tabular} & After prompting for input  \\
+		&                   &                                                                                                        &                                                                               &                            \\
+		\hline
+	\end{tabular}
+\end{table}
 
 % Declassification is necessary for the input and output channels. The journals might be print to the user over the output channel. In order to do so the journal must be declassified correctly. 
 
@@ -158,11 +218,18 @@ Since encryption is still in early beta it has to be turned on manually. The mos
 
 % The following table shows the rules for declassification and endorsement throughout the system.
 
-\subsection{Exception handling}
 
+
+
+%\subsubsection{Lattice}
 
 \subsection{Limitations}
- 
+
+Unary Locks not working for runtime checks.
+
+Exception handling
+
+%\subsection{Exception handling}
  
  
 %Technical requirements: -Msg type should be "m.text" when sending patient journal (JSON format). The convertion of string to JSON and vice versa should happen in the client.
