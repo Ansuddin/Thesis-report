@@ -129,7 +129,7 @@ A design problem is the concurrent writes to a journal from multiple hospital. B
 % Solution merging data like version control systems like git.
 
 
-
+\newpage
 \section{Paragon implementation}
 
 A \emph{policy-first} approach is used when implementing the prototype. The first step is to carefully specify the policies for the system. A journal has several parts that may only be obtained by appropriate users; the policies should uphold that. The policies are defined in the class \emph{Policy} and used throughout the system.
@@ -169,7 +169,7 @@ In Paragon a policy defines what actor information can flow to and under what co
 \cite{paragonprogramming}. Any object can be used as an actor. The confidentiality policies in the prototype uses \emph{Doctor} and \emph{Secretary} as actors. 
 
 
-\subsubsection{Defining policies}
+\subsubsection{Defining policies}\label{policydef}
 The policies \emph{low}, \emph{medium} and \emph{high} are defined as this:
 
 \begin{lstlisting}
@@ -201,12 +201,47 @@ The actors used here are \emph{untrustedObserver} and \emph{trustedObserver}. Th
 % Policy definition
 % Policy usage
 \subsubsection{Using policies}
-In the \emph{PatientJournal} class the field are decorated with policies that specifies the policy for that specific field. 
+A policy is used as a label on variables. To express concerns for both confidentiality and integrity the policies described previously can be combined and labeled on variables. Fields in the class \emph{PatientJournal} are defined as:
+
+\begin{lstlisting}
+	private ?(Policy.low    + Policy.trusted) String   publicNote;
+	private ?(Policy.medium + Policy.trusted) String[] publicSessions;
+	private ?(Policy.high   + Policy.trusted) String[] privateSessions;
+\end{lstlisting}
+
+The \emph{PatientJournal} class has methods that adds a session to \emph{publicSession} or \emph{privateSession}. The class also implements simple getter and setter methods. Common for these methods are they must specify the \emph{read} or \emph{write} effect for the method.
 
 % Show table of policies and how they are defined and how they are used for low, high and medium.
 
-%Integrity. Are used for ensuring that data from untrusted sources can not interfere with trusted. Only used for input. Integrity of who can declassify what information is based dynamically enforced through locks.
+
+
+\subparagraph{Read effects}
+The read effect specifies what the information policy is. It has already been introduced when labeling the fields in the \emph{PatientJournal} class. When decorating a method with a read effect signature it simply tells what the policy is for the returned type. Paragon ensures that the policy returned must respect the policies of the field or parameters that are in the context of the method. Through read effects explicit flows are captured across methods and fields. This is an example of how a simple \emph{get()} method is defined in \emph{PatientJournal}.
+\begin{lstlisting}
+?(Policy.medium + Policy.trusted)
+public  String[] getPublicSessions(){
+	return publicSessions;
+}
+\end{lstlisting}
+
+If the read effect instead was \emph{?(Policy.low+Policy.trusted)} then Paragon would have caught it since the field \emph{publicSession} has a more restrictive policy. Note that is a read effect is not specified then Paragon sets the read effect as \emph{?(Object x:)} (the least restrictive policy in Paragon).
+
+\subparagraph{Write effects}
+In Paragon the write effect prevents implicit flows. The write effect specifies what context the method can be called in. The context would have to at least as restrictive as the method write effect. The write effect for a method is defined like this:
+
+\begin{lstlisting}
+!(Policy.lowD + Policy.trusted) 
+public void setPublicNote(?(Policy.lowD + Policy.trusted) String note){
+	this.publicNote = note;
+}
+\end{lstlisting}
+
+This method has the write effect \emph{!(Policy.lowD+Policy.trusted)}. Now if this method was called in a method that has the write effect \emph{!(Policy.highD+Policy.trusted)} then there would be an implicit flow and Paragon would detect it.
+
+Read and write effects are important aspect of Paragon since they ensure secure information flow across methods and fields.
+
 \subsection{Locks}
+%Integrity. Are used for ensuring that data from untrusted sources can not interfere with trusted. Only used for input. Integrity of who can declassify what information is based dynamically enforced through locks.
 %How locks are openend
 % Show table for locks and how they are defined and how they are used.
 % IsReferred is used to check if the current doctor has the patient in care
@@ -215,11 +250,6 @@ In the \emph{PatientJournal} class the field are decorated with policies that sp
 
 % Primary mechanism for ensuring integrity and the trusted untrusted labeling for mainly input.
 
-\subsection{Modularity}
-
-\paragraph{Read effects}
-
-\paragraph{Write effects}
 
 \subsection{Declassification}
 
@@ -254,10 +284,10 @@ In the \emph{PatientJournal} class the field are decorated with policies that sp
 
 \subsection{Limitations}
 
-\subsection{Matrix API}
+\subsubsection{Matrix API}
 
 
-\subsection{Exception handling}
+\subsubsection{Exception handling}
 Exception handling
 
 
