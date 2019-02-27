@@ -132,7 +132,7 @@ A design problem is the concurrent writes to a journal from multiple hospital. B
 
 \section{Paragon implementation}
 
-A \emph{policy-first} approach is used when implementing the prototype. The first step is to carefully specify the policies for the system. A journal has several parts that may only be obtained by appropriate users; the policies should uphold that.
+A \emph{policy-first} approach is used when implementing the prototype. The first step is to carefully specify the policies for the system. A journal has several parts that may only be obtained by appropriate users; the policies should uphold that. The policies are defined in the class \emph{Policy} and used throughout the system.
 
 For confidentiality three policies are defined with \emph{low} being the most liberal, \emph{High} being the most strict and \emph{medium} in the middle. The figure \ref{fig:lattice_confidentiality} depicts a lattice for the three policies where information can only flow upwards. In the figure \emph{public} represents low, \emph{confidential} represents medium and \emph{secret} represents high. 
 
@@ -166,16 +166,31 @@ The next section will show how the policies have been defined and used in parago
 \subsection{Policies}\label{policies} 
 
 In Paragon a policy defines what actor information can flow to and under what conditions 
-\cite{paragonprogramming}. Any object can be used as an actor. The policies in the prototype uses \emph{Doctor} and \emph{Secretary} as actors. The 
-
-
-
+\cite{paragonprogramming}. Any object can be used as an actor. The policies in the prototype uses \emph{Doctor} and \emph{Secretary} as actors. The policies \emph{low}, \emph{medium} and \emph{high} are defined as this:
 
 \begin{lstlisting}
-public static final policy low = { Doctor d:; Secretary s:};
+public static final policy low = { Doctor d: ;Secretary s:};
 public static final policy medium = { Doctor d:};
 public static final policy high = { Doctor d: IsReferred(d)};
 \end{lstlisting}
+
+
+Here policy \emph{low} is less restrictive than \emph{medium} since a variable labeled with the policy low can be viewed by the actors \emph{Doctor} and \emph{Secretary} whereas a variable labeled with \emph{medium} can only be viewed by the actor \emph{Doctor}. The policy \emph{high} is a more interesting policy. It is more restrictive since it can only flow to a specific \emph{Doctor} if the lock \emph{IsReferred(d)} is open. Policy \emph{high} is an example of a dynamic policy which uses a parameterized unary lock.
+
+The following are integrity policies defined as follows:
+\begin{lstlisting}
+private static final Object untrustedObserver = new Object();
+private static final Object trustedObserver = new Object();
+public static final policy untrusted = { untrustedObserver :; };
+public static final policy trusted = { untrustedObserver :; trustedObserver: };
+\end{lstlisting}
+
+
+There are two differences from the 
+
+with the property \emph{fresh} meaning that they can not be reconstructed. They policies have the property that they can be combined with other policies since interference of the actors when combining is avoided.
+
+
 
 
 % The policies defined for confidentiality are with fresh actors and the objects correspond to the entities where information may flow. By using fresh actors the policies can be combined with other policies that would otherwise have interfered with eachother. The integrity policy is more general in nature and has defines two actors; trusted and untrusted observers. The policies are defined as follows: ?(Policy.high + Policy.trusted).
@@ -192,6 +207,7 @@ In the \emph{PatientJournal} class the field are decorated with policies that sp
 
 %Integrity. Are used for ensuring that data from untrusted sources can not interfere with trusted. Only used for input. Integrity of who can declassify what information is based dynamically enforced through locks.
 \subsection{Locks}
+%How locks are openend
 % Show table for locks and how they are defined and how they are used.
 % IsReferred is used to check if the current doctor has the patient in care
 % It opens the lock Referred.
@@ -238,9 +254,13 @@ In the \emph{PatientJournal} class the field are decorated with policies that sp
 
 \subsection{Limitations}
 
-Unary Locks not working for runtime checks.
+\subsection{Matrix API}
 
+
+\subsection{Exception handling}
 Exception handling
+
+
 
 %\subsection{Exception handling}
  
