@@ -166,7 +166,11 @@ The next section will show how the policies have been defined and used in parago
 \subsection{Policies}\label{policies} 
 
 In Paragon a policy defines what actor information can flow to and under what conditions 
-\cite{paragonprogramming}. Any object can be used as an actor. The policies in the prototype uses \emph{Doctor} and \emph{Secretary} as actors. The policies \emph{low}, \emph{medium} and \emph{high} are defined as this:
+\cite{paragonprogramming}. Any object can be used as an actor. The confidentiality policies in the prototype uses \emph{Doctor} and \emph{Secretary} as actors. 
+
+
+\subsubsection{Defining policies}
+The policies \emph{low}, \emph{medium} and \emph{high} are defined as this:
 
 \begin{lstlisting}
 public static final policy low = { Doctor d: ;Secretary s:};
@@ -175,7 +179,7 @@ public static final policy high = { Doctor d: IsReferred(d)};
 \end{lstlisting}
 
 
-Here policy \emph{low} is less restrictive than \emph{medium} since a variable labeled with the policy low can be viewed by the actors \emph{Doctor} and \emph{Secretary} whereas a variable labeled with \emph{medium} can only be viewed by the actor \emph{Doctor}. The policy \emph{high} is a more interesting policy. It is more restrictive since it can only flow to a specific \emph{Doctor} if the lock \emph{IsReferred(d)} is open. Policy \emph{high} is an example of a dynamic policy which uses a parameterized unary lock.
+Here policy \emph{low} is less restrictive than \emph{medium} since a variable labeled with the policy low can be viewed by the any\emph{Doctor} or \emph{Secretary} actor whereas a variable labeled with \emph{medium} can only be viewed by any \emph{Doctor} actor. The policy \emph{high} is a more interesting policy. It is more restrictive since it can only flow to a specific \emph{Doctor} if the lock \emph{IsReferred(d)} is open. Policy \emph{high} is an example of a dynamic policy which uses a parameterized unary lock.
 
 The following are integrity policies defined as follows:
 \begin{lstlisting}
@@ -186,11 +190,7 @@ public static final policy trusted = { untrustedObserver :; trustedObserver: };
 \end{lstlisting}
 
 
-There are two differences from the 
-
-with the property \emph{fresh} meaning that they can not be reconstructed. They policies have the property that they can be combined with other policies since interference of the actors when combining is avoided.
-
-
+The actors used here are \emph{untrustedObserver} and \emph{trustedObserver}. The policy \emph{trusted} can be viewed by both observers while \emph{untrusted} can only be viewed by \emph{untrustedObserver}. This captures integrity since a variable labeled with \emph{untrusted} can not flow to \emph{trusted}. Note that actors used here are instances of objects and using them as actors gives the policies a special property of being combinable with other policies \cite{paragonprogramming}.
 
 
 % The policies defined for confidentiality are with fresh actors and the objects correspond to the entities where information may flow. By using fresh actors the policies can be combined with other policies that would otherwise have interfered with eachother. The integrity policy is more general in nature and has defines two actors; trusted and untrusted observers. The policies are defined as follows: ?(Policy.high + Policy.trusted).
@@ -200,7 +200,7 @@ with the property \emph{fresh} meaning that they can not be reconstructed. They 
 
 % Policy definition
 % Policy usage
-
+\subsubsection{Using policies}
 In the \emph{PatientJournal} class the field are decorated with policies that specifies the policy for that specific field. 
 
 % Show table of policies and how they are defined and how they are used for low, high and medium.
