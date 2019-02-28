@@ -36,7 +36,7 @@ The following non-functional requirements are defined:
 \end{itemize}
 
 
-\subsection{System design}
+\subsection{System design} \label{systemdesign}
 
 
 The system consists of two components; \emph{Matrix} and the \emph{client}. The Matrix component encapsulates the Matrix SDK and provides an interface. The client component consumes that interface and can be considered as the endpoint in a communication channel. The client component provides secure information flow for data received through Matrix. 
@@ -338,13 +338,6 @@ Declassification and endorsement are methods that should be applied with great c
 	\end{tabular}
 \end{table}
 
-% Declassification is necessary for the input and output channels. The journals might be print to the user over the output channel. In order to do so the journal must be declassified correctly. 
-
-%Another concern is the input channel where the input needs to be endorsed. The client requires input from both secretary and doctor. Input channels are untrusted and need to be endorced/sanitized based on which actor the input came from.
-
-% The following table shows the rules for declassification and endorsement throughout the system.
-
-
 
 
 %\subsubsection{Lattice}
@@ -352,16 +345,14 @@ Declassification and endorsement are methods that should be applied with great c
 \subsection{Limitations}
 
 \subsubsection{Matrix API}
-
+The Matrix API implementation was briefly described in section \ref{systemdesign}. The API is implemented in Java using the foreign language binder JPY to leverage the Matrix Python SDK and makes it possible to use it with Java/Paragon. When a journal is passed to the API the encryption is not performed until the Python code is executed. Hence there exists a layer between Paragon and Matrix where the data is unencrypted and where Paragon policies cannot be enforced.
 
 \subsubsection{Exception handling}
-Exception handling
+Another limitation of the prototype is that exceptions are unexplored. Any exception is a potential channel for implicit flows. The tools provided by Paragon such as read effects, write effects and locks can be used to properly handle exception.
 
 
 
-%\subsection{Exception handling}
- 
- 
-%Technical requirements: -Msg type should be "m.text" when sending patient journal (JSON format). The convertion of string to JSON and vice versa should happen in the client.
+
 
 \section{Summary}
+This chapter has described the implementation of the prototype. 
