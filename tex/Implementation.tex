@@ -230,8 +230,8 @@ If the read effect instead was \emph{?(Policy.low+Policy.trusted)} then Paragon 
 In Paragon the write effect prevents implicit flows. The write effect specifies what context the method can be called in. The context would have to at least as restrictive as the method write effect. The write effect for a method is defined like this:
 
 \begin{lstlisting}
-!(Policy.lowD + Policy.trusted) 
-public void setPublicNote(?(Policy.lowD + Policy.trusted) String note){
+!(Policy.low + Policy.trusted) 
+public void setPublicNote(?(Policy.low + Policy.trusted) String note){
 	this.publicNote = note;
 }
 \end{lstlisting}
@@ -241,32 +241,99 @@ This method has the write effect \emph{!(Policy.lowD+Policy.trusted)}. Now if th
 Read and write effects are important aspect of Paragon since they ensure secure information flow across methods and fields.
 
 \subsection{Locks}
-%Integrity. Are used for ensuring that data from untrusted sources can not interfere with trusted. Only used for input. Integrity of who can declassify what information is based dynamically enforced through locks.
-%How locks are openend
-% Show table for locks and how they are defined and how they are used.
-% IsReferred is used to check if the current doctor has the patient in care
-% It opens the lock Referred.
-% Would be a problem in a concurrent system then the Referred lock would be shared by multiple users at the same time. Another design would be to have a list of global users or what? 
+The integrity policy ensures that no information can not flow from untrusted source to variables labeled with \emph{trusted}. However we also want to specify which actors are allowed to change information. A secretary should only be able to edit the field \emph{publicNote} in \emph{PatientJournal}. A doctor should be able to add sessions to \emph{publicSessions} but should only be able to add sessions to \emph{privateSessions} if the patient is referred to the Doctor. This has been achieved through locks. The lock \emph{IsReferred} was introduced when defining the \emph{high} policy. The lock takes a \emph{Doctor} as parameter and becomes open for the doctor. Another parameterized lock is the\emph{IsDoctor} lock that opens during program start if the user is a doctor. The locks are accompanied with 0-ary locks \emph{ReferredLock} and \emph{DoctorLock}. The locks are defined as the following: 
 
-% Primary mechanism for ensuring integrity and the trusted untrusted labeling for mainly input.
+\begin{lstlisting}
+public static ?(lowD+trusted) lock IsReferred(Doctor); 
+public static ?(lowD+trusted) lock ReferredLock;
+public static ?(lowD+trusted) lock IsDoctor(Employee);
+public static ?(lowD+trusted) lock DoctorLock;
+\end{lstlisting}
+
+The locks \emph{ReferredLock} and \emph{DoctorLock} are used on methods with a special annotation that specifies that the method can only be called if the lock is open. By using lock combined with the annotation the requirement for modifying information can be fulfilled. The class \emph{PatientJournal} provides two methods for adding sessions with the annotation:
+
+\begin{lstlisting}
+~Policy.DoctorLock
+public !(Policy.mediumD + Policy.trusted) void addToPublicSessions(?(Policy.mediumD + Policy.trusted) String session){
+// Add sessions
+} 
+
+~Policy.Referred
+public !(Policy.highD + Policy.trusted) void addToPrivateSessions(?(Policy.highD + Policy.trusted) String session){
+// Add sessions
+} 	
+\end{lstlisting}  
+
+The lock \emph{DoctorLock} is opened when \emph{IsDoctor} is opened and the lock \emph{ReferredLock} opens when \emph{IsReferred} is open. 
+
+% How a lock is opened 
+The Paragon compiler might not be able to infer if the lock is opened through compilation. Hence the lock must be checked at run-time and used like this:
+
+\begin{lstlisting}
+if(Policy.IsReferred(self)){
+	journal.addToPrivateSession(session);
+}
+\end{lstlisting}
+
 
 
 \subsection{Declassification}
+A journal system must be able to view the patient journals through some output channel. Furthermore the system must take user input through an input channel to edit a journal. Hence it is necessary to \emph{declassify} information when using an output channel and \emph{endorse} information when using an input channel. The system provides mechanism for achieving this. We need to revisit the policy definitions to make this possible. 
+
+The policy for \emph{System.out} is the least restrictive defined as \emph{?{Object a:}}.
+Hence any flow using the defined policies would be rejected. Declassification of information must be done for allowing flow to \emph{System.out}. To achieve this we have to extend the policies with a lock \emph{declassifyLock}:
+
+\begin{lstlisting}
+private lock declassifyLock;
+public static final policy low = { Doctor d: ;Secretary s:; Object x: declassifyLock};
+public static final policy medium = { Doctor d:; Object x: declassifyLock};
+public static final policy high = { Doctor d: IsReferred(d); Object x: declassifyLock};
+\end{lstlisting}
+
+After the modification the policy now states that a variable labeled with the policy can flow to any actor if the \emph{declassifyLock} is open. Thus we can specify a method that takes some value as input, opens the lock and returns the value with the least restrictive policy:
+
+\begin{lstlisting}
+?bottom
+public static <A> 
+A declassifyLow(?(bottom*low) A x){
+	open declassifyLock {
+		return x;
+	}
+}
+\end{lstlisting}
+
+The method expects a parameter with a policy that is at least as restrictive as the policy \emph{low} and \emph{bottom} (variable name for {Object x:}). The method opens the lock and returns the variable and has the read effect \emph{?bottom}.  We provide similar declassify methods for \emph{low} and \emph{high}. However it is an issue that a secretary could call declassify methods for \emph{medium} and \emph{high}. We can use the annotation seen in the previous section to overcome this so only the appropriate actors can declassify:
+
+\begin{lstlisting}
+~Referred
+?high
+public static <A> 
+A declassifyHigh(?(high*low) A x){
+	open declassifyLock {
+		return x;
+	}
+}
+\end{lstlisting}
+
+The approach for endorsement is similar with an \emph{endorseLock} added to the \emph{untrusted policy} and then specifying a method that can endorse a variable.
+
+Declassification and endorsement are methods that should be applied with great care. It should be considered who can declassify, what is declassified, where the declassification occurs and when it can occur. The table below gives an overview of this.
 
 \begin{table}[H]
-	\hspace*{-2cm}
+	\hspace*{-2.3cm}
 	\centering
 	\begin{tabular}{|l|l|l|l|l|} 
 		\hline
-		& Who               & What                                                                                                   & Where                                                                         & When                       \\ 
+		& Who               & What                    & Where                                                                         & When                       \\ 
 		\hline
-		1 & Anyone~           & \begin{tabular}[c]{@{}l@{}}Journal.Name\\Journal.SSN\\Journal.Address\\Journal.PublicNote\end{tabular} & Util.printJournal()                                                           & Printing the journal       \\
-		& Doctor            & Journal.PublicSessions                                                                                 & Util.printJournal()                                                           & Printing the journal       \\
-		& Doctor (Referred) & Journal.PrivateSessions                                                                                & Util.printJournal()                                                           & Printing the journal       \\
-		&                   &                                                                                                        &                                                                               &                            \\ 
+		& Anyone~           & Journal.name            & Util.printJournal()                                                           & Printing the journal       \\
+		& Anyone~ ~         & Journal.ssn             & Util.printJournal()                                                           & Printing the journal       \\
+		Declassification & Anyone~ ~         & Journal.address         & Util.printJournal()                                                           & Printing the journal       \\
+		& Anyone~ ~         & Journal.publicNote      & Util.printJournal()                                                           & Printing the journal       \\
+		& Doctor            & Journal.publicSessions  & Util.printJournal()                                                           & Printing the journal       \\
+		& Doctor (Referred) & Journal.privateSessions & Util.printJournal()                                                           & Printing the journal       \\ 
 		\hline
-		2 & Anyone            & User input                                                                                             & \begin{tabular}[c]{@{}l@{}}secretary.receive()\\doctor.receive()\end{tabular} & After prompting for input  \\
-		&                   &                                                                                                        &                                                                               &                            \\
+		Endorsement      & Anyone            & User input              & \begin{tabular}[c]{@{}l@{}}secretary.receive()\\doctor.receive()\end{tabular} & After prompting for input  \\
 		\hline
 	\end{tabular}
 \end{table}
