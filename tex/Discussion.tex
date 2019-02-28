@@ -1,7 +1,46 @@
-The previous section applied Paragon as a programming language and demonstrated how policies can be defined and enforced. Hence achieving stronger security guarantees. This section considers what Information-Flow Control offers to the prototype and discusses Paragon from a programmers perspective.
+The previous section applied Paragon as a programming language and demonstrated how policies can be defined and enforced. Hence achieving stronger security guarantees. This chapter evaluate the programming experience in Paragon with Matrix and considers what Information-Flow Control offers to the prototype.
+
+\section{Paragon}
+
+Programming in a Information-Flow Control can be a challenging task. Paragon provides secure information flow by defining policies and labeling variables and methods. It forces the programmer to change its mindset and have more concern about the flow of information in the system. 
+
+\subsection{Defining policies} The policy language in Paragon is flexible and expressive. The same policy can be expressed in several ways. Consider the policies for high and low: 
+
+\begin{lstlisting}
+Object observer = new Object();
+Object highObserver = new Object();
+
+policy lowA = {Object x:};
+policy highA = {:};
+
+policy lowB = {Object x:};
+policy highB = {observer:};
+
+policy lowC = {Secretary s:; Doctor d:};
+policy highC = {Doctor d:};
+\end{lstlisting}
+
+Each encoding of the low and high policies has some differences e.g. \emph{lowA} has the least restrictive policy while \emph{lowC} allows flows to any doctor or secretary. Even though \emph{lowC} is low it is encoded in such way that it cannot flow to an output channel without declassification. 
+There are even more possibilities when introducing locks as seen in the prototype. The prototype relies heavily on locks as for enabling declassification and endorsement of information. Another important usage of locks are to ensure that method can only be called depending on the state of the lock. This is how it is guaranteed that a secretary cannot add to \emph{privateSessions} or \emph{publicSession}. This guarantee could also have been achieved by extending the integrity policies and use write effects to control what context methods can be called. 
+
+Since policies can be defined in many ways; the task of defining policies should be done with care and consideration for what information flows should be captured by the policies.
+
+
+%\subparagraph{Auto-generating interface files}
+%Using external Java classes should be done with consideration since there is no guarantee that the information flow to that class will enforce the policies. However it might be necessary to use som external library. Paragon interface file must be provided to use external classes. If the interface file is not specified correctly a compile error occur. This is a fairly trivial task but in long term it might be impractical for the programmer. Auto-generation of interface files would be an attractive feature.
+
+
+\subsection{Matrix}
+
+In the evaluation of Matrix security we found that Matrix is capable of having several security properties such as confidentiality, integrity, forward and backward secrecy which is achieved through the end-to-end encryption.
+
+Matrix primary use case is as a secure messaging protocol however it has a wide range of use cases. If Matrix is used as a secure communication channel like in the use case for IoT described in section \ref{endtoend}, then the end-to-end encryption is not enough to achieve confidentiality and integrity throughout the system. Information-Flow Control is a mechanism that aid in achieves stronger security guarantee.
+
+The interface between Matrix and Paragon makes it possible to combine the end-to-end encryption security guarantees with policy enforcement through Paragon hence achieving end-to-end security. The implementation provides the most basic methods and are fairly
+
+It is challenging to setup and use the foreign binding tool JPY. However once becoming comfortable with JPY the interface can easily be extended with more methods from the Matrix Python SDK.
 
 \section{The Policy system}
-Matrix primary use case is as a secure messaging protocol however it has a wide range of use cases. If Matrix is used as a secure communication channel like in the use case for IoT described in section \ref{endtoend}, then the end-to-end encryption is not enough to achieve confidentiality and integrity throughout the system. Information-Flow Control is a mechanism that aid in achieves stronger security guarantee.
 
 
 The prototype displays major improvements in terms of confidentiality and integrity in the system. The prototype is secure by construction and gives a guarantee that the defined policies about the information is enforced. Consider the Java code where a secretary handles a patient journal: 
@@ -31,40 +70,10 @@ The prototype also demonstrate improvement to an actual problem in the current j
 The prototype is by no means a full-fledged journal system and has some obvious limits. The prototype lacks support for concurrency and assumes that only a single user can use it at a time. The prototype does not handle the issue with concurrent writes described \ref{concurrentwrites} which is also impractical. The purpose of the prototype was to demonstrate improvements of the security guarantees provided by matrix to ensure end-to-end security by enforcing policies which the prototype has demonstrated.
 
 
-\section{Matrix}
-The interface allows Matrix to be used with an Information-Flow Control tool.
-% Hvor fyldestgørende/brugbart er interfacet?
-%Husk i Discussion, at komme tilbage hertil. Eventuelt opsummér Matrix security model, med det slut, at end-to-end encryption ikke er tilstrækkeligt; at dit API gør, at man nu kan kode end-to-end security ovenpå Matrix.
-
-%Du havde nogen gode referencer, der motivérede dit systemdesign og valget af Matrix (i forhold til Danmarks ønsker/vision/plan). Jeg synes ikke jeg har set henvisninger til det endnu i læsningen.
-
-
-
-\section{Paragon}
-
-% Policy first approach or code first approach
-
-%Reflekter over Paragon som værktøj. Hvad er godt og hvad er mindre godt 
-% Mindre teknisk forbedring genering af .pi interface filer.
-% Hvor godt vil locks virke med concurrency? 
-% Would be a problem in a concurrent system then the Referred lock would be shared by multiple users at the same time. Another design would be to have a list of global users or what? 
-
-
-
-% The relation between actor and entity in the system might be blurry 
-% The same policies can be defined several ways. Which way is best? The prototype type takes a more dynamic labeling approach.
-% The integrity policy could be build upon with actors as well but 
-
-% The policies interferes with eachother if the same actor is used in multiple policies.
-% Hence using an entity as actor 
-% Perhaps better way of specifying what the policy context for some object is?
-% Declassifying methods? 
-% More expressiveness when putting "must open" locks signature
-
-% Should be carefully considered when locks should be opended and when declassification and as well as endorsement should occur. The 
-
-
-% 
 
 
 \section{Summary}
+
+With Paragon provides a flexible and expressive way of defining policies. Paragon can be used on top of Matrix through the provided interface. End-to-end security is achieved by extending the security guarantees from Matrix' end-to-end encryption with Paragon's enforcement of specified policies. This is demonstrated by implementing a prototype inspired by the Danish journal system.
+
+

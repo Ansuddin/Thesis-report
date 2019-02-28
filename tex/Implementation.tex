@@ -6,8 +6,9 @@ This chapter describes the implementation of the prototype. The prototype is a s
 
 \section{Journal system}
 
+
 % Describe the requirements for the journal system.
-The journal system is inspired by the Danish E-journal system as described in section \ref{intro}. A journal system serves an important purpose by providing patient journals to different hospitals and clinics. If a patient arrives at the ER and the doctor cannot access the patient's journal then the treatment of the patient gets problematic. A doctor might miss out on important details about the patient or even worse prescribe medication that might give the patient an allergic reaction. The availability of a patient journal is a necessity however the number of medical employees that have access to such a journal has raised privacy concerns. Around 90.000 medical employees have access to patient journals. Consider the scenario where a patient gets referred to a physiotherapist with muscle pain. When the therapist opens the journal the full medical history will be present; if the patient had received psychiatric treatment those session would be readable too. Furthermore a patient journal is accessible by a large number of unrelated medical employees with the only prevention mechanism being logging and audit trails.
+The journal system is inspired by Danish journal system as described in section \ref{intro}. A journal system serves an important purpose by providing patient journals to different hospitals and clinics. If a patient arrives at the ER and the doctor cannot access the patient's journal then the treatment of the patient gets problematic. A doctor might miss out on important details about the patient or even worse prescribe medication that might give the patient an allergic reaction. The availability of a patient journal is a necessity however the number of medical employees that have access to such a journal has raised privacy concerns. Around 90.000 medical employees have access to patient journals. Consider the scenario where a patient gets referred to a physiotherapist with muscle pain. When the therapist opens the journal the full medical history will be present; if the patient had received psychiatric treatment those session would be readable too. It is legally required that an employee accessing the journal must have the patient in care and that the lookup must be relevant for the employee \cite{adgang}\cite{kontrol}. Yet a patient journal is accessible by a large number of unrelated medical employees with the only prevention mechanism being logging and audit trails.
 
 
 The lack of secure information flow is evident and the prototype demonstrates how Information-Flow control can be leveraged to enforce security policies concerning the information. The journal system is a small distributed system where Hospitals can send, receive and store patient journals. Matrix provides the distributed structure and is responsible for securely storing and transmitting the journals. Paragon provides secure information flow at the endpoints hence providing end-to-end security. 
@@ -108,7 +109,7 @@ A design problem is the concurrent writes to a journal from multiple hospital. B
 
 \subsection{Matrix API}
 
-The Matrix API implementation was briefly described in section \ref{systemdesign}. The API is implemented in Java using the foreign language binder JPY to leverage the Matrix Python SDK and makes it possible to use it with Java/Paragon. Without the API it would not be possible to use Matrix with Paragon. To be able to use the API; a Paragon \emph{signature} must be provided. In fact a signature file has to be specified to use any external Java class. The \emph{MatrixApi} signature file is specified as such:
+The Matrix API implementation was briefly described in section \ref{systemdesign}. The API is implemented in Java using the foreign language binder JPY to leverage the Matrix Python SDK and makes it possible to use it with Java/Paragon. The API binds to the most important methods in the the Matrix Python SDK like \emph{send}, \emph{retrieve}, \emph{login}, \emph{joinRoom} etc. Without the API it would not be possible to use Matrix with Paragon. To be able to use the API; a Paragon \emph{interface} file must be provided. In fact a interface file has to be specified to use any external Java class. The \emph{MatrixApi} interface file is specified as such:
 
 \begin{lstlisting}
 public native class MatrixApi<policy p> {
@@ -119,7 +120,7 @@ public native class MatrixApi<policy p> {
 }
 \end{lstlisting}
 
-The signature file describes that the \emph{MatrixApi} class takes a type argument \emph{policy} which specifies what policy the API should enforce. Note that Paragon cannot assert if the external class will respect the policies.
+The interface file describes that the \emph{MatrixApi} class takes a type argument \emph{policy} which specifies what policy the API should enforce. Note that Paragon cannot assert if the external class will respect the policies.
 
 The annotation \emph{?} and \emph{!} represents \emph{read} and \emph{write} effects, and will be explained in the next sections.
  
@@ -345,7 +346,7 @@ Another limitation of the prototype is that exceptions are unexplored. Any excep
 
 
 \subsection{Concurrency}
-Concurrency is not supported in Paragon and has been identified as an area for future work \cite{paragonpaper}. The lock used for declassification and endorsement would be affected in a concurrent system. The declassification method uses a lock that can only be opened in the same method without side effects. However in a concurrent system there could be side effects.
+Concurrency is not supported in Paragon and has been identified as an area for future work \cite{paragonpaper}. The side effects that comes with concurrency are untested.
 
 
 \section{Summary}
