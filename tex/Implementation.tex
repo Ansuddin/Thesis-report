@@ -75,30 +75,9 @@ The room can be considerably large since many different types of hospitals needs
 
 \subsubsection{Client}
 
-%Program flow
-%Program starts as either a Doctor or secretary. If Doctor then IsDoctor is opened.
-%The program runs a while loop and presents a list of patients which the user can select.
-%When user selects a journal it is first checked who the user is.
-%If the user is doctor then it is checked if the patient is referred and the lock IsReferred would then open
-%The user then receives the journal through the receive method and can perform some action: 
-%If the user is a secretary than the user can print the journal, or edit the public note.
-%If the user is a doctor then the journal can be printed, public note can be edited or 
-%a public session note can be added. If the patient is referred then the doctor can add to private session
-%When the user has done some action the program returns to the main loop.  
+The program starts as either a doctor or a secretary. The user is then presented a list of patients that can be selected. The list is provided by the hospital that keeps track of all journals in a hashmap with \emph{SSN} (Social security number) as the key and \emph{matrix room ID} as the value. When the user selects a journal; it is first retrieved from Matrix and the user then receives the journal. It is determined what tasks the user can perform and depending on the user's role the journal can be partially or fully accessible 
 
-
- The hospital keeps track of all journals they have access to through a hashmap with key being the CPR and the value being the roomid. When a doctor or secretary want to retrieve a journal; the latest journal from the patient journal's room is fetched.
- he hospital retrieves the latest event 
- 
- 
- 
-The sessions between a doctor and a 
-
-A patient journal the PatientJournal class depicts 
-
-% Describe how the design with matrix would be
 Figure \ref{fig:journalsystem} depicts the class diagram for the system.
-
 
 
 \begin{figure}[H] 
@@ -120,16 +99,10 @@ Figure \ref{fig:journalsystem} depicts the class diagram for the system.
 
 A design problem is the concurrent writes to a journal from multiple hospital. Before writing to a journal; the latest version of the journal in Matrix is first retrieved and then the writes are appended to the journal. However multiple hospitals might have retrieved the latest journal and different doctors might have committed changes to the journal and send it to Matrix hence one of the writes would be lost since only the latest journal is retrieved. 
 
-%Another limitation is that the rooms a hospital can access are precreated and the hospitals in a room are preconfigured. 
-
-%This is a common issue in distributed systems but is not handled in this solution. 
-
 
 % It is assumed that a version control mechanism is in place and the latest journal received is always up to date.
 % Solution merging data like version control systems like git.
 
-
-\newpage
 \section{Paragon implementation}
 
 A \emph{policy-first} approach is used when implementing the prototype. The first step is to carefully specify the policies for the system. A journal has several parts that may only be obtained by appropriate users; the policies should uphold that. The policies are defined in the class \emph{Policy} and used throughout the system.
@@ -355,4 +328,4 @@ Another limitation of the prototype is that exceptions are unexplored. Any excep
 
 
 \section{Summary}
-This chapter has described the implementation of the prototype. 
+This chapter has described requirements for the prototype, the overall system design and how it is implemented in Paragon. We have seen how the policies can be described and enforced in Paragon. 
