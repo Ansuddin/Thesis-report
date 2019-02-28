@@ -1,20 +1,20 @@
-The following goals were defined for the thesis:
+
+The criterias of a successful project described in section ?? are presented below:
 
 \begin{itemize}
-	\item a
-	\item b
-	\item c
-	\item d
-\end{itemize}
+	\item Evaluation of Matrix security model
+	\item Survey IFC tools to improve the Matrix security model
+	\item Implement a prototype distributed system running on Matrix
+	\item Demonstrate improvements to the Matrix security model
+\end{itemize} 
 
-In section ?? we saw that a bla bla bla
+Matrix was evaluated in terms of secure messaging systems. The evaluation found that the end-to-end encryption provided by Matrix is sufficient and several security properties are ensured. However information leak can occur at the endpoints and additional mechanisms must be applied. Information-Flow Control is such mechanism that can prevent leaks at endpoints hence provide stronger security guarantees.
 
-Tools were analyzed and Paragon was selected.
+For improving the security guarantees Matrix can be combined with a Information-Flow Control tool. The tools Jif, Paragon and JSFlow was considered.  Paragon was selected for the flexibility and expressiveness for defining policies.
 
-Paragon has been applied to improve the security..
+A prototype inspired by the Danish journal system has been implemented using Paragon on top of Matrix. To be able to use Matrix with Paragon an API for Matrix has been provided. The API is the main technical contribution of the thesis. 
 
-It has been demonstrated that the security is improved since ... 
+Improvements have been demonstrated by providing enforcement of security policies at the endpoints hence achieving end-to-end security.
 
-The thesis contributes with an interface between Matrix and Paragon that can be used to develop end-to-end secure systems. There 
 
-  that can be used with the Information-Flow Security tool Paragon. The 
+

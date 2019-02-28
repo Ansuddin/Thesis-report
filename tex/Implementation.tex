@@ -39,7 +39,7 @@ The current journal systems allows medical employees to access the journals from
 
 \subsection{System design} \label{systemdesign}
 
-The system is distributed and allows to run multiple clients to send and retrieve patient journals. The system consists of two components; \emph{Matrix} and the \emph{client}. The Matrix component encapsulates the Matrix SDK and provides an interface to Paragon. The client component consumes that interface and can be considered as the endpoint in a communication channel. The client component provides secure information flow for data received through Matrix. Without the interface it would not be possible to achieve end-to-end security in the system. 
+The system is a distributed system that allows multiple clients to send and retrieve patient journals. The system consists of two components; \emph{Matrix} and the \emph{client}. The Matrix component encapsulates the Matrix SDK and provides an interface to Paragon. The client component consumes that interface and can be considered as the endpoint in a communication channel. The client component provides secure information flow for data received through Matrix. Without the interface it would not be possible to achieve end-to-end security in the system. 
 The component diagram in figure \ref{fig:matrix_component} depicts this.
 
 \begin{figure}[H] 
@@ -85,7 +85,7 @@ Figure \ref{fig:journalsystem} depicts the class diagram for the system.
 \begin{figure}[H] 
 	\hspace*{-1.3cm}
 	\centering
-	\includegraphics[width=14cm]{figures/journalsystem_class.png}
+	\includegraphics[width=14cm]{figures/journalsystem_class2.png}
 	\caption{Class diagram for the Journal system}
 	\label{fig:journalsystem}
 \end{figure}
@@ -109,7 +109,7 @@ A design problem is the concurrent writes to a journal from multiple hospital. B
 
 \subsection{Matrix API}
 
-The Matrix API implementation was briefly described in section \ref{systemdesign}. The API is implemented in Java using the foreign language binder JPY to leverage the Matrix Python SDK and makes it possible to use it with Java/Paragon. The API binds to the most important methods in the the Matrix Python SDK like \emph{send}, \emph{retrieve}, \emph{login}, \emph{joinRoom} etc. Without the API it would not be possible to use Matrix with Paragon. To be able to use the API; a Paragon \emph{interface} file must be provided. In fact a interface file has to be specified to use any external Java class. The \emph{MatrixApi} interface file is specified as such:
+The Matrix API implementation was briefly described in section \ref{systemdesign}. The API is implemented in Java using the foreign language binder JPY to leverage the Matrix Python SDK and makes it possible to use it with Java/Paragon. The API binds the most important methods in the the Matrix Python SDK like \emph{send}, \emph{retrieve}, \emph{login}, \emph{joinRoom} etc. Without the API it would not be possible to use Matrix with Paragon. To be able to use the API; a Paragon \emph{interface} file must be provided. In fact a interface file has to be specified to use any external Java class. The \emph{MatrixApi} interface file is specified as such:
 
 \begin{lstlisting}
 public native class MatrixApi<policy p> {
@@ -341,13 +341,12 @@ Declassification and endorsement are methods that should be applied with great c
 
 When a journal is passed to the API the encryption is not performed until the Python code is executed. Hence there exists a layer between Paragon and Matrix where the data is unencrypted and where Paragon policies cannot be enforced. This could be solved by applying encryption before passing data on to the API and have assurance of confidentiality throughout the system.
 
+\subsubsection{Concurrency}
+Concurrency is unsupported in Paragon and has been identified as an area for future works \cite{paragonprogramming}. Concurrency might be an issue for locks that shares the state.
+
 \subsubsection{Exception handling}
 Another limitation of the prototype is that exceptions are unexplored. Any exception is a potential channel for implicit flows. The tools provided by Paragon such as read effects, write effects and locks can be used to properly handle exception.
 
 
-\subsection{Concurrency}
-Concurrency is not supported in Paragon and has been identified as an area for future work \cite{paragonpaper}. The side effects that comes with concurrency are untested.
-
-
 \section{Summary}
-This chapter has described requirements for the prototype, the overall system design and how it is implemented in Paragon. We have seen how the policies can be described and enforced in Paragon. 
+The prototype implements a distributed journal system. The journals in the system must be stored and transmitted securely and once received at the endpoints confidentiality and integrity must still be preserved. The system uses Paragon to express and enforce security policies at the endpoints and Matrix to transmit the journals. The system design has been presented with implementation specific details related to Paragon. 

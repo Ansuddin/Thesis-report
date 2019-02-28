@@ -26,6 +26,24 @@ There are even more possibilities when introducing locks as seen in the prototyp
 Since policies can be defined in many ways; the task of defining policies should be done with care and consideration for what information flows should be captured by the policies.
 
 
+\subsection{Pros}
+Some of the benefits of Paragon has already been mentioned in section ??. The main benefits are the flexibility of the policies and how policies can be combined. Another advantage is how programmer-friendly it is. Paragon might seem alien at first glance but once the Paragon concepts of policies, locks, write and read effect become clear the experience is more like programming in Java with some extra decorators for methods and fields.
+
+\subsection{Cons}
+There are some overheads related to the Paragon compiler.   These are listed below:
+
+\begin{itemize}
+	\item If Class A depends on Class B then Class B must be compiled first otherwise the compilation will fail. This becomes problematic when several classes might depend on each other. 
+	\item Generally good error messaging but at times very vague. 	
+	\item Lack of support for Java features. 
+	\item An interface with method definitions that has a return type will for some reason give compile errors. Only interfaces void methods could be compiled.
+	\item The compilation time from Paragon to Java is slow. The prototype is a rather small application and takes around 30 seconds to compile.
+	\item That Paragon program could successfully compile but errors would be detected by the Java compiler.
+\end{itemize} 
+
+
+
+
 %\subparagraph{Auto-generating interface files}
 %Using external Java classes should be done with consideration since there is no guarantee that the information flow to that class will enforce the policies. However it might be necessary to use som external library. Paragon interface file must be provided to use external classes. If the interface file is not specified correctly a compile error occur. This is a fairly trivial task but in long term it might be impractical for the programmer. Auto-generation of interface files would be an attractive feature.
 
@@ -36,9 +54,10 @@ In the evaluation of Matrix security we found that Matrix is capable of having s
 
 Matrix primary use case is as a secure messaging protocol however it has a wide range of use cases. If Matrix is used as a secure communication channel like in the use case for IoT described in section \ref{endtoend}, then the end-to-end encryption is not enough to achieve confidentiality and integrity throughout the system. Information-Flow Control is a mechanism that aid in achieves stronger security guarantee.
 
-The interface between Matrix and Paragon makes it possible to combine the end-to-end encryption security guarantees with policy enforcement through Paragon hence achieving end-to-end security. The implementation provides the most basic methods and are fairly
+The interface (API) between Matrix and Paragon makes it possible to combine the end-to-end encryption security guarantees with policy enforcement through Paragon hence achieving end-to-end security. The interface provides few basics methods from Matrix Python SDK that were necessary for the prototype. It is challenging to setup and use the foreign binding tool JPY. However once becoming comfortable with JPY the interface can easily be extended with more methods from the Matrix Python SDK.
 
-It is challenging to setup and use the foreign binding tool JPY. However once becoming comfortable with JPY the interface can easily be extended with more methods from the Matrix Python SDK.
+Due to the lack of concurrency support in Paragon it is not possible to implement secure messaging applications since such application must listen to events in a different thread.
+
 
 \section{The Policy system}
 
@@ -67,13 +86,12 @@ The Java compiler would be helpless in detecting if the secret parts of the jour
 
 The prototype also demonstrate improvement to an actual problem in the current journal systems. The section xx describes how the only mechanism is auditing and logging trail and clearly a mechanism for enforcing policies would be of great benefit. 
 
-The prototype is by no means a full-fledged journal system and has some obvious limits. The prototype lacks support for concurrency and assumes that only a single user can use it at a time. The prototype does not handle the issue with concurrent writes described \ref{concurrentwrites} which is also impractical. The purpose of the prototype was to demonstrate improvements of the security guarantees provided by matrix to ensure end-to-end security by enforcing policies which the prototype has demonstrated.
-
+The prototype is by no means a full-fledged journal system and has some obvious limits. The prototype lacks support for concurrency and assumes that only a single user can use it at a time. The prototype does not handle the issue with concurrent writes described \ref{concurrentwrites} which would be insufficient in a real journal system. Despite the limitations of the prototype; improvements to the overall security guarantees have been demonstrated by combining Matrix' end-to-end security with Paragon's enforcement of security policies to ensure end-to-end security.
 
 
 
 \section{Summary}
 
-With Paragon provides a flexible and expressive way of defining policies. Paragon can be used on top of Matrix through the provided interface. End-to-end security is achieved by extending the security guarantees from Matrix' end-to-end encryption with Paragon's enforcement of specified policies. This is demonstrated by implementing a prototype inspired by the Danish journal system.
+Paragon provides a flexible and expressive way of defining policies. Paragon can be used on top of Matrix through the provided interface. End-to-end security is achieved by extending the security guarantees from Matrix' end-to-end encryption with Paragon's enforcement of specified policies. This is demonstrated by implementing a prototype inspired by the Danish journal system.
 
 
