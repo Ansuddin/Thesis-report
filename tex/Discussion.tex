@@ -1,30 +1,46 @@
+The previous section applied Paragon as a programming language and demonstrated how policies can be defined and enforced. Hence achieving stronger security guarantees. This section considers what Information-Flow Control offers to the prototype and discusses Paragon from a programmers perspective.
 
-% This section discuss and demonstrates the increased security guarantee with Matrix and IFC
-%Preferably with code snippets
-
-
-
-\subsection{The Policy system}
-% The implementation presents a prototype inspired by journal systems. 
-% It offers enforcement of policies that was not possible before. The prototype could easily be extended with policies similar to high - could be another type of doctor which no one except that type could see. Paragon is a powerful tool with the policies bla bla.
-
-\subsection{Matrix API}
+\section{The Policy system}
+Matrix primary use case is as a secure messaging protocol however it has a wide range of use cases. If Matrix is used as a secure communication channel like in the use case for IoT described in section \ref{endtoend}, then the end-to-end encryption is not enough to achieve confidentiality and integrity throughout the system. Information-Flow Control is a mechanism that aid in achieves stronger security guarantee.
 
 
-\paragraph{Encryption}
-Since encryption is still in early beta it has to be turned on manually. The most common use case of Matrix is as a secure messaging system. It is a important requirement in secure messaging system that encryption is "easy to work with" hence the encryption mechanism largely happens under the hood and has little to no when using the Matrix SDK.
-%D Declaration examples
+The prototype displays major improvements in terms of confidentiality and integrity in the system. The prototype is secure by construction and gives a guarantee that the defined policies about the information is enforced. Consider the Java code where a secretary handles a patient journal: 
 
-%Reflekter over Matrix interfacet. Muligheder og begrænsinger
-% Hvad er manglerne på Matrix og pointerer præcis hvor de er.
-% Hvordan kunne 
-% API'et husker ting for mig hvor nøglerne bliver gemt og har tilstanden på nøglerne. HEr kan der forekommer leaks. 
-%Python SDK bliver brugt på den anbefalede måde og brugen af det kan ikke forværres.
+\begin{lstlisting}
 
-% Lave en kryptering fra java til python og reducering hvor meget man stoler på python. Der foregår dobbelkryptering og så behøver man ikke stoler på python.
-% How does it affect the information flow that the matrix interface is essentially written in python through a java foreign class and that the interface itself is 
+public class PatientJournal{
 
-\subsection{Paragon}
+private String publicNote;
+private String[] publicSessions; // Unaccessible to secretary
+private String[] privateSessions; // Unaccessible to secretary
+
+}
+
+public class Secretary {
+
+public void receive(PatientJoural journal){
+// Perform task on journal
+}
+
+\end{lstlisting}
+
+The Java compiler would be helpless in detecting if the secret parts of the journal are unintentionally accessed or modified. In the prototype such unintentional access or modification of information would be detected immediately by the Paragon compiler. This is a strong guarantee that Information-Flow Control tools offer.
+
+The prototype also demonstrate improvement to an actual problem in the current journal systems. The section xx describes how the only mechanism is auditing and logging trail and clearly a mechanism for enforcing policies would be of great benefit. 
+
+%I Discussion: Det er nok vigtigt at nævne begrænsninger. For eksempel, kan mange læger være logget ind? Hvor holdes der styr på det? Hvad skal der til for, at systemet bliver mere generelt / praktisk / anvendeligt? Så kan du runde det af ved at sige, at formålet var at demonstrére, ikke at lave et færdigt produkt, og at dine valg var tilstrækkelige, og passende, for at demonstrére, hvad du ville demonstrére.
+
+
+\section{Matrix}
+The interface allows Matrix to be used with an Information-Flow Control tool.
+% Hvor fyldestgørende/brugbart er interfacet?
+%Husk i Discussion, at komme tilbage hertil. Eventuelt opsummér Matrix security model, med det slut, at end-to-end encryption ikke er tilstrækkeligt; at dit API gør, at man nu kan kode end-to-end security ovenpå Matrix.
+
+%Du havde nogen gode referencer, der motivérede dit systemdesign og valget af Matrix (i forhold til Danmarks ønsker/vision/plan). Jeg synes ikke jeg har set henvisninger til det endnu i læsningen.
+
+
+
+\section{Paragon}
 
 % Policy first approach or code first approach
 
@@ -34,11 +50,9 @@ Since encryption is still in early beta it has to be turned on manually. The mos
 % Would be a problem in a concurrent system then the Referred lock would be shared by multiple users at the same time. Another design would be to have a list of global users or what? 
 
 
-% Can IFC provide immutability or append-only features?
 
 % The relation between actor and entity in the system might be blurry 
 % The same policies can be defined several ways. Which way is best? The prototype type takes a more dynamic labeling approach.
-
 % The integrity policy could be build upon with actors as well but 
 
 % The policies interferes with eachother if the same actor is used in multiple policies.
@@ -48,5 +62,9 @@ Since encryption is still in early beta it has to be turned on manually. The mos
 % More expressiveness when putting "must open" locks signature
 
 % Should be carefully considered when locks should be opended and when declassification and as well as endorsement should occur. The 
+
+
+% 
+
 
 \section{Summary}

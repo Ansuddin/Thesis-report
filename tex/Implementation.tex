@@ -1,13 +1,13 @@
 
 % This chapter presents the implementation of a distributed system running on Matrix and developed with Paragon as described in the criterias.
 
-This chapter describes the implementation of the prototype in the case study. The prototype is a system for sending and retrieving patient journals among different hospitals. The system relies on Matrix as the secure communication channel and storage.
+This chapter describes the implementation of the prototype. The prototype is a system for sending and retrieving patient journals among different hospitals. The system relies on Matrix as the secure communication channel and storage.
 
 
 \section{Journal system}
 
 % Describe the requirements for the journal system.
-A journal system serves an important purpose by providing patient journals to different hospitals and clinics. If a patient arrives at the ER and the doctor cannot access the patient's journal then the treatment of the patient gets problematic. A doctor might miss out on important details about the patient or even worse prescribe medication that might give the patient an allergic reaction. The availability of a patient journal is a necessity however the number of medical employees that have access to such a journal has raised privacy concerns. Around 90.000 medical employees have access to patient journals. Consider the scenario where a patient gets referred to a physiotherapist with muscle pain. When the therapist opens the journal the full medical history will be present; if the patient had received psychiatric treatment those session would be readable too. Furthermore a patient journal is accessible by a large number of unrelated medical employees with the only prevention mechanism being logging and audit trails.
+The journal system is inspired by the Danish E-journal system as described in section \ref{intro}. A journal system serves an important purpose by providing patient journals to different hospitals and clinics. If a patient arrives at the ER and the doctor cannot access the patient's journal then the treatment of the patient gets problematic. A doctor might miss out on important details about the patient or even worse prescribe medication that might give the patient an allergic reaction. The availability of a patient journal is a necessity however the number of medical employees that have access to such a journal has raised privacy concerns. Around 90.000 medical employees have access to patient journals. Consider the scenario where a patient gets referred to a physiotherapist with muscle pain. When the therapist opens the journal the full medical history will be present; if the patient had received psychiatric treatment those session would be readable too. Furthermore a patient journal is accessible by a large number of unrelated medical employees with the only prevention mechanism being logging and audit trails.
 
 
 The lack of secure information flow is evident and the prototype demonstrates how Information-Flow control can be leveraged to enforce security policies concerning the information. The journal system is a small distributed system where Hospitals can send, receive and store patient journals. Matrix provides the distributed structure and is responsible for securely storing and transmitting the journals. Paragon provides secure information flow at the endpoints hence providing end-to-end security. 
@@ -32,14 +32,13 @@ The following non-functional requirements are defined:
 \begin{itemize}
 	\item Confidentiality: the system must ensure the confidentiality throughout the system according to the security policies at all times.
 	\item Integrity: the system must ensure that only intended actors can modify the specific parts of a patient journal.
-	\item Accessibility: the system can only used from the hospital hence retrieving patient journals outside the hospital is not possible.
 \end{itemize}
 
+The current journal systems allows medical employees to access the journals from anywhere. The prototype makes the assumption that the system can only be used within hospitals. Furthermore access for patients to their journal is not supported.
 
 \subsection{System design} \label{systemdesign}
 
-
-The system consists of two components; \emph{Matrix} and the \emph{client}. The Matrix component encapsulates the Matrix SDK and provides an interface. The client component consumes that interface and can be considered as the endpoint in a communication channel. The client component provides secure information flow for data received through Matrix. 
+The system is distributed and allows to run multiple clients to send and retrieve patient journals. The system consists of two components; \emph{Matrix} and the \emph{client}. The Matrix component encapsulates the Matrix SDK and provides an interface to Paragon. The client component consumes that interface and can be considered as the endpoint in a communication channel. The client component provides secure information flow for data received through Matrix. Without the interface it would not be possible to achieve end-to-end security in the system. 
 The component diagram in figure \ref{fig:matrix_component} depicts this.
 
 \begin{figure}[H] 
@@ -51,6 +50,8 @@ The component diagram in figure \ref{fig:matrix_component} depicts this.
 \end{figure}
 
 Matrix provides several SDK libraries that client application can be build on top of. The most prominent is the Javascript Matrix SDK. It is the best maintained with the largest feature set however it is not compatible with the Java based Information-Flow Control tool Paragon. A Java Matrix SDK exists but it is an early alpha version with end-to-end encryption not implemented yet. The Python Matrix SDK is another major SDK with support for end-to-end encryption in beta. The Python Matrix SDK is used in the Matrix component through a Java-Python bridge \emph{JPY} that can embed Python code in Java as shown in the Matrix component in figure \ref{fig:matrix_component} 
+
+
 
 
 \subsubsection{Matrix}
@@ -75,7 +76,7 @@ The room can be considerably large since many different types of hospitals needs
 
 \subsubsection{Client}
 
-The program starts as either a doctor or a secretary. The user is then presented a list of patients that can be selected. The list is provided by the hospital that keeps track of all journals in a hashmap with \emph{SSN} (Social security number) as the key and \emph{matrix room ID} as the value. When the user selects a journal; it is first retrieved from Matrix and the user then receives the journal. It is determined what tasks the user can perform and depending on the user's role the journal can be partially or fully accessible 
+A client represents a hospital with a set of employees that can view some journals. The hospital subscribes to rooms in Matrix that the employees can fetch. The client is a simple console application and is preconfigured to run as a hospital. During program start a list of employees is presented. It is assumed that by selecting an employee the user login as that employee. The user is then presented a list of patients that can be selected. The list is provided by the hospital that keeps track of all journals in a \emph{map} with \emph{SSN} (Social security number) as the key and \emph{matrix room ID} as the value. When the user selects a journal; it is first retrieved from Matrix and the user then receives the journal. It is determined what tasks the user can perform and depending on the user's role the journal can be partially or fully accessible 
 
 Figure \ref{fig:journalsystem} depicts the class diagram for the system.
 
@@ -104,6 +105,25 @@ A design problem is the concurrent writes to a journal from multiple hospital. B
 % Solution merging data like version control systems like git.
 
 \section{Paragon implementation}
+
+\subsection{Matrix API}
+
+The Matrix API implementation was briefly described in section \ref{systemdesign}. The API is implemented in Java using the foreign language binder JPY to leverage the Matrix Python SDK and makes it possible to use it with Java/Paragon. Without the API it would not be possible to use Matrix with Paragon. To be able to use the API; a Paragon \emph{signature} must be provided. In fact a signature file has to be specified to use any external Java class. The \emph{MatrixApi} signature file is specified as such:
+
+\begin{lstlisting}
+public native class MatrixApi<policy p> {
+	!p void send(?p String message, ?p String room);
+	?p String retrieve(?p String room);
+	?p String objectToJSON(?p PatientJournalD object);
+	?p PatientJournalD JSONToObject(?p String json);
+}
+\end{lstlisting}
+
+The signature file describes that the \emph{MatrixApi} class takes a type argument \emph{policy} which specifies what policy the API should enforce. Note that Paragon cannot assert if the external class will respect the policies.
+
+The annotation \emph{?} and \emph{!} represents \emph{read} and \emph{write} effects, and will be explained in the next sections.
+ 
+\subsection{Policies}\label{policies} 
 
 A \emph{policy-first} approach is used when implementing the prototype. The first step is to carefully specify the policies for the system. A journal has several parts that may only be obtained by appropriate users; the policies should uphold that. The policies are defined in the class \emph{Policy} and used throughout the system.
 
@@ -136,13 +156,12 @@ The next section will show how the policies have been defined and used in parago
 
 
 
-\subsection{Policies}\label{policies} 
-
-In Paragon a policy defines what actor information can flow to and under what conditions 
-\cite{paragonprogramming}. Any object can be used as an actor. The confidentiality policies in the prototype uses \emph{Doctor} and \emph{Secretary} as actors. 
 
 
 \subsubsection{Defining policies}\label{policydef}
+In Paragon a policy defines what actor information can flow to and under what conditions 
+\cite{paragonprogramming}. Any object can be used as an actor. The confidentiality policies in the prototype uses \emph{Doctor} and \emph{Secretary} as actors. 
+
 The policies \emph{low}, \emph{medium} and \emph{high} are defined as this:
 
 \begin{lstlisting}
@@ -318,13 +337,15 @@ Declassification and endorsement are methods that should be applied with great c
 \subsection{Limitations}
 
 \subsubsection{Matrix API}
-The Matrix API implementation was briefly described in section \ref{systemdesign}. The API is implemented in Java using the foreign language binder JPY to leverage the Matrix Python SDK and makes it possible to use it with Java/Paragon. When a journal is passed to the API the encryption is not performed until the Python code is executed. Hence there exists a layer between Paragon and Matrix where the data is unencrypted and where Paragon policies cannot be enforced.
+
+When a journal is passed to the API the encryption is not performed until the Python code is executed. Hence there exists a layer between Paragon and Matrix where the data is unencrypted and where Paragon policies cannot be enforced. This could be solved by applying encryption before passing data on to the API and have assurance of confidentiality throughout the system.
 
 \subsubsection{Exception handling}
 Another limitation of the prototype is that exceptions are unexplored. Any exception is a potential channel for implicit flows. The tools provided by Paragon such as read effects, write effects and locks can be used to properly handle exception.
 
 
-
+\subsection{Concurrency}
+Concurrency is not supported in Paragon and has been identified as an area for future work \cite{paragonpaper}. The lock used for declassification and endorsement would be affected in a concurrent system. The declassification method uses a lock that can only be opened in the same method without side effects. However in a concurrent system there could be side effects.
 
 
 \section{Summary}
