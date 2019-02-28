@@ -28,7 +28,7 @@ The Java compiler would be helpless in detecting if the secret parts of the jour
 
 The prototype also demonstrate improvement to an actual problem in the current journal systems. The section xx describes how the only mechanism is auditing and logging trail and clearly a mechanism for enforcing policies would be of great benefit. 
 
-%I Discussion: Det er nok vigtigt at nævne begrænsninger. For eksempel, kan mange læger være logget ind? Hvor holdes der styr på det? Hvad skal der til for, at systemet bliver mere generelt / praktisk / anvendeligt? Så kan du runde det af ved at sige, at formålet var at demonstrére, ikke at lave et færdigt produkt, og at dine valg var tilstrækkelige, og passende, for at demonstrére, hvad du ville demonstrére.
+The prototype is by no means a full-fledged journal system and has some obvious limits. The prototype lacks support for concurrency and assumes that only a single user can use it at a time. The prototype does not handle the issue with concurrent writes described \ref{concurrentwrites} which is also impractical. The purpose of the prototype was to demonstrate improvements of the security guarantees provided by matrix to ensure end-to-end security by enforcing policies which the prototype has demonstrated.
 
 
 \section{Matrix}

@@ -93,12 +93,12 @@ Figure \ref{fig:journalsystem} depicts the class diagram for the system.
 
 
 
-\subsubsection{Limitations}
+\subsubsection{Limitations} \label{concurrentwrites}
 
 %Incompatibility with Paragon
 
 
-A design problem is the concurrent writes to a journal from multiple hospital. Before writing to a journal; the latest version of the journal in Matrix is first retrieved and then the writes are appended to the journal. However multiple hospitals might have retrieved the latest journal and different doctors might have committed changes to the journal and send it to Matrix hence one of the writes would be lost since only the latest journal is retrieved. 
+A design problem is the concurrent writes to a journal from multiple hospital. Before writing to a journal; the latest version of the journal in Matrix is first retrieved and then the writes are appended to the journal. However multiple hospitals might have retrieved the latest journal and different doctors might have committed changes to the journal and send it to Matrix hence one of the writes would be lost since only the latest journal is retrieved. A solution to this would be extending the rooms with version control functionality that would track and combine the changes made to a journal.
 
 
 % It is assumed that a version control mechanism is in place and the latest journal received is always up to date.
