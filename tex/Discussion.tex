@@ -30,18 +30,19 @@ Since policies can be defined in many ways; the task of defining policies should
 Some of the benefits of Paragon has already been mentioned in section ??. The main benefits are the flexibility of the policies and how policies can be combined. Another advantage is how programmer-friendly it is. Paragon might seem alien at first glance but once the Paragon concepts of policies, locks, write and read effect become clear the experience is more like programming in Java with some extra decorators for methods and fields.
 
 \subsection{Cons}
-There are some overheads related to the Paragon compiler.   These are listed below:
+There are some overheads related to the Paragon compiler. Some of them are listed below:
 
 \begin{itemize}
 	\item If Class A depends on Class B then Class B must be compiled first otherwise the compilation will fail. This becomes problematic when several classes might depend on each other. 
 	\item Generally good error messaging but at times very vague. 	
-	\item Lack of support for Java features. 
-	\item An interface with method definitions that has a return type will for some reason give compile errors. Only interfaces void methods could be compiled.
-	\item The compilation time from Paragon to Java is slow. The prototype is a rather small application and takes around 30 seconds to compile.
+	\item Lack of support for common Java features such as the class \emph{java.lang.Class},  \emph{foreach} loops.
+	\item Poor support for inheritance. An interface with method definitions that has a return type will for some reason give compile errors. Only interfaces void methods could be compiled. \emph{@Override} annotation is not supported.
+	\item No support for \emph{foreach} loops.
+	\item The compilation time from Paragon to Java is slow. The prototype is a rather small application and still takes up to 1 minute to compile.
 	\item That Paragon program could successfully compile but errors would be detected by the Java compiler.
 \end{itemize} 
 
-
+These shortcomings makes it tedious 
 
 
 %\subparagraph{Auto-generating interface files}
@@ -54,7 +55,7 @@ In the evaluation of Matrix security we found that Matrix is capable of having s
 
 Matrix primary use case is as a secure messaging protocol however it has a wide range of use cases. If Matrix is used as a secure communication channel like in the use case for IoT described in section \ref{endtoend}, then the end-to-end encryption is not enough to achieve confidentiality and integrity throughout the system. Information-Flow Control is a mechanism that aid in achieves stronger security guarantee.
 
-The interface (API) between Matrix and Paragon makes it possible to combine the end-to-end encryption security guarantees with policy enforcement through Paragon hence achieving end-to-end security. The interface provides few basics methods from Matrix Python SDK that were necessary for the prototype. It is challenging to setup and use the foreign binding tool JPY. However once becoming comfortable with JPY the interface can easily be extended with more methods from the Matrix Python SDK.
+The interface between Matrix and Paragon makes it possible to combine the end-to-end encryption security guarantees with policy enforcement through Paragon hence achieving end-to-end security. The interface provides few basics methods from Matrix Python SDK that were necessary for the prototype. It is challenging to setup and use the foreign binding tool JPY. However once becoming comfortable with JPY the interface can easily be extended with more methods from the Matrix Python SDK.
 
 Due to the lack of concurrency support in Paragon it is not possible to implement secure messaging applications since such application must listen to events in a different thread.
 

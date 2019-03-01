@@ -37,6 +37,18 @@ The following non-functional requirements are defined:
 
 The current journal systems allows medical employees to access the journals from anywhere. The prototype makes the assumption that the system can only be used within hospitals. Furthermore access for patients to their journal is not supported.
 
+\subsubsection{Threat Model}
+%adversary model
+The threat model is defined in the context of confidentiality and integrity.
+\begin{itemize}
+	\item The adversary has the ability to observe information sent over the network.
+	\item The adversary can generate input to the system .
+	\item The adversary can observe public output.   
+\end{itemize}
+
+% Dolev-yao model
+
+
 \subsection{System design} \label{systemdesign}
 
 The system is a distributed system that allows multiple clients to send and retrieve patient journals. The system consists of two components; \emph{Matrix} and the \emph{client}. The Matrix component encapsulates the Matrix SDK and provides an interface to Paragon. The client component consumes that interface and can be considered as the endpoint in a communication channel. The client component provides secure information flow for data received through Matrix. Without the interface it would not be possible to achieve end-to-end security in the system. 
@@ -85,7 +97,7 @@ Figure \ref{fig:journalsystem} depicts the class diagram for the system.
 \begin{figure}[H] 
 	\hspace*{-1.3cm}
 	\centering
-	\includegraphics[width=14cm]{figures/journalsystem_class2.png}
+	\includegraphics[width=14cm]{figures/journalsystem_class.png}
 	\caption{Class diagram for the Journal system}
 	\label{fig:journalsystem}
 \end{figure}
@@ -107,12 +119,12 @@ A design problem is the concurrent writes to a journal from multiple hospital. B
 
 \section{Paragon implementation}
 
-\subsection{Matrix API}
+\subsection{Matrix interface}
 
-The Matrix API implementation was briefly described in section \ref{systemdesign}. The API is implemented in Java using the foreign language binder JPY to leverage the Matrix Python SDK and makes it possible to use it with Java/Paragon. The API binds the most important methods in the the Matrix Python SDK like \emph{send}, \emph{retrieve}, \emph{login}, \emph{joinRoom} etc. Without the API it would not be possible to use Matrix with Paragon. To be able to use the API; a Paragon \emph{interface} file must be provided. In fact a interface file has to be specified to use any external Java class. The \emph{MatrixApi} interface file is specified as such:
+The Matrix interface was briefly described in section \ref{systemdesign}. The interface is provided through Java using the foreign language binder JPY. JPY is used to leverage the Matrix Python SDK thus make it possible to use Matrix with Java/Paragon. The interface binds the most important methods in the the Matrix Python SDK like \emph{send}, \emph{retrieve}, \emph{login}, \emph{joinRoom} etc. Without the interface it would not be possible to use Matrix with Paragon. To be able to use the interface; a Paragon \emph{interface} file must be provided. In fact a interface file has to be specified to use any external Java class. The \emph{MatrixApi} interface file is specified as such:
 
 \begin{lstlisting}
-public native class MatrixApi<policy p> {
+public native interface Matrix<policy p> {
 	!p void send(?p String message, ?p String room);
 	?p String retrieve(?p String room);
 	?p String objectToJSON(?p PatientJournalD object);
@@ -337,9 +349,9 @@ Declassification and endorsement are methods that should be applied with great c
 
 \subsection{Limitations}
 
-\subsubsection{Matrix API}
+\subsubsection{Matrix interface}
 
-When a journal is passed to the API the encryption is not performed until the Python code is executed. Hence there exists a layer between Paragon and Matrix where the data is unencrypted and where Paragon policies cannot be enforced. This could be solved by applying encryption before passing data on to the API and have assurance of confidentiality throughout the system.
+When a journal is passed to the interface the encryption is not performed until the Python code is executed. Hence there exists a layer between Paragon and Matrix where the data is unencrypted and where Paragon policies cannot be enforced. This could be solved by applying encryption before passing data on to the interface and have assurance of confidentiality throughout the system.
 
 \subsubsection{Concurrency}
 Concurrency is unsupported in Paragon and has been identified as an area for future works \cite{paragonprogramming}. Concurrency might be an issue for locks that shares the state.

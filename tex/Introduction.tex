@@ -1,106 +1,60 @@
-\section{Data privacy and protection}
+\section{Information Privacy and Protection}
 
-With GDPR becoming effective in 2018 the focus on data privacy is at its peak. 
-Privacy violation is when sensitive data is exposed to unauthorized actors\cite{cwe}. OWASP top ten ranks \emph{sensitive data exposure} as 3rd biggest security threat\cite{owasp}. 
+With GDPR becoming effective in 2018, the focus on information privacy is at its peak. 
+Privacy violation is when sensitive information is exposed to an unauthorized actor; like how Cambridge Analytica was able to gain sensitive information about Facebook users without their permission or when sensitive information about halv a million Google Plus users was leaked \cite{cwe} \cite{googleplus} \cite{cambridge}. Both information leaks were due to insecure implementation of API's. These cases have made people more aware of how application deals with information. Unsurprisingly OWASP top ten ranks \emph{sensitive data exposure} as the third biggest security threat\cite{owasp}. 
 
-Recent cases of data leakage has put more attention on data privacy and protection. Some cases are due to poor security measures and could arguably have been prevented. Examples of cases are:
-
-\begin{itemize}
-	\item The infamous Facebook - Cambridge Analytica scandal. Third parties were able to collect data through Facebook Login API.
-	\item Google Plus leak. 500.000 users private data was exposed to third parties through APIs\cite{googleplus}.
-	\item Medicaid leak. A medical assistant had accessed patients' health records and exchanged mails with another employee containing the patients' private data\cite{medicaid}.  
-\end{itemize}
-
-
-%https://www.nytimes.com/2018/10/08/technology/google-plus-security-disclosure.html
-%https://www.seattletimes.com/seattle-news/health/91000-state-medicaid-clients-warned-of-data-breach/
-
-The cases above failed to achieve end-to-end security and the improper handling of sensitive data could have been prevented with appropriate security policies and enforcement technique that enforces these policies.
-
-There is more awareness on how applications deal with data. This add extra concern to the programmer and the application about how sensitive data is handled and protected.  
-
-The well-known security enforcement techniques like access controls, firewalls and encryption are inadequate alone and does not ensure end-to-end security\cite{Sabelfeld2003}.
+The mentioned cases failed to achieve \emph{end-to-end security}; assurance of \emph{confidentiality} and \emph{integrity} throughout the system \cite{Sabelfeld2003}. The improper handling of sensitive information could have been prevented with appropriate security policies and enforcement technique that enforces these policies.
 
 
 
+\section{Information-Flow Control} 
+\emph{Secure information flow} means that only authorized flow of information is allowed \cite{Denning1976}. Secure information flow in a system guarantees confidentiality and integrity of information throughout the system \cite{Hedin2011}. Consider the following insecure flow with variables holding \emph{public} and \emph{secret} information: 
 
-%https://cwe.mitre.org/data/definitions/359.html
+\begin{lstlisting}
+public = secret;
+\end{lstlisting}
 
+Here the secret information is leaked by directly assigning it to a publicly observable variable. This is an example of \emph{explicit flow} of information \cite{Hedin2011}. Information-Flow Control can prevent such flows by allowing the programmer to define and enforce policies in a language-based way\cite{Sabelfeld2003}. 
 
-%OWASP top ten A3 sensitive data exposure
-
-
-\section{Information Flow Control} % ikke teknisk. hvilke problemer løser ifc -> lave eksempeler med kode
-
-There exist useful security enforcement mechanisms for protecting confidential information such as firewalls, encryption and access control. However, these mechanisms each have their drawbacks.
+The security enforcement mechanisms such as firewalls, encryption and access control all protect confidential information but is unable to control how the information flows:
 
 \begin{itemize}
-	\item \emph{Access} control prevents unauthorized access to information but once access is granted there is no guarantee how that confidential information is handled.
+	\item \emph{Access control} prevents unauthorized access to information but once access is granted there is no guarantee how that confidential information is handled.
 	\item \emph{Firewall} limits communication from the outside hence isolate and protect information. Yet the firewall have no way of telling if the communication going through violates confidentiality.
 	\item \emph{Encryption} secures information on a channel with only the endpoints being able to access that information. However there is no assurance that once the data is decrypted that the confidentiality of that information is ensured.
 \end{itemize}
 
-The mechanisms mentioned above all have in common that they lack control of how the information flows. Information-flow security aims at protecting confidentiality and integrity of information by enforcing security policies. Information-Flow Control allows the programmer to define and enforce policies in a language-based way\cite{Sabelfeld2003}. 
-
+These are all useful mechanisms but fall short in terms of end-to-end security. 
 
 
 \section{Matrix}\label{matrix:intro}
-Matrix is an open standard protocol for messaging over HTTP and synchronizing data. Matrix provides secure real-time communication over a decentralized federated network. Matrix secures data by providing end-to-end encryption.
+Matrix provides an encryption mechanism for secure messaging and synchronizing data over HTTP. Matrix is an open standard protocol that enables secure decentralized communication over a \emph{federation} of servers. The secure communication is provided by an end-to-end encryption mechanism ensuring confidentiality and integrity of information while it is stored at the servers and is at transit. However as mentioned earlier it cannot control the flow of information and is vulnerable to leaks at the endpoints.
 
-Matrix cover use cases such as instant messaging, VoIP, Internet of Things communication and is generally applicable anywhere for subscribing and publishing data over standard HTTP API.
- 
+\subparagraph{Why Matrix?}
 The fragmentation of IP communication is the problem Matrix essentially wants to solve. Making calls and messages between users needless of which app they use. However they define their longer term goal as \emph{"to act as a generic HTTP messaging and data synchronisation protocol for the whole web"}\cite{matrixfaq}.
 
+In the Digital Strategy 2016-2020 the Danish Agency of Digitisation defines initiative 7.2 as \emph{"Common standards for secure exchange of information"}. The large number of software systems in the Danish public sector has created a need for an uniform way of exchanging data across different application in a secure manner\cite{TheGovernment2016}. 
+
+The initiative has similarities to the issue Matrix is trying to solve with fragmented IP communication. With Matrix security guarantees and their long term goal as a generic HTTP messaging protocol there is a strong case for using Matrix as a communication channel in this case study.
 
 
-%https://matrix.org/docs/guides/faq
-%However in the presence of end-to-end encryption, apps can still leak through their application logic; a content-filtering chat bot running at the receiving end of an end-to-end encrypted connection can leak anything it receives from this connection. 
+\section{The Case Study}
+
+The goal of the case study is to make a prototype secure implementation of a distributed medical journal system, using a combination of Matrix and IFC. We will use a protocol called \emph{Matrix} as the communication channel and strengthen the security at the endpoints using Information-Flow Control.
 
 
+\subsection{Journal System}\label{journalintro}
 
-\section{The case study} % Challenges 
-
-The goal of the case study is to make secure implementation of a prototype using Information-Flow Control. The case study will use Matrix as the communication channel and strengthen the security at the endpoints using IFC.
-
-\subsection{Journal system}\label{journalintro}
-The prototype implements a journal system and is loosely based on the Danish E-journal system.
-
-%https://journalofethics.ama-assn.org/article/electronic-health-records-privacy-confidentiality-and-security/2012-09
 Medical privacy is a well-known issue\cite{Rahim2013}. Sensitive data about patients needs to be handled carefully. In Denmark patients have access to their medical records through E-journal\cite{ejournal}. A patient's journal on E-journal is available for up to 90.000 different medical employees\cite{JP90000}. 
 
-There are clear policies about who and under what conditions should access a journal. It is legally required that an employee accessing the journal must have the patient in care and that the lookup must be relevant for the employee. Safety measures have been applied through logging and audit trails with random sampling checks however they do not prevent access to journals. Any medical employee can access the patient journal and even if prevention mechanism were established there would be no limitation to what a medical employee could see once access was granted \cite{adgang}\cite{kontrol}. 
+There are clear policies about who should access a journal and under what conditions . It is legally required that an employee accessing the journal must have the patient in care and that the lookup must be relevant for the employee. Safety measures have been applied through logging and audit trails with random sampling checks. However they do not prevent access to journals; any medical employee can access the patient journal and even if prevention mechanism were established there would be no limitation to what a medical employee could see once access was granted \cite{adgang}\cite{kontrol}. 
 
-% Furthermore there exist different patient journal systems for each region in Denmark and a solution  borgerforslag
-
-%https://www.sundhed.dk/borger/service/om-sundheddk/om-portalen/datasikkerhed/andres-dataadgang/adgang-til-sundhedsdata/
-
-The mechanisms in the current journal system might restrain malicious intend. However it does not guarantee prevention of unintentional access or disclosure of information\cite{Harman2012}. 
+The mechanisms in the current journal system might restrain malicious intent. However it does not guarantee prevention of unintentional access or disclosure of information\cite{Harman2012}. 
 What is missing is the enforcement of secure information flow policies. Unintentional access or disclosure of information can be prevented by enforcing policies that define secure information flow.
 
-The prototype will model a simplified scenario of hospitals with different actors accessing a patient journal. 
 
-%The bulk of information on the journal system is extracted from newspaper articles hence there is a high uncertainty of how the system really works. Therefore many assumptions are made about the current system when programming the prototype.
-
-
-%https://journalofethics.ama-assn.org/article/electronic-health-records-privacy-confidentiality-and-security/2012-09
-
-
-%https://cwe.mitre.org/data/definitions/359.html
-
-%https://www.version2.dk/artikel/e-journals-systemadministrator-vi-vaerner-patienternes-privatliv-1059692
-%Vi kan ikke garantere, at alle bliver opdaget, men borgerne kan se i 'Min log', hvem der har været inde og se på deres data. Derudover laves der en auditering, hvor ca. fire procent af alle opslag undersøges, og der verificeres, om der har været en behandlerrelation.
-%Loggen på sundhed.dk viser kun de tilgange til journalen der har været via netop sundhed.dk. Læger, apoteker m.m. har nemlig også en adgang til sundhed.dk hvor de kan slå folk op - og det bliver logget. Men loggen i sundhed.dk viser IKKE de opslag der sker i alle de andre systemer i sundhedsvæsenet, f.eks. patientjournal-systemerne. 
-%https://www.version2.dk/artikel/90000-ansatte-har-adgang-til-patientjournaler-stikproever-er-eneste-kontrol-58628
-%https://jyllands-posten.dk/indland/ECE6715461/op-imod-90000-ansatte-kan-kigge-i-din-journal/
-%https://www.dr.dk/nyheder/regionale/sjaelland/it-systemer-snakker-ikke-godt-nok-sammen-risikerer-gaa-ud-over
-
-\subsection{Scope} 
-%Selvom jeg ikke kiggr på fx trafic analysis så er det vigtigt at nævne og påpege det ikkeer noget jeg løser.
-
-% Clarify at the exam what is meant by the Matrix security model described in the project proposal 
-
-% The goal of the thesis is not to reimplement Matrix using IFC tools. It is to use Matrix and analyze the security model and see what security guarentees and how we can improve security for the system that uses Matrix. 
-The objective of the project is to do a secure implementation of the prototype described above. Secure exchange of patient journal is ensured using Matrix and the endpoints are secured using IFC.
+\subsection{Objectives} 
+The objective of the project is to do a secure implementation of the prototype inspired by the Danish journal systems. Secure exchange of patient journals is ensured using Matrix and the endpoints are secured using IFC.
 
 A successful project is one that fulfills these criteria: 
 
@@ -111,45 +65,20 @@ A successful project is one that fulfills these criteria:
 	\item Demonstrate increased security guarantee with Matrix and IFC
 \end{itemize}   
 
-
-\subsection{Why Matrix?}
-In the Digital Strategy 2016-2020 the Danish Agency of Digitisation defines initiative 7.2 as \emph{"Common standards for secure exchange of information"}. The large number of software systems in the Danish public sector has created a need for an uniform way of exchanging data across different application in a secure manner\cite{TheGovernment2016}. 
-
-The initiative has similarities to the issue Matrix is trying to solve with fragmented IP communication. With Matrix security guarantees and their long term goal as a generic HTTP messaging protocol there is a strong case for using Matrix as a communication channel in this case study.
-
-
-%Matrix gives security guarantees in term of end-to-end encryption and makes data exchange secure; however the end-points are still vulnerable. By using Matrix as the communication channel it gives gives a stronger security guarantee and adds complexity to the solution being developed using IFC tools. 
- 
 \section{Method}
-The research method used is a case study. The objective of the study is to implement a prototype using an Information Flow Control tool on top of Matrix. 
-The objective is achieved by:
+The research method used is a case study. A case study allow us investigate 
+the how and why of a case \cite{yin}. By investigating the following we can achieve the objectives described previously:
 
 \begin{itemize}
-	\item Analyzing and selecting an Information Flow Control tools.
-	\item Provide an interface to make it possible to use Matrix with the tool. 
-	\item Implement the prototype using the interface and the tool.
+	\item Why there exist a shortcoming in the Matrix security model.
+	\item What it takes to improve the security guarantee of Matrix. 
+	\item How the security guarantees can be improved using the Information-Flow Contol tool Paragon.
 \end{itemize}
 
- 
- \section{Threat model}
- %adversary model
- The threat model is defined in the context of confidentiality and integrity.
- \begin{itemize}
- 	\item The adversary has the ability to observe information sent over the network.
- 	\item The adversary can generate input to the system .
- 	\item The adversary can observe public output.   
- \end{itemize}
- 
- % Dolev-yao model
- 
- 
- 
+
 \section{Contribution} %end-to-end security
 
-
-The thesis contributes with the interface created between Paragon and Matrix making it possible to develop other secure applications on top of secure communication channel Matrix provides. 
-
-Another contribution is the findings of secure implementation using Paragon.
+The thesis contributes with an interface created between the Information-Flow Control language Paragon and the secure communication protocol Matrix. The contribution enables developing other secure applications on top of the Matrix protocol. Another contribution is the findings of secure implementation using Paragon.
 
  
  
@@ -158,5 +87,4 @@ Another contribution is the findings of secure implementation using Paragon.
 Chapter \ref{background} sets the foundation for the thesis and introduces relevant information and background. Chapters \ref{analysis} analyzes the Matrix security model and survey IFC tools. Chapter \ref{design} goes in depth with design of the solution. The results are then presented and discussed in Chapter \ref{results}. The thesis is wrapped up in the conclusion section Chapter 6. 
  
 \section{Summary}
-There is more awareness on how applications deal with data. This add extra concern to the programmer and the application about how sensitive data is handled and protected. Encryption is an obvious way of ensuring confidentiality; Matrix is a tool that provides end-to-end encryption. However there is no guarantee of encryption of the data is decrypted. Information flow control is such mechanism that enforces security policies throughout the system.
-
+This section introduces the scope of the thesis and what is expected of the thesis. We achieve end-to-end security through secure information flow. Information-Flow Control is a mechanism for enforcing secure information policies in a system. The objective of the thesis is to evaluate the security model of Matrix, survey and select an Information-Flow Control tools, implement a prototype using the tool and demonstrate the improvements to the Matrix security model. 
