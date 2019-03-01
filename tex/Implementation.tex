@@ -37,17 +37,6 @@ The following non-functional requirements are defined:
 
 The current journal systems allows medical employees to access the journals from anywhere. The prototype makes the assumption that the system can only be used within hospitals. Furthermore access for patients to their journal is not supported.
 
-\subsubsection{Threat Model}
-%adversary model
-The threat model is defined in the context of confidentiality and integrity.
-\begin{itemize}
-	\item The adversary has the ability to observe information sent over the network.
-	\item The adversary can generate input to the system .
-	\item The adversary can observe public output.   
-\end{itemize}
-
-% Dolev-yao model
-
 
 \subsection{System design} \label{systemdesign}
 
@@ -125,10 +114,10 @@ The Matrix interface was briefly described in section \ref{systemdesign}. The in
 
 \begin{lstlisting}
 public native interface Matrix<policy p> {
-	!p void send(?p String message, ?p String room);
-	?p String retrieve(?p String room);
-	?p String objectToJSON(?p PatientJournalD object);
-	?p PatientJournalD JSONToObject(?p String json);
+  !p void send(?p String message, ?p String room);
+  ?p String retrieve(?p String room);
+  ?p String objectToJSON(?p PatientJournalD object);
+  ?p PatientJournalD JSONToObject(?p String json);
 }
 \end{lstlisting}
 
@@ -177,10 +166,10 @@ In Paragon a policy defines what actor information can flow to and under what co
 
 The policies \emph{low}, \emph{medium} and \emph{high} are defined as this:
 
-\begin{lstlisting}
-public static final policy low = { Doctor d: ;Secretary s:};
-public static final policy medium = { Doctor d:};
-public static final policy high = { Doctor d: IsReferred(d)};
+\begin{lstlisting}[columns=fullflexible]
+policy low = { Doctor d: ;Secretary s:};
+policy medium = { Doctor d:};
+policy high = { Doctor d: IsReferred(d)};
 \end{lstlisting}
 
 
@@ -188,10 +177,11 @@ Here policy \emph{low} is less restrictive than \emph{medium} since a variable l
 
 The following are integrity policies defined as follows:
 \begin{lstlisting}
-private static final Object untrustedObserver = new Object();
-private static final Object trustedObserver = new Object();
-public static final policy untrusted = { untrustedObserver :; };
-public static final policy trusted = { untrustedObserver :; trustedObserver: };
+Object untrustedObserver = new Object();
+Object trustedObserver = new Object();
+policy untrusted = { untrustedObserver :; };
+policy trusted = { untrustedObserver:
+                 ; trustedObserver: };
 \end{lstlisting}
 
 
@@ -209,9 +199,14 @@ The actors used here are \emph{untrustedObserver} and \emph{trustedObserver}. Th
 A policy is used as a label on variables. To express concerns for both confidentiality and integrity the policies described previously can be combined and labeled on variables. Fields in the class \emph{PatientJournal} are defined as:
 
 \begin{lstlisting}
-	private ?(Policy.low    + Policy.trusted) String   publicNote;
-	private ?(Policy.medium + Policy.trusted) String[] publicSessions;
-	private ?(Policy.high   + Policy.trusted) String[] privateSessions;
+?(Policy.low + Policy.trusted) 
+private String publicNote;
+
+?(Policy.medium + Policy.trusted) 
+private String[] publicSessions;
+
+?(Policy.high   + Policy.trusted) 
+private String[] privateSessions;
 \end{lstlisting}
 
 The \emph{PatientJournal} class has methods that adds a session to \emph{publicSession} or \emph{privateSession}. The class also implements simple getter and setter methods. Common for these methods are they must specify the \emph{read} or \emph{write} effect for the method.
@@ -236,7 +231,8 @@ In Paragon the write effect prevents implicit flows. The write effect specifies 
 
 \begin{lstlisting}
 !(Policy.low + Policy.trusted) 
-public void setPublicNote(?(Policy.low + Policy.trusted) String note){
+public void setPublicNote(
+	?(Policy.low + Policy.trusted) String note){
 	this.publicNote = note;
 }
 \end{lstlisting}
@@ -259,13 +255,17 @@ The locks \emph{ReferredLock} and \emph{DoctorLock} are used on methods with a s
 
 \begin{lstlisting}
 ~Policy.DoctorLock
-public !(Policy.mediumD + Policy.trusted) void addToPublicSessions(?(Policy.mediumD + Policy.trusted) String session){
-// Add sessions
+public !(Policy.mediumD + Policy.trusted) 
+void addToPublicSessions(
+	?(Policy.mediumD + Policy.trusted) String session){
+	// Add sessions
 } 
 
 ~Policy.Referred
-public !(Policy.highD + Policy.trusted) void addToPrivateSessions(?(Policy.highD + Policy.trusted) String session){
-// Add sessions
+public !(Policy.highD + Policy.trusted) 
+void addToPrivateSessions(
+	?(Policy.highD + Policy.trusted) String session){
+	// Add sessions
 } 	
 \end{lstlisting}  
 
@@ -290,9 +290,15 @@ Hence any flow using the defined policies would be rejected. Declassification of
 
 \begin{lstlisting}
 private lock declassifyLock;
-public static final policy low = { Doctor d: ;Secretary s:; Object x: declassifyLock};
-public static final policy medium = { Doctor d:; Object x: declassifyLock};
-public static final policy high = { Doctor d: IsReferred(d); Object x: declassifyLock};
+policy low = { Doctor d: 
+             ; Secretary s:
+             ; Object x: declassifyLock};
+	
+policy medium = { Doctor d:
+                ; Object x: declassifyLock};
+	
+policy high = { Doctor d: IsReferred(d)
+              ; Object x: declassifyLock};
 \end{lstlisting}
 
 After the modification the policy now states that a variable labeled with the policy can flow to any actor if the \emph{declassifyLock} is open. Thus we can specify a method that takes some value as input, opens the lock and returns the value with the least restrictive policy:
@@ -325,6 +331,7 @@ The approach for endorsement is similar with an \emph{endorseLock} added to the 
 Declassification and endorsement are methods that should be applied with great care. It should be considered who can declassify, what is declassified, where the declassification occurs and when it can occur. The table below gives an overview of this.
 
 \begin{table}[H]
+	
 	\hspace*{-2.3cm}
 	\centering
 	\begin{tabular}{|l|l|l|l|l|} 
@@ -341,6 +348,7 @@ Declassification and endorsement are methods that should be applied with great c
 		Endorsement      & Anyone            & User input              & \begin{tabular}[c]{@{}l@{}}secretary.receive()\\doctor.receive()\end{tabular} & After prompting for input  \\
 		\hline
 	\end{tabular}
+	\caption{Overview of declassification}
 \end{table}
 
 

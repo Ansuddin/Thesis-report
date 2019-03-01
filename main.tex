@@ -29,9 +29,8 @@
 \setcounter{secnumdepth}{3}
 
 \tableofcontents*
-\chapter*{List of Tables}
-\chapter*{List of Figures}
-
+\listoffigures
+\listoftables
 
 
 
@@ -45,11 +44,11 @@
 \chapter{Introduction}\label{intro}
 \input{tex/Introduction}
 
-\chapter{Background}\label{background}
-\input{tex/Background}
+\chapter{Evaluation of Matrix Security model}\label{evaluationchapter}
+\input{tex/Matrix_evaluation}
 
-\chapter{Analysis}\label{analysis}
-\input{tex/Analysis}
+\chapter{Survey of Information-Flow Control Tools} \label{surveychapter}
+\input{tex/Analysis_ifc}
 
 \chapter{Implementation}\label{implementation}
 \input{tex/Implementation}
@@ -57,10 +56,13 @@
 \chapter{Discussion}\label{discussion}
 \input{tex/Discussion}
 
-\chapter{Conclusion}
+\chapter{Conclusion} \label{conclusion}
 \input{tex/Conclusion}
 
-%\chapter*{Appendices}
+\chapter*{Appendix}
+
+The source code for the prototype can be found at \emph{https://github.com/Ansuddin/thesis-code-handin}
+
 %\addcontentsline{toc}{chapter}{Appendices}
 
 %\renewcommand{\thesection}{\Alph{section}}

@@ -37,6 +37,7 @@
 \usepackage{float}
 \usepackage{adjustbox}
 \usepackage{array}
+\usepackage{amsmath}  % for \hookrightarrow
 
 \newcolumntype{R}[2]{%
 	>{\adjustbox{angle=#1,lap=\width-(#2)}\bgroup}%
@@ -77,50 +78,39 @@
 % To list code blocks in latex
 \usepackage{lstautogobble}
 \usepackage{listings}
-\lstset{
-	language=C,                % choose the language of the code
-%	numbers=left,                   % where to put the line-numbers
-	stepnumber=1,                   % the step between two line-numbers.        
-%	numbersep=5pt,                  % how far the line-numbers are from the code
-	backgroundcolor=\color{white},  % choose the background color. You must add \usepackage{color}
-	showspaces=false,               % show spaces adding particular underscores
-	showstringspaces=false,         % underline spaces within strings
-	showtabs=false,                 % show tabs within strings adding particular underscores
-	tabsize=2,                      % sets default tabsize to 2 spaces
-	captionpos=b,                   % sets the caption-position to bottom
-	breaklines=true,                % sets automatic line breaking
-	breakatwhitespace=true,         % sets if automatic breaks should only happen at whitespace
-%	title=\lstname,                 % show the filename of files included with \lstinputlisting;
-	autogobble=true
-}
+%\lstset{
+%	language=C,                % choose the language of the code
+%%	numbers=left,                   % where to put the line-numbers
+%	stepnumber=1,                   % the step between two line-numbers.        
+%%	numbersep=5pt,                  % how far the line-numbers are from the code
+%	backgroundcolor=\color{white},  % choose the background color. You must add \usepackage{color}
+%	showspaces=false,               % show spaces adding particular underscores
+%	showstringspaces=false,         % underline spaces within strings
+%	showtabs=false,                 % show tabs within strings adding particular underscores
+%	tabsize=2,                      % sets default tabsize to 2 spaces
+%	captionpos=b,                   % sets the caption-position to bottom
+%	breaklines=true,                % sets automatic line breaking
+%	breakatwhitespace=true,         % sets if automatic breaks should only happen at whitespace
+%%	title=\lstname,                 % show the filename of files included with \lstinputlisting;
+%	autogobble=true
+%}
+\definecolor{javared}{rgb}{0.6,0,0} % for strings
+\definecolor{javagreen}{rgb}{0.25,0.5,0.35} % comments
+\definecolor{javapurple}{rgb}{0.5,0,0.35} % keywords
+\definecolor{javadocblue}{rgb}{0.25,0.35,0.75} % javadoc
+\definecolor{javaback}{rgb}{0.93, 0.90, 0.87}
 
-\lstdefinestyle{ttt}{
-    basicstyle=\ttfamily,
-  %columns=fullflexible,
-    mathescape=true,
-    literate={->}{$\rightarrow $}{1}
-  }
-
-\lstdefinestyle{csv}{
-	xleftmargin=-2.5cm,
-	xrightmargin=-2.5cm,
-	belowskip=0pt,
-	basicstyle=\scriptsize,
-	stringstyle=\scriptsize,
-	fontadjust=true}
-% xml listings
-\lstdefinestyle{XML}{ 
-	columns=fullflexible, 
-	basicstyle=\rmfamily, 
-	commentstyle=\ttfamily\itshape\color{green!50!black}, 
-	morestring=[s]{"}{"}, 
-	morecomment=[s]{?}{?}, 
-	morecomment=[s]{!--}{--}, 
-	morecomment=[s]{!DOCTYPE}{]}, 
-	moredelim=[s][\color{black}]{>}{<}, 
-	moredelim=[s][\bfseries\color{black}]{\ }{=}, 
-	stringstyle=\color{blue}, 
-	identifierstyle=\bfseries\color{violet} 
+\lstset{language=Java,
+	basicstyle=\ttfamily,
+	keywordstyle=\color{javapurple}\bfseries,
+	stringstyle=\color{javared},
+	commentstyle=\color{javagreen},
+	morecomment=[s][\color{javadocblue}]{/**}{*/},
+	numbers=none,
+	backgroundcolor=\color{javaback},
+	frame=single,
+	breaklines=true,
+	tabsize=4
 }
 
 
